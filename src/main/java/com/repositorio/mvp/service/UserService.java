@@ -1,12 +1,12 @@
 package com.repositorio.mvp.service;
 
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.UUID;
 
 import org.springframework.stereotype.Service;
 
-import com.repositorio.mvp.DTO.UserRequestDTO;
-import com.repositorio.mvp.DTO.UserResponseDTO;
+import com.repositorio.mvp.DTO.user.UserRequestDTO;
+import com.repositorio.mvp.DTO.user.UserResponseDTO;
 import com.repositorio.mvp.model.User;
 import com.repositorio.mvp.repository.UserRepository;
 
@@ -32,9 +32,9 @@ public class UserService {
     public UserResponseDTO createUser(UserRequestDTO userRequestDTO) {
         //Usamos o Builder para transformar o DTO de entrada na Entidade
         User user = User.builder()
-            .name(userRequestDTO.getName())
-            .email(userRequestDTO.getEmail())
-            .password(userRequestDTO.getPassword())
+            .name(userRequestDTO.name())
+            .email(userRequestDTO.email())
+            .password(userRequestDTO.password())
             .build();
         User savedUser = userRepository.save(user);
 
@@ -42,7 +42,7 @@ public class UserService {
     }
 
     //Metodo para buscar um usuário por ID
-    public UserResponseDTO findUserById(Long id) {
+    public UserResponseDTO findUserById(UUID id) {
         User user = userRepository.findById(id)
             .orElseThrow(() -> new RuntimeException("Usuário não encontrado com o ID: " + id));
         return toUserResponseDTO(user);
@@ -51,11 +51,11 @@ public class UserService {
     public List<UserResponseDTO> listAllUsers() {
         return userRepository.findAll().stream()
             .map(this::toUserResponseDTO)
-            .collect(Collectors.toList());
+            .toList();
     }
 
     //Metodo para excluir um usuário por ID
-    public void deleteUserById(Long id) {
+    public void deleteUserById(UUID id) {
         if (!userRepository.existsById(id)) {
             throw new RuntimeException("Usuário não encontrado com o ID: " + id);
         }
@@ -63,14 +63,14 @@ public class UserService {
     }
 
     //Metodo para atualizar um usuário por ID
-    public UserResponseDTO updateByIdUser(Long id, UserRequestDTO updatedUser) {
+    public UserResponseDTO updateByIdUser(UUID id, UserRequestDTO updatedUser) {
         User userToUpdate = userRepository.findById(id)
             .orElseThrow(() -> new RuntimeException("Usuário não encontrado com o ID: " + id));
 
         // Atualiza a entidade existente com os dados novos do DTO
-        userToUpdate.setName(updatedUser.getName());
-        userToUpdate.setEmail(updatedUser.getEmail());
-        userToUpdate.setPassword(updatedUser.getPassword());
+        userToUpdate.setName(updatedUser.name());
+        userToUpdate.setEmail(updatedUser.email());
+        userToUpdate.setPassword(updatedUser.password());
 
         User savedUser = userRepository.save(userToUpdate);
         return toUserResponseDTO(savedUser);

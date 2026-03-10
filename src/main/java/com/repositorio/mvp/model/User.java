@@ -35,7 +35,7 @@ public class User {
 
     @NotBlank
     @Column(nullable = false, length = 50)
-    @Size(min = 8, max = 50)
+    @Size(max = 50)
     private String name;
 
     @NotBlank
@@ -45,8 +45,8 @@ public class User {
     private String email;
 
     @NotBlank
-    @Column(nullable = false, length = 50)
-    @Size(min = 8, max = 50)
+    @Column(nullable = false, length = 60)
+    @Size(min = 8, max = 60)
     @ToString.Exclude
     private String password;
 }

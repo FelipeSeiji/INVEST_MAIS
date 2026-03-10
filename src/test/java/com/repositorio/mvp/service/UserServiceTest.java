@@ -6,6 +6,7 @@ import static org.mockito.Mockito.when;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 
 import java.util.List;
 import java.util.Optional;
@@ -16,10 +17,14 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import com.repositorio.mvp.DTO.user.UserResponseDTO;
+import com.repositorio.mvp.config.SecurityConfig;
 import com.repositorio.mvp.model.User;
 import com.repositorio.mvp.repository.UserRepository;
+
+import jakarta.persistence.EntityNotFoundException;
 
 @ExtendWith(MockitoExtension.class)
 public class UserServiceTest {
@@ -30,6 +35,12 @@ public class UserServiceTest {
     @Mock
     private UserRepository userRepository;
 
+    @Mock
+    private SecurityConfig securityConfig;
+
+    @Mock
+    private PasswordEncoder passwordEncoder;
+
     UUID userId = UUID.randomUUID();
 
     @Test
@@ -38,9 +49,12 @@ public class UserServiceTest {
             .id(userId)
             .name(USER.name())
             .email(USER.email())
-            .password(USER.password())
+            .password("senha_encriptada")
             .build();
 
+        when(securityConfig.passwordEncoder()).thenReturn(passwordEncoder);
+        when(userRepository.existsByEmail(anyString())).thenReturn(false);
+        when(passwordEncoder.encode(anyString())).thenReturn("senha_encriptada");
         when(userRepository.save(any(User.class))).thenReturn(user);
 
         UserResponseDTO createdUser = userService.createUser(USER);
@@ -52,12 +66,13 @@ public class UserServiceTest {
     }
 
     @Test
-    public void createUser_WithInvalidData_ThrowException() {
-        when(userRepository.save(any(User.class))).thenThrow(new RuntimeException("Dados inválidos"));
+    public void createUser_WithEmailAlreadyInUse_ThrowException() {
+        when(userRepository.existsByEmail(anyString())).thenReturn(true);
         
         assertThatThrownBy(() -> {
             userService.createUser(INVALID_USER);
-        }).isInstanceOf(RuntimeException.class);
+        }).isInstanceOf(IllegalArgumentException.class)
+          .hasMessage("Email já está em uso");
     }
 
     @Test
@@ -84,11 +99,13 @@ public class UserServiceTest {
         when(userRepository.findById(userId)).thenReturn(Optional.empty());
         assertThatThrownBy(() -> {
             userService.findUserById(userId);
-        }).isInstanceOf(RuntimeException.class);
+        }).isInstanceOf(EntityNotFoundException.class)
+          .hasMessage("Usuário não encontrado");
     }
 
     @Test
     public void listAllUsers_ReturnsListOfUserResponseDTO() {
+        UUID userId2 = UUID.randomUUID();
         User user1 = User.builder()
             .id(userId)
             .name(USER.name())
@@ -97,7 +114,7 @@ public class UserServiceTest {
             .build();
 
         User user2 = User.builder()
-            .id(userId)
+            .id(userId2)
             .name("Maria")
             .email("maria@gmail.com")
             .password("1234")
@@ -111,9 +128,7 @@ public class UserServiceTest {
         assertThat(users.size()).isEqualTo(2);
         assertThat(users.get(0).id()).isEqualTo(userId);
         assertThat(users.get(0).name()).isEqualTo(USER.name());
-        assertThat(users.get(0).email()).isEqualTo(USER.email());
-        assertThat(users.get(1).id()).isEqualTo(userId);
+        assertThat(users.get(1).id()).isEqualTo(userId2);
         assertThat(users.get(1).name()).isEqualTo("Maria");
-        assertThat(users.get(1).email()).isEqualTo("maria@gmail.com");
     }
 }

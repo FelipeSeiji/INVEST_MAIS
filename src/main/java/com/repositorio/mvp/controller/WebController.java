@@ -13,7 +13,8 @@ import com.repositorio.mvp.service.UserService;
 public class WebController {
 
     private final UserService userService;
-
+    // temporario para testes 
+    // remover depois
     @GetMapping("/users")
     public String usersPage(Model model) {
         model.addAttribute("users", userService.listAllUsers());

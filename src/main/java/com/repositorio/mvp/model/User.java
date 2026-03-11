@@ -46,7 +46,7 @@ public class User {
 
     @NotBlank
     @Column(nullable = false, length = 50)
-    @Size(min = 8, max = 50)
+    @Size(max = 80)
     @ToString.Exclude
     private String password;
 }

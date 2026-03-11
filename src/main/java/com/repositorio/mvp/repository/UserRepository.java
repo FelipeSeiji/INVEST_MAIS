@@ -10,5 +10,5 @@ import com.repositorio.mvp.model.User;
 @Repository
 public interface UserRepository extends JpaRepository<User, UUID> {
 
-    boolean existsByEmail(String email);
+    boolean existsByEmail(String string);
 }

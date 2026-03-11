@@ -5,7 +5,7 @@ import lombok.Getter;
 
 @AllArgsConstructor
 @Getter
-public enum CategoryQuestion {
+public enum AssetCategory {
     ACAO_NACIONAL("AN"),
     FUNDOS_IMOBILIARIOS_NACIONAL("FIN"),
     ACAO_INTERNACIONAL("AI"),
@@ -15,4 +15,5 @@ public enum CategoryQuestion {
     CRIPTOMOEDA("CM");
 
     private final String codigo;
+
 }

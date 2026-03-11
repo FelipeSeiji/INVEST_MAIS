@@ -2,7 +2,7 @@ package com.repositorio.mvp.DTO.question;
 
 import java.util.UUID;
 
-import com.repositorio.mvp.enums.CategoryActive;
+import com.repositorio.mvp.enums.AssetCategory;
 
 public record QuestionResponseDTO(
     UUID id,
@@ -11,5 +11,5 @@ public record QuestionResponseDTO(
     Integer quantity,
     Boolean response,
     String idQuestion,
-    CategoryActive categoryActive
+    AssetCategory categoryActive
 ) {}

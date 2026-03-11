@@ -1,7 +1,7 @@
 package com.repositorio.mvp.DTO.active;
 
 import java.util.UUID;
-import com.repositorio.mvp.enums.CategoryActive;
+import com.repositorio.mvp.enums.AssetCategory;
 
 public record ActiveResponseDTO(
     UUID id,
@@ -11,6 +11,7 @@ public record ActiveResponseDTO(
     Double note,
     Double price,
     Double recommend,
-    Double porcentage,
-    CategoryActive categoryActive
+    Double percentage,
+    UUID userId,
+    AssetCategory categoryActive
 ) {}

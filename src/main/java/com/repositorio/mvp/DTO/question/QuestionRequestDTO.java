@@ -1,6 +1,6 @@
 package com.repositorio.mvp.DTO.question;
 
-import com.repositorio.mvp.enums.CategoryQuestion;
+import com.repositorio.mvp.enums.AssetCategory;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -28,5 +28,5 @@ public record QuestionRequestDTO(
     String idQuestion,
 
     @NotNull(message = "A categoria é obrigatória")
-    CategoryQuestion categoryQuestion
+    AssetCategory assetCategory
 ) {}

@@ -1,8 +1,9 @@
 package com.repositorio.mvp.model;
 
+import java.math.BigDecimal;
 import java.util.UUID;
 
-import com.repositorio.mvp.enums.CategoryActive;
+import com.repositorio.mvp.enums.AssetCategory;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -40,8 +41,8 @@ public class Mark {
     private UUID id;
 
     @NotNull
-    @Column(nullable = false)
-    private Double percentage;
+    @Column(nullable = false, precision = 10, scale = 2)
+    private BigDecimal percentage;
 
     @NotBlank
     @Column(nullable = false, length = 50)
@@ -50,9 +51,9 @@ public class Mark {
     @NotNull
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
-    private CategoryActive categoryActive;
+    private AssetCategory categoryActive;
 
-    //Muitos ativos pertencem a um usuario
+    //Muitos metas pertencem a um usuario
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     @ToString.Exclude

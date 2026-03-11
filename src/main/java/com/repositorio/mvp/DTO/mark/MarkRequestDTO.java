@@ -1,6 +1,6 @@
 package com.repositorio.mvp.DTO.mark;
 
-import com.repositorio.mvp.enums.CategoryActive;
+import com.repositorio.mvp.enums.AssetCategory;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PositiveOrZero;
@@ -16,5 +16,5 @@ public record MarkRequestDTO(
     String label,
 
     @NotNull(message = "A categoria é obrigatória")
-    CategoryActive categoryActive
+    AssetCategory categoryActive
 ) {}

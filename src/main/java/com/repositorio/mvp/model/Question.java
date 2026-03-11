@@ -2,15 +2,18 @@ package com.repositorio.mvp.model;
 
 import java.util.UUID;
 
-import com.repositorio.mvp.enums.CategoryQuestion;
+import com.repositorio.mvp.enums.AssetCategory;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -59,5 +62,10 @@ public class Question {
     @NotNull
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
-    private CategoryQuestion categoryQuestion;
+    private AssetCategory assetCategory;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "active_id", nullable = false)
+    @ToString.Exclude
+    private Active active;
 }

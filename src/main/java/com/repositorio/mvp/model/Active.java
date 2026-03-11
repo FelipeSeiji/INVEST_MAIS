@@ -1,10 +1,13 @@
 package com.repositorio.mvp.model;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import com.repositorio.mvp.enums.CategoryActive;
+import org.hibernate.annotations.Formula;
+
+import com.repositorio.mvp.enums.AssetCategory;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -21,6 +24,7 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.PositiveOrZero;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -48,33 +52,40 @@ public class Active {
     private String name;
 
     @NotNull
-    @Column(nullable = false)
-    private Integer amount;
+    @Column(nullable = false, precision = 19, scale = 8)
+    @PositiveOrZero
+    private BigDecimal amount;
 
     @NotNull
-    @Column(nullable = false)
-    private Double currentValue;
+    @Column(nullable = false, precision = 19, scale = 2)
+    private BigDecimal currentValue;
     
     @NotNull
-    @Column(nullable = false)
-    private Double note;
+    @Column(nullable = false, precision = 10, scale = 2)
+    @PositiveOrZero
+    private BigDecimal note;
     
     @NotNull
-    @Column(nullable = false)
-    private Double price;
+    @Column(nullable = false, precision = 19, scale = 2)
+    @PositiveOrZero
+    private BigDecimal price;
     
     @NotNull
-    @Column(nullable = false)
-    private Double recommend;
+    @Column(nullable = false, precision = 10, scale = 2)
+    private BigDecimal recommend;
     
     @NotNull
-    @Column(nullable = false)
-    private Double percentage;
+    @Column(nullable = false, precision = 10, scale = 2)
+    @PositiveOrZero
+    private BigDecimal percentage;
     
     @NotNull
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
-    private CategoryActive categoryActive;
+    private AssetCategory categoryActive;
+
+    @Formula("amount * price")
+    private BigDecimal totalValue;
 
     //Muitos ativos pertencem a um usuario
     @ManyToOne(fetch = FetchType.LAZY)
@@ -83,8 +94,8 @@ public class Active {
     private User user;
 
     //Um ativo possui varias respostas
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
-    @JoinColumn(name = "active_id")
+    @Builder.Default
+    @OneToMany(mappedBy = "active",cascade = CascadeType.ALL, orphanRemoval = true)
     @ToString.Exclude
     private List<Question> answers = new ArrayList<>();
 }

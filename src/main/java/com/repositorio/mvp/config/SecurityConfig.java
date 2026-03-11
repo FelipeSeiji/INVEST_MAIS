@@ -21,6 +21,7 @@ public class SecurityConfig {
             .httpBasic(httpBasic -> httpBasic.disable())
             .authorizeHttpRequests(auth -> auth
             .requestMatchers("/h2-console/**").permitAll()
+            .requestMatchers("POST", "/api/users").permitAll()
             .anyRequest().authenticated()
         );
 

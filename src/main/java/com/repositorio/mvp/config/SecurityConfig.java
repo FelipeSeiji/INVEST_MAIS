@@ -13,14 +13,16 @@ public class SecurityConfig {
     
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-    //remove o form de login e auth
+    //remove o form de login e auth, autorizar o h2
         http
             .csrf(csrf -> csrf.disable())
             .formLogin(form -> form.disable())
+            .headers(headers -> headers.frameOptions(frame -> frame.disable()))
             .httpBasic(httpBasic -> httpBasic.disable())
             .authorizeHttpRequests(auth -> auth
-                .anyRequest().permitAll()
-            );
+            .requestMatchers("/h2-console/**").permitAll()
+            .anyRequest().authenticated()
+        );
 
         return http.build();
     }

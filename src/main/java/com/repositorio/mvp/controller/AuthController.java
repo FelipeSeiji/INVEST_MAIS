@@ -35,7 +35,7 @@ public class AuthController {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
-    
+    //POST /api/auth/login
     @PostMapping("/login")
     public ResponseEntity login(@RequestBody @Valid AuthenticationDTO data){
         var usernamePassword = new UsernamePasswordAuthenticationToken(data.login(), data.password());
@@ -46,7 +46,7 @@ public class AuthController {
 
         return ResponseEntity.ok(new LoginResponseDTO(token));
     }
-
+    //POST /api/auth/register
     @PostMapping("/register")
     public ResponseEntity register(@RequestBody @Valid RegisterDTO data){
         if(this.repository.findByEmail(data.email()) != null) return ResponseEntity.badRequest().build();

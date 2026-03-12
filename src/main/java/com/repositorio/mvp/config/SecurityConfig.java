@@ -24,17 +24,16 @@ public class SecurityConfig {
     
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-    //remove o form de login e auth, autorizar o h2
         http
             .csrf(csrf -> csrf.disable())
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .headers(headers -> headers.frameOptions().disable())
             .addFilterBefore(SecurityFilter, UsernamePasswordAuthenticationFilter.class)
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/h2-console/**").permitAll()
+                .requestMatchers("/h2-console/**").permitAll()//TODO remover depois
                 .requestMatchers(HttpMethod.POST, "/api/auth/login").permitAll()
                 .requestMatchers(HttpMethod.POST, "/api/auth/register").permitAll()
-                .anyRequest().authenticated()//TODO alterar para authenticated() quando tiver o token
+                .anyRequest().authenticated()
         );
 
         return http.build();

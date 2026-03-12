@@ -17,7 +17,7 @@ import com.auth0.jwt.exceptions.JWTVerificationException;
 public class TokenService {
     @Value("${api.security.token.secret}")
     private String secret;
-    
+    //gera token JWT
     public String generateToken(UUID userId){
         try{
             Algorithm algorithm = Algorithm.HMAC256(secret);
@@ -33,7 +33,7 @@ public class TokenService {
         }
         
     }
-
+    //valida o token JWT e agora retorna o ID do usuário 
     public UUID validateToken(String token){
         try {
             Algorithm algorithm = Algorithm.HMAC256(secret);
@@ -49,6 +49,6 @@ public class TokenService {
     }
     
     private Instant genExpirationDate(){
-        return LocalDateTime.now().plusHours(2).toInstant(ZoneOffset.of("-03:00"));
+        return LocalDateTime.now().plusDays(2).toInstant(ZoneOffset.of("-03:00"));//Sessãos com tempo de expiração
     }
 }

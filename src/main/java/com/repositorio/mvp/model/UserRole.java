@@ -1,5 +1,5 @@
 package com.repositorio.mvp.model;
-
+//futura implementação
 public enum UserRole {
     ADMIN("admin"),
     USER("user");

@@ -3,6 +3,7 @@ package com.repositorio.mvp.service;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
+import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -17,12 +18,12 @@ public class TokenService {
     @Value("${api.security.token.secret}")
     private String secret;
     
-    public String generateToken(String email){
+    public String generateToken(UUID userId){
         try{
             Algorithm algorithm = Algorithm.HMAC256(secret);
             String token = JWT.create()
                 .withIssuer("auth-api")
-                .withSubject(email)
+                .withSubject(userId.toString())
                 .withExpiresAt(genExpirationDate())
                 .sign(algorithm);
             return token;    
@@ -33,16 +34,17 @@ public class TokenService {
         
     }
 
-    public String validateToken(String token){
+    public UUID validateToken(String token){
         try {
             Algorithm algorithm = Algorithm.HMAC256(secret);
-            return JWT.require(algorithm)
+            String subject = JWT.require(algorithm)
                     .withIssuer("auth-api")
                     .build()
                     .verify(token)
                     .getSubject();
+            return UUID.fromString(subject);        
         } catch (JWTVerificationException exception){
-            return "";
+            return null;
         }
     }
     

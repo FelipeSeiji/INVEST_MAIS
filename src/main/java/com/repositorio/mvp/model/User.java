@@ -16,6 +16,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -56,7 +57,7 @@ public class User implements UserDetails{
     @ToString.Exclude
     private String password;
 
-    @NotBlank
+    @NotNull
     @Column(nullable = false)
     private UserRole role;
 

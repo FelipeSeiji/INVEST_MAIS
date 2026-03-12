@@ -19,8 +19,9 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import com.repositorio.mvp.DTO.user.UserRequestDTO;
 import com.repositorio.mvp.DTO.user.UserResponseDTO;
-import com.repositorio.mvp.config.SecurityConfig;
+import com.repositorio.mvp.mapper.UserMapper;
 import com.repositorio.mvp.model.User;
 import com.repositorio.mvp.repository.UserRepository;
 import com.repositorio.mvp.service.UserServiceImpl;
@@ -31,16 +32,16 @@ import jakarta.persistence.EntityNotFoundException;
 public class UserServiceTest {
 
     @InjectMocks
-    private UserServiceImpl userService;
+    private UserServiceImpl userServiceImpl;
 
     @Mock
     private UserRepository userRepository;
-
-    @Mock
-    private SecurityConfig securityConfig;
-
+    
     @Mock
     private PasswordEncoder passwordEncoder;
+
+    @Mock
+    private UserMapper userMapper;
 
     UUID userId = UUID.randomUUID();
 
@@ -53,13 +54,16 @@ public class UserServiceTest {
             .password("senha_encriptada")
             .build();
 
-        when(securityConfig.passwordEncoder()).thenReturn(passwordEncoder);
+        UserResponseDTO expectedResponse = new UserResponseDTO(userId, USER.name(), USER.email()); 
+
         when(userRepository.existsByEmail(anyString())).thenReturn(false);
+        when(userMapper.toUser(any(UserRequestDTO.class))).thenReturn(user);
         when(passwordEncoder.encode(anyString())).thenReturn("senha_encriptada");
         when(userRepository.save(any(User.class))).thenReturn(user);
+        when(userMapper.toUserResponseDTO(any(User.class))).thenReturn(expectedResponse);
 
-        UserResponseDTO createdUser = userService.createUser(USER);
-        
+        UserResponseDTO createdUser = userServiceImpl.createUser(USER);
+
         assertThat(createdUser).isNotNull();
         assertThat(createdUser.id()).isEqualTo(userId);
         assertThat(createdUser.name()).isEqualTo(USER.name());
@@ -71,7 +75,7 @@ public class UserServiceTest {
         when(userRepository.existsByEmail(anyString())).thenReturn(true);
         
         assertThatThrownBy(() -> {
-            userService.createUser(INVALID_USER);
+            userServiceImpl.createUser(INVALID_USER);
         }).isInstanceOf(IllegalArgumentException.class)
           .hasMessage("Email já está em uso");
     }
@@ -85,9 +89,12 @@ public class UserServiceTest {
             .password(USER.password())
             .build();
 
-        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+        UserResponseDTO expectedResponse = new UserResponseDTO(userId, USER.name(), USER.email());
 
-        UserResponseDTO foundUser = userService.findUserById(userId);
+        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+        when(userMapper.toUserResponseDTO(user)).thenReturn(expectedResponse); 
+
+        UserResponseDTO foundUser = userServiceImpl.findUserById(userId);
 
         assertThat(foundUser).isNotNull();
         assertThat(foundUser.id()).isEqualTo(userId);
@@ -99,7 +106,7 @@ public class UserServiceTest {
     public void findUserById_WithInvalidId_ThrowException() {
         when(userRepository.findById(userId)).thenReturn(Optional.empty());
         assertThatThrownBy(() -> {
-            userService.findUserById(userId);
+            userServiceImpl.findUserById(userId);
         }).isInstanceOf(EntityNotFoundException.class)
           .hasMessage("Usuário não encontrado");
     }
@@ -121,9 +128,14 @@ public class UserServiceTest {
             .password("1234")
             .build();
 
+        UserResponseDTO expectedResponse1 = new UserResponseDTO(userId, USER.name(), USER.email());
+        UserResponseDTO expectedResponse2 = new UserResponseDTO(userId2, "Maria", "maria@gmail.com");
+
         when(userRepository.findAll()).thenReturn(List.of(user1, user2));
+        when(userMapper.toUserResponseDTO(user1)).thenReturn(expectedResponse1);
+        when(userMapper.toUserResponseDTO(user2)).thenReturn(expectedResponse2);
         
-        List<UserResponseDTO> users = userService.listAllUsers();
+        List<UserResponseDTO> users = userServiceImpl.listAllUsers();
         
         assertThat(users).isNotNull();
         assertThat(users.size()).isEqualTo(2);

@@ -13,6 +13,7 @@ import com.repositorio.mvp.DTO.user.UserUpdateRequestDTO;
 import com.repositorio.mvp.mapper.UserMapper;
 import com.repositorio.mvp.model.User;
 import com.repositorio.mvp.repository.UserRepository;
+import com.repositorio.mvp.service.interfaces.UserService;
 
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -22,12 +23,13 @@ import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
-public class UserService {
+public class UserServiceImpl implements UserService{
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final UserMapper userMapper;
 
     //Metodo para criar um novo usuário
+    @Override
     @Transactional
     public UserResponseDTO createUser(UserRequestDTO userRequestDTO) {
         if (userRepository.existsByEmail(userRequestDTO.email())) {
@@ -42,6 +44,7 @@ public class UserService {
     }
 
     //Metodo para buscar um usuário por ID
+    @Override
     @Transactional(readOnly = true)
     public UserResponseDTO findUserById(UUID id) {
         return userRepository.findById(id)
@@ -51,6 +54,7 @@ public class UserService {
 
     //Metodo para listar todos os usuários
     @Transactional(readOnly = true)
+    @Override
     public List<UserResponseDTO> listAllUsers() {
         return userRepository.findAll().stream()
             .map(userMapper::toUserResponseDTO)
@@ -59,15 +63,17 @@ public class UserService {
 
     //Metodo para excluir um usuário por ID
     @Transactional
+    @Override
     public void deleteUserById(UUID id) {
         if (!userRepository.existsById(id)) {
-            throw new RuntimeException("Usuário não encontrado com o ID: " + id);
+            throw new EntityNotFoundException("Usuário não encontrado com o ID: " + id);
         }
         userRepository.deleteById(id);
     }
 
     //Metodo para atualizar um usuário por ID
     @Transactional
+    @Override
     public UserResponseDTO updateByIdUser(UUID id, UserUpdateRequestDTO userUpdateRequestDTO) {
         User user = userRepository.findById(id)
             .orElseThrow(() -> new EntityNotFoundException("Usuário não encontrado."));

@@ -1,4 +1,4 @@
-package com.repositorio.mvp.service;
+package com.repositorio.mvp.mock.service;
 
 import static com.repositorio.mvp.shared.UserConstants.INVALID_USER;
 import static com.repositorio.mvp.shared.UserConstants.USER;
@@ -23,6 +23,7 @@ import com.repositorio.mvp.DTO.user.UserResponseDTO;
 import com.repositorio.mvp.config.SecurityConfig;
 import com.repositorio.mvp.model.User;
 import com.repositorio.mvp.repository.UserRepository;
+import com.repositorio.mvp.service.UserServiceImpl;
 
 import jakarta.persistence.EntityNotFoundException;
 
@@ -30,7 +31,7 @@ import jakarta.persistence.EntityNotFoundException;
 public class UserServiceTest {
 
     @InjectMocks
-    private UserService userService;
+    private UserServiceImpl userService;
 
     @Mock
     private UserRepository userRepository;

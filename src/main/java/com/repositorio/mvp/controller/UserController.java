@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.repositorio.mvp.DTO.user.UserRequestDTO;
 import com.repositorio.mvp.DTO.user.UserResponseDTO;
 import com.repositorio.mvp.DTO.user.UserUpdateRequestDTO;
-import com.repositorio.mvp.service.UserService;
+import com.repositorio.mvp.service.UserServiceImpl;
 
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
@@ -29,7 +29,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 @RequiredArgsConstructor
 public class UserController {
     
-    private final UserService userService;
+    private final UserServiceImpl userService;
     
     //POST /api/users
     @PostMapping

@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.repositorio.mvp.DTO.user.UserRequestDTO;
 import com.repositorio.mvp.DTO.user.UserResponseDTO;
+import com.repositorio.mvp.DTO.user.UserUpdateRequestDTO;
 import com.repositorio.mvp.service.UserService;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -58,8 +59,8 @@ public class UserController {
 
     //PUT /api/users/{id}
     @PutMapping("/{id}")
-    public ResponseEntity<UserResponseDTO> updateUser(@PathVariable UUID id, @Valid @RequestBody UserRequestDTO userRequestDTO) {
-        return ResponseEntity.ok(userService.updateByIdUser(id, userRequestDTO));
+    public ResponseEntity<UserResponseDTO> updateUser(@PathVariable UUID id, @Valid @RequestBody UserUpdateRequestDTO userUpdateRequestDTO) {
+        return ResponseEntity.ok(userService.updateByIdUser(id, userUpdateRequestDTO));
     }
     
 }

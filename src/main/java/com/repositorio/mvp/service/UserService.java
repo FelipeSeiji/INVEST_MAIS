@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.repositorio.mvp.DTO.user.UserRequestDTO;
 import com.repositorio.mvp.DTO.user.UserResponseDTO;
+import com.repositorio.mvp.DTO.user.UserUpdateRequestDTO;
 import com.repositorio.mvp.mapper.UserMapper;
 import com.repositorio.mvp.model.User;
 import com.repositorio.mvp.repository.UserRepository;
@@ -67,21 +68,17 @@ public class UserService {
 
     //Metodo para atualizar um usuário por ID
     @Transactional
-    public UserResponseDTO updateByIdUser(UUID id, UserRequestDTO userRequestDTO) {
+    public UserResponseDTO updateByIdUser(UUID id, UserUpdateRequestDTO userUpdateRequestDTO) {
         User user = userRepository.findById(id)
             .orElseThrow(() -> new EntityNotFoundException("Usuário não encontrado."));
 
         // Regra de negócio: Validação de e-mail duplicado
-        if (userRepository.existsByEmail(userRequestDTO.email()) && !user.getEmail().equals(userRequestDTO.email())) {
+        if (userRepository.existsByEmail(userUpdateRequestDTO.email()) && !user.getEmail().equals(userUpdateRequestDTO.email())) {
             throw new IllegalArgumentException("Email já está em uso por outro usuário.");
         }
 
-        user.setName(userRequestDTO.name());
-        user.setEmail(userRequestDTO.email());
-        
-        if (userRequestDTO.password() != null) {
-            user.setPassword(passwordEncoder.encode(userRequestDTO.password()));
-        }
+        user.setName(userUpdateRequestDTO.name());
+        user.setEmail(userUpdateRequestDTO.email());
 
         return userMapper.toUserResponseDTO(userRepository.save(user));
     }

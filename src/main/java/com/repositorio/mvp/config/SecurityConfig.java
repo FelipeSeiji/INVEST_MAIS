@@ -30,6 +30,8 @@ public class SecurityConfig {
             .headers(headers -> headers.frameOptions().disable())
             .addFilterBefore(SecurityFilter, UsernamePasswordAuthenticationFilter.class)
             .authorizeHttpRequests(auth -> auth
+                .requestMatchers("/").permitAll()
+                .requestMatchers("/script/**","/style/**").permitAll()
                 .requestMatchers("/h2-console/**").permitAll()//TODO remover depois
                 .requestMatchers(HttpMethod.POST, "/api/auth/login").permitAll()
                 .requestMatchers(HttpMethod.POST, "/api/auth/register").permitAll()

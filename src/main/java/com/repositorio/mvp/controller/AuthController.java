@@ -1,5 +1,7 @@
 package com.repositorio.mvp.controller;
 
+import java.time.Instant;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -13,11 +15,15 @@ import com.repositorio.mvp.DTO.auth.AuthenticationDTO;
 import com.repositorio.mvp.DTO.auth.LoginResponseDTO;
 import com.repositorio.mvp.DTO.register.RegisterDTO;
 import com.repositorio.mvp.repository.UserRepository;
+import com.repositorio.mvp.repository.InvalidatedTokenRepository;
 import com.repositorio.mvp.service.TokenService;
+import com.repositorio.mvp.model.InvalidatedToken;
 import com.repositorio.mvp.model.User;
 import com.repositorio.mvp.model.UserRole;
 
 import org.springframework.web.bind.annotation.RequestBody;
+
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 
 @RestController
@@ -35,6 +41,10 @@ public class AuthController {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private InvalidatedTokenRepository invalidatedTokenRepository;
+
     //POST /api/auth/login
     @PostMapping("/login")
     public ResponseEntity login(@RequestBody @Valid AuthenticationDTO data){
@@ -57,6 +67,25 @@ public class AuthController {
         this.repository.save(newUser);
 
         return ResponseEntity.ok().build();
-    }
+    }    
+    //POST /api/auth/logout
+    @PostMapping("/logout")
+    public ResponseEntity logout(HttpServletRequest request){
+
+        String authHeader = request.getHeader("Authorization");
+
+        if(authHeader == null || !authHeader.startsWith("Bearer "))
+            return ResponseEntity.badRequest().build();
+
+        String token = authHeader.substring(7);
+
+        Instant expiration = tokenService.getExpiration(token);
+
+        invalidatedTokenRepository.save(
+            new InvalidatedToken(token, expiration)
+        );
+
+        return ResponseEntity.ok().build();
+    }   
 
 }

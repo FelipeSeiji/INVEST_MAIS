@@ -12,6 +12,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+import com.repositorio.mvp.repository.InvalidatedTokenRepository;
 import com.repositorio.mvp.repository.UserRepository;
 import com.repositorio.mvp.service.TokenService;
 
@@ -26,16 +27,28 @@ public class SecurityFilter extends OncePerRequestFilter{
     @Autowired
     UserRepository userRepository;
 
+    @Autowired
+    InvalidatedTokenRepository invalidatedTokenRepository;
+
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         var token = this.recoverToken(request);
         if(token != null){
+            if(invalidatedTokenRepository.existsById(token)){
+                filterChain.doFilter(request, response);
+                return;
+            }
             var userId = tokenService.validateToken(token);
-            UserDetails user = userRepository.findById(userId).orElse(null);
+            if(userId != null){
+                UserDetails user = userRepository.findById(userId).orElse(null);
 
-            var authentication = new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
-            SecurityContextHolder.getContext().setAuthentication(authentication);
+                if(user != null){
+                    var authentication = new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
+                    SecurityContextHolder.getContext().setAuthentication(authentication);
+                }
+            }
         }
+
         filterChain.doFilter(request, response);
     }
 
@@ -46,6 +59,7 @@ public class SecurityFilter extends OncePerRequestFilter{
             return null;
         }
 
+        
         return authHeader.replace("Bearer ", "");
     }
 }

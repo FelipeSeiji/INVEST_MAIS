@@ -47,8 +47,24 @@ public class TokenService {
             return null;
         }
     }
-    
+
     private Instant genExpirationDate(){
         return LocalDateTime.now().plusDays(2).toInstant(ZoneOffset.of("-03:00"));//Sessãos com tempo de expiração
     }
+    //desloga um adicionando o token a uma lista de tokens inválidos
+    public Instant getExpiration(String token) {
+    try {
+        Algorithm algorithm = Algorithm.HMAC256(secret);
+
+        return JWT.require(algorithm)
+                .withIssuer("auth-api")
+                .build()
+                .verify(token)
+                .getExpiresAt()
+                .toInstant();
+
+    } catch (JWTVerificationException exception) {
+        return null;
+    }
+}
 }

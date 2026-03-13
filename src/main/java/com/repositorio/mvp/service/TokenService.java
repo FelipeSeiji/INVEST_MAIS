@@ -3,6 +3,7 @@ package com.repositorio.mvp.service;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
+import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -34,7 +35,7 @@ public class TokenService {
         
     }
     //valida o token JWT e agora retorna o ID do usuário 
-    public UUID validateToken(String token){
+    public Optional<UUID> validateToken(String token){
         try {
             Algorithm algorithm = Algorithm.HMAC256(secret);
             String subject = JWT.require(algorithm)
@@ -42,9 +43,9 @@ public class TokenService {
                     .build()
                     .verify(token)
                     .getSubject();
-            return UUID.fromString(subject);        
+            return Optional.of(UUID.fromString(subject));     
         } catch (JWTVerificationException exception){
-            return null;
+            return Optional.empty();
         }
     }
 
@@ -64,7 +65,7 @@ public class TokenService {
                 .toInstant();
 
     } catch (JWTVerificationException exception) {
-        return null;
+        throw new RuntimeException("Token inválido", exception);
     }
 }
 }

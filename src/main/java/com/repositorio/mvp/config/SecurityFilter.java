@@ -17,6 +17,7 @@ import com.repositorio.mvp.repository.UserRepository;
 import com.repositorio.mvp.service.TokenService;
 
 import java.io.IOException;
+import java.util.UUID;
 
 @Component
 public class SecurityFilter extends OncePerRequestFilter{
@@ -38,8 +39,9 @@ public class SecurityFilter extends OncePerRequestFilter{
                 filterChain.doFilter(request, response);
                 return;
             }
-            var userId = tokenService.validateToken(token);
-            if(userId != null){
+            var userIdOpt = tokenService.validateToken(token);
+            if (userIdOpt.isPresent()) {
+                UUID userId = userIdOpt.get();
                 UserDetails user = userRepository.findById(userId).orElse(null);
 
                 if(user != null){

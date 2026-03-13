@@ -2,6 +2,8 @@ package com.repositorio.mvp.model;
 
 import java.util.UUID;
 
+import com.repositorio.mvp.enums.UserRole;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -49,4 +51,7 @@ public class User {
     @Size(min = 8, max = 60)
     @ToString.Exclude
     private String password;
+
+    @Column(nullable = false)
+    private UserRole role;
 }

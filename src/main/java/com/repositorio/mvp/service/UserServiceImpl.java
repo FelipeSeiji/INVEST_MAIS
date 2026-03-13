@@ -10,10 +10,13 @@ import org.springframework.transaction.annotation.Transactional;
 import com.repositorio.mvp.DTO.user.UserRequestDTO;
 import com.repositorio.mvp.DTO.user.UserResponseDTO;
 import com.repositorio.mvp.DTO.user.UserUpdateRequestDTO;
+import com.repositorio.mvp.enums.UserRole;
 import com.repositorio.mvp.mapper.UserMapper;
 import com.repositorio.mvp.model.User;
 import com.repositorio.mvp.repository.UserRepository;
-import com.repositorio.mvp.service.interfaces.UserService;
+import com.repositorio.mvp.service.interfaces.UserCommandService;
+import com.repositorio.mvp.service.interfaces.UserQueryService;
+import com.repositorio.mvp.validation.UserValidation;
 
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -23,21 +26,21 @@ import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
-public class UserServiceImpl implements UserService{
+public class UserServiceImpl implements UserQueryService, UserCommandService{
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final UserMapper userMapper;
+    private final UserValidation userValidation;
 
     //Metodo para criar um novo usuário
     @Override
     @Transactional
     public UserResponseDTO createUser(UserRequestDTO userRequestDTO) {
-        if (userRepository.existsByEmail(userRequestDTO.email())) {
-            throw new IllegalArgumentException("Email já está em uso");
-        }
+        userValidation.validadeNewEmail(userRequestDTO.email());
 
         User user = userMapper.toUser(userRequestDTO);
         user.setPassword(passwordEncoder.encode(userRequestDTO.password()));
+        user.setRole(UserRole.USER);
         userRepository.save(user);
 
         return userMapper.toUserResponseDTO(user);
@@ -74,14 +77,11 @@ public class UserServiceImpl implements UserService{
     //Metodo para atualizar um usuário por ID
     @Transactional
     @Override
-    public UserResponseDTO updateByIdUser(UUID id, UserUpdateRequestDTO userUpdateRequestDTO) {
+    public UserResponseDTO updateUserById(UUID id, UserUpdateRequestDTO userUpdateRequestDTO) {
         User user = userRepository.findById(id)
             .orElseThrow(() -> new EntityNotFoundException("Usuário não encontrado."));
 
-        // Regra de negócio: Validação de e-mail duplicado
-        if (userRepository.existsByEmail(userUpdateRequestDTO.email()) && !user.getEmail().equals(userUpdateRequestDTO.email())) {
-            throw new IllegalArgumentException("Email já está em uso por outro usuário.");
-        }
+        userValidation.validadeUpdateEmail(userUpdateRequestDTO.email(), user.getEmail());
 
         user.setName(userUpdateRequestDTO.name());
         user.setEmail(userUpdateRequestDTO.email());

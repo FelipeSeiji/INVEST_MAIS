@@ -60,7 +60,7 @@ public class UserController {
     //PUT /api/users/{id}
     @PutMapping("/{id}")
     public ResponseEntity<UserResponseDTO> updateUser(@PathVariable UUID id, @Valid @RequestBody UserUpdateRequestDTO userUpdateRequestDTO) {
-        return ResponseEntity.ok(userService.updateByIdUser(id, userUpdateRequestDTO));
+        return ResponseEntity.ok(userService.updateUserById(id, userUpdateRequestDTO));
     }
     
 }

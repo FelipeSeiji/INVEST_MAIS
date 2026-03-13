@@ -16,6 +16,7 @@ import com.repositorio.mvp.DTO.auth.LoginResponseDTO;
 import com.repositorio.mvp.DTO.register.RegisterDTO;
 import com.repositorio.mvp.repository.UserRepository;
 import com.repositorio.mvp.repository.InvalidatedTokenRepository;
+import com.repositorio.mvp.service.LoginAttemptService;
 import com.repositorio.mvp.service.TokenService;
 import com.repositorio.mvp.model.InvalidatedToken;
 import com.repositorio.mvp.model.User;
@@ -45,16 +46,48 @@ public class AuthController {
     @Autowired
     private InvalidatedTokenRepository invalidatedTokenRepository;
 
+    @Autowired
+    private LoginAttemptService loginAttemptService;
+
     //POST /api/auth/login
     @PostMapping("/login")
-    public ResponseEntity login(@RequestBody @Valid AuthenticationDTO data){
-        var usernamePassword = new UsernamePasswordAuthenticationToken(data.login(), data.password());
-        var auth = this.authenticationManager.authenticate(usernamePassword);
+    public ResponseEntity login(@RequestBody @Valid AuthenticationDTO data,
+                            HttpServletRequest request) {
 
-    User user = (User) auth.getPrincipal();
-    var token = tokenService.generateToken(user.getId());
+    String ip = request.getRemoteAddr();
+    int attempts = loginAttemptService.getAttempts(ip);
 
-        return ResponseEntity.ok(new LoginResponseDTO(token));
+    int delay = Math.min(attempts, 6);
+
+    if (loginAttemptService.isBlocked(ip)) {
+        return ResponseEntity
+                .status(429)
+                .body("IP temporarily blocked due to too many failed attempts");
+    }
+    
+    if(delay > 0){
+        try {
+            Thread.sleep(delay * 1000);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+    }
+
+    try {
+            var usernamePassword = new UsernamePasswordAuthenticationToken(data.login(), data.password());
+            var auth = this.authenticationManager.authenticate(usernamePassword);
+
+            loginAttemptService.loginSucceeded(ip);
+
+            User user = (User) auth.getPrincipal();
+            var token = tokenService.generateToken(user.getId());
+
+            return ResponseEntity.ok(new LoginResponseDTO(token));
+
+        } catch (Exception e) {
+            loginAttemptService.loginFailed(ip);
+            return ResponseEntity.status(401).build();
+        }
     }
     //POST /api/auth/register
     @PostMapping("/register")

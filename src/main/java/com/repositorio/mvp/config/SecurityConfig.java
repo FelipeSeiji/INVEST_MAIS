@@ -21,6 +21,9 @@ public class SecurityConfig {
     
     @Autowired
     SecurityFilter SecurityFilter;
+
+    @Autowired
+    LoginRateLimitFilter loginRateLimitFilter;
     
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -29,6 +32,7 @@ public class SecurityConfig {
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .headers(headers -> headers.frameOptions().disable())
             .addFilterBefore(SecurityFilter, UsernamePasswordAuthenticationFilter.class)
+            .addFilterBefore(loginRateLimitFilter, UsernamePasswordAuthenticationFilter.class)
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/").permitAll()
                 .requestMatchers("/script/**","/style/**").permitAll()

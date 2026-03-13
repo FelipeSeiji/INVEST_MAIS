@@ -1,15 +1,53 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <meta charset="utf-8">
-        <meta http-equiv="X-UA-Compatible" content="IE=edge">
-        <title></title>
-        <meta name="description" content="">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <link rel="stylesheet" href="">
-    </head>
-    <body>
-        
-        <script src="" async defer></script>
-    </body>
+<head>
+    <title>Auth</title>
+    <link rel="stylesheet" href="/css/auth.css">
+</head>
+
+<body>
+
+<div class="container">
+
+    <!-- LOGIN -->
+    <div class="panel">
+
+        <h2>Login</h2>
+
+        <form id="loginForm">
+
+            <input id="loginEmail" type="email" placeholder="Email" required>
+
+            <input id="loginPassword" type="password" placeholder="Senha" required>
+
+            <button type="submit">Entrar</button>
+
+        </form>
+
+    </div>
+
+    <!-- REGISTER -->
+    <div class="panel">
+
+        <h2>Criar Conta</h2>
+
+        <form id="registerForm">
+
+            <input id="name" placeholder="Nome" required>
+
+            <input id="registerEmail" type="email" placeholder="Email" required>
+
+            <input id="registerPassword" type="password" placeholder="Senha" required>
+
+            <button type="submit">Registrar</button>
+
+        </form>
+
+    </div>
+
+</div>
+
+<script src="/script/auth.js"></script>
+
+</body>
 </html>

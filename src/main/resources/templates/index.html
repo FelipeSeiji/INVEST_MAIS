@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teste de Segurança MVP com 2FA</title>
+    <link rel="stylesheet" href="/style/style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <h1>Teste de Autenticação API</h1>
+
+        <div class="card">
+            <h2>Registrar</h2>
+            <input type="text" id="regName" placeholder="Nome">
+            <input type="email" id="regEmail" placeholder="E-mail">
+            <input type="password" id="regPassword" placeholder="Senha">
+            <button onclick="register()">Registrar</button>
+        </div>
+
+        <div class="card">
+            <h2>Login</h2>
+            <input type="email" id="loginEmail" placeholder="E-mail">
+            <input type="password" id="loginPassword" placeholder="Senha">
+            <input type="text" id="loginTotp" placeholder="Código 2FA (se ativado)" maxlength="6">
+            <button onclick="login()">Entrar</button>
+        </div>
+
+        <div class="card">
+            <h2>Configurar 2FA</h2>
+            <p><small>Requer estar logado para gerar o código.</small></p>
+            <button onclick="setup2FA()">Gerar QR Code 2FA</button>
+            <div id="qrcode" style="margin-top: 15px; display: flex; justify-content: center;"></div>
+        </div>
+
+        <div class="card">
+            <h2>Área Segura</h2>
+            <p>Status: <span id="authStatus">Deslogado</span></p>
+            <button onclick="testSecureRoute()">Testar Rota Segura (Requer Token)</button>
+            <button onclick="logout()" style="background-color: #d9534f;">Sair (Logout)</button>
+        </div>
+
+        <div class="console">
+            <h3>Console Log:</h3>
+            <pre id="output">Aguardando ações...</pre>
+        </div>
+    </div>
+
+    <script src="/script/app.js"></script>
+</body>
+</html>

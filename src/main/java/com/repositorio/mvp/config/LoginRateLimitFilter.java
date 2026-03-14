@@ -18,7 +18,7 @@ import jakarta.servlet.http.HttpServletResponse;
 @Component
 public class LoginRateLimitFilter extends OncePerRequestFilter{
     
-    private final Map<String, Bucket> cache = new ConcurrentHashMap<>();
+    private final Map<String, Bucket> cache = new ConcurrentHashMap<>();//TODO trocar para outro cache 
 
     private Bucket createNewBucket() {
         Bandwidth limit = Bandwidth.simple(5, Duration.ofMinutes(1));//5 por minuto

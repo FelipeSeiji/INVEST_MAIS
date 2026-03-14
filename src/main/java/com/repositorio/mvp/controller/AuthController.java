@@ -64,10 +64,9 @@ public class AuthController {
                 .status(429)
                 .body("IP temporarily blocked due to too many failed attempts");
     }
-    
     if(delay > 0){
         try {
-            Thread.sleep(delay * 1000);
+            Thread.sleep(delay * 1000);//TODO modificar futuramente 
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
         }

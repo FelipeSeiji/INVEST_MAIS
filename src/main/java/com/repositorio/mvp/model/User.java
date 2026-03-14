@@ -61,6 +61,12 @@ public class User implements UserDetails{
     @Column(nullable = false)
     private UserRole role;
 
+    @Column(nullable = false)
+    private boolean mfaEnabled = false;
+
+    @Column(length = 32)
+    private String mfaSecret;
+
     public User(String name, String email, String password, UserRole role){
         this.name = name;
         this.email = email;

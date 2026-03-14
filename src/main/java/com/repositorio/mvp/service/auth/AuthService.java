@@ -13,17 +13,12 @@ import lombok.RequiredArgsConstructor;
 @Service
 @RequiredArgsConstructor
 public class AuthService implements UserDetailsService {
-
-    // Injeção de dependência limpa e imutável exigida pelo Lombok
     private final UserRepository userRepository;
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        // Busca o usuário no banco (que agora retorna um Optional<User>)
         return userRepository.findByEmail(email)
-                // Se encontrar, converte a entidade User para UserDetailsImpl
-                .map(UserDetailsImpl::new) 
-                // Se não encontrar, lança a exceção padrão do Spring Security
-                .orElseThrow(() -> new UsernameNotFoundException("Usuário não encontrado com o e-mail: " + email));
+            .map(UserDetailsImpl::new)
+            .orElseThrow(() -> new UsernameNotFoundException("Usuário não encontrado"));
     }
 }

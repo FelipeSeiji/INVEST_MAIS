@@ -1,5 +1,9 @@
 package com.repositorio.mvp.service.token;
 
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -7,17 +11,14 @@ import org.springframework.stereotype.Service;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
+import com.auth0.jwt.exceptions.JWTCreationException;
+import com.auth0.jwt.exceptions.JWTVerificationException;
 
 @Service
 public class TokenServiceImpl {
+    @Value("${api.security.token.secret}")
     private String secret;
-
-    public TokenServiceImpl(@Value("${api.security.token.secret}") String secret) {
-        this.secret = secret;
-    }
-
-    @Override
-    public String generateToken(UUID userId) {
+    public String generateToken(UUID userId){
         try{
             Algorithm algorithm = Algorithm.HMAC256(secret);
             String token = JWT.create()
@@ -30,27 +31,40 @@ public class TokenServiceImpl {
             throw new RuntimeException("Erro ao gerar token JWT", exception);
             
         }
+        
     }
 
-    @Override
-    public String validateToken(String token)
-    {
+    public Optional<UUID> validateToken(String token){
         try {
             Algorithm algorithm = Algorithm.HMAC256(secret);
-            JWT.require(algorithm)
-                .withIssuer("auth-api")
-                .build()
-                .verify(token);
-            return JWT.decode(token).getSubject();
-        } catch (JWTVerificationException exception) {
-            throw new RuntimeException("Token JWT inválido", exception);
+            String subject = JWT.require(algorithm)
+                    .withIssuer("auth-api")
+                    .build()
+                    .verify(token)
+                    .getSubject();
+            return Optional.of(UUID.fromString(subject));     
+        } catch (JWTVerificationException exception){
+            return Optional.empty();
         }
     }
 
-
-    private Date genExpirationDate() {
-        Calendar calendar = Calendar.getInstance();
-        calendar.add(Calendar.HOUR, 2);
-        return calendar.getTime();
+    private Instant genExpirationDate(){
+        return LocalDateTime.now().plusDays(2).toInstant(ZoneOffset.of("-03:00"));//Sessãos com tempo de expiração
     }
+    //desloga um adicionando o token a uma lista de tokens inválidos
+    public Instant getExpiration(String token) {
+    try {
+        Algorithm algorithm = Algorithm.HMAC256(secret);
+
+        return JWT.require(algorithm)
+                .withIssuer("auth-api")
+                .build()
+                .verify(token)
+                .getExpiresAt()
+                .toInstant();
+
+    } catch (JWTVerificationException exception) {
+        throw new RuntimeException("Token inválido", exception);
+    }
+}
 }

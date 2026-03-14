@@ -13,10 +13,10 @@ import com.repositorio.mvp.DTO.user.UserUpdateRequestDTO;
 import com.repositorio.mvp.enums.UserRole;
 import com.repositorio.mvp.mapper.UserMapper;
 import com.repositorio.mvp.model.User;
+import com.repositorio.mvp.model.validation.UserValidation;
 import com.repositorio.mvp.repository.UserRepository;
 import com.repositorio.mvp.service.interfaces.UserCommandService;
 import com.repositorio.mvp.service.interfaces.UserQueryService;
-import com.repositorio.mvp.validation.UserValidation;
 
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;

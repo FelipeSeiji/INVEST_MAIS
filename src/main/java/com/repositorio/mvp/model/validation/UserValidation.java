@@ -1,4 +1,4 @@
-package com.repositorio.mvp.validation;
+package com.repositorio.mvp.model.validation;
 
 import org.springframework.stereotype.Component;
 

@@ -26,7 +26,7 @@ import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
-public class UserServiceImpl implements UserQueryService, UserCommandService{
+public class UserService implements UserQueryService, UserCommandService{
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final UserMapper userMapper;

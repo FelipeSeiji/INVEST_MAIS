@@ -24,7 +24,7 @@ import com.repositorio.mvp.DTO.user.UserResponseDTO;
 import com.repositorio.mvp.mapper.UserMapper;
 import com.repositorio.mvp.model.User;
 import com.repositorio.mvp.repository.UserRepository;
-import com.repositorio.mvp.service.UserServiceImpl;
+import com.repositorio.mvp.service.UserService;
 
 import jakarta.persistence.EntityNotFoundException;
 
@@ -32,7 +32,7 @@ import jakarta.persistence.EntityNotFoundException;
 public class UserServiceTest {
 
     @InjectMocks
-    private UserServiceImpl userServiceImpl;
+    private UserService userServiceImpl;
 
     @Mock
     private UserRepository userRepository;

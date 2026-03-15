@@ -1,32 +1,16 @@
 package com.repositorio.mvp.model;
 
+import java.time.LocalDateTime;
 import java.util.UUID;
-
 import com.repositorio.mvp.enums.UserRole;
-
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.*;
+import lombok.*;
 
 @Entity
 @Table(name = "TB_USER")
 @Getter
-@Setter
+@Setter // Usado com cuidado, prefira métodos de negócio
 @ToString
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -39,13 +23,11 @@ public class User {
 
     @NotBlank
     @Column(nullable = false, length = 50)
-    @Size(max = 50)
     private String name;
 
     @NotBlank
     @Email
     @Column(nullable = false, unique = true, length = 50)
-    @Size(min = 8, max = 50)
     private String email;
 
     @NotBlank
@@ -56,6 +38,24 @@ public class User {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private UserRole role;
+
+    // --- NOVOS CAMPOS PARA 2FA ---
+    @Column(name = "two_factor_code", length = 6)
+    private String twoFactorCode;
+
+    @Column(name = "two_factor_expiry")
+    private LocalDateTime twoFactorExpiry;
+
+    // Métodos de negócio (Evitando setters diretos para regras)
+    public void generateTwoFactorCode(String code, LocalDateTime expiry) {
+        this.twoFactorCode = code;
+        this.twoFactorExpiry = expiry;
+    }
+
+    public void clearTwoFactorCode() {
+        this.twoFactorCode = null;
+        this.twoFactorExpiry = null;
+    }
 
     public void updateProfile(String name, String email) {
         this.name = name;

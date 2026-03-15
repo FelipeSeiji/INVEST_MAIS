@@ -1,4 +1,4 @@
-package com.repositorio.mvp.service.token;
+package com.repositorio.mvp.security.token;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -15,43 +15,40 @@ import com.auth0.jwt.exceptions.JWTCreationException;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 
 @Service
-public class TokenServiceImpl {
+public class TokenService {
     @Value("${api.security.token.secret}")
     private String secret;
-    public String generateToken(UUID userId){
+
+    public String generateToken(UUID uuid){
         try{
             Algorithm algorithm = Algorithm.HMAC256(secret);
-            String token = JWT.create()
+            return JWT.create()
                 .withIssuer("auth-api")
-                .withSubject(userId.toString())
+                .withSubject(uuid.toString())
                 .withExpiresAt(genExpirationDate())
-                .sign(algorithm);
-            return token;    
+                .sign(algorithm);   
         } catch (JWTCreationException exception){
             throw new RuntimeException("Erro ao gerar token JWT", exception);
             
         }
-        
     }
 
-    public Optional<UUID> validateToken(String token){
+    public String validateToken(String token){
         try {
             Algorithm algorithm = Algorithm.HMAC256(secret);
-            String subject = JWT.require(algorithm)
+            return JWT.require(algorithm)
                     .withIssuer("auth-api")
                     .build()
                     .verify(token)
                     .getSubject();
-            return Optional.of(UUID.fromString(subject));     
         } catch (JWTVerificationException exception){
-            return Optional.empty();
+            throw new RuntimeException("Token inválido ou expirado", exception);
         }
     }
 
     private Instant genExpirationDate(){
-        return LocalDateTime.now().plusDays(2).toInstant(ZoneOffset.of("-03:00"));//Sessãos com tempo de expiração
+        return LocalDateTime.now().plusDays(2).toInstant(ZoneOffset.of("-03:00"));
     }
-    //desloga um adicionando o token a uma lista de tokens inválidos
     public Instant getExpiration(String token) {
     try {
         Algorithm algorithm = Algorithm.HMAC256(secret);

@@ -10,31 +10,32 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+
+import lombok.RequiredArgsConstructor;
 
 @Configuration
 @EnableWebSecurity
+@RequiredArgsConstructor
 public class SecurityConfig {
+    private final SecurityFilter securityFilter;
+
+
 
     @Bean
 public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
     http
         .csrf(csrf -> csrf.disable()) 
         .authorizeHttpRequests(auth -> auth
-            // 1. Libere o endpoint de LOGIN (geralmente /auth/login ou similar)
             .requestMatchers(HttpMethod.POST, "/auth/login").permitAll() 
-            
-            // 2. Libere o endpoint de CADASTRO (que você já tinha)
             .requestMatchers(HttpMethod.POST, "/api/users").permitAll() 
-            
-            // 3. Libere recursos de infra/docs
             .requestMatchers("/h2-console/**", "/swagger-ui/**", "/v3/api-docs/**").permitAll() 
-            
-            // O resto exige token JWT
+            .requestMatchers(HttpMethod.POST, "/auth/login", "/auth/verify-2fa").permitAll()
+
             .anyRequest().authenticated() 
         )
-        // O H2 usa frames, por isso o disable ou sameOrigin é necessário
-        .headers(headers -> headers.frameOptions(frame -> frame.disable())); 
-
+        .headers(headers -> headers.frameOptions(frame -> frame.disable()))
+        .addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class);
     return http.build();
 }
 

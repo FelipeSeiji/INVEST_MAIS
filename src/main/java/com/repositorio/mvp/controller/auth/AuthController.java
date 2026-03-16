@@ -16,6 +16,8 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
+import jakarta.servlet.http.HttpServletRequest;
+
 @RestController
 @RequestMapping("/auth")
 @RequiredArgsConstructor
@@ -23,14 +25,16 @@ import lombok.RequiredArgsConstructor;
 public class AuthController {
 
     private final AuthService authService;
+    private final HttpServletRequest request;
+
 
     // POST /auth/login
     @PostMapping("/login")
     @Operation(summary = "Inicia o login e envia código 2FA", description = "Valida e-mail e senha. Se corretos, envia um e-mail com o código de 6 dígitos para o usuário.")
     public ResponseEntity<String> login(@Valid @RequestBody LoginRequestDTO loginRequest) {
-        authService.initiateLogin(loginRequest);
-        
-        // Retornamos apenas uma mensagem de sucesso. O front-end saberá que deve abrir a tela de digitar o código.
+        String ip = request.getRemoteAddr();
+        authService.initiateLogin(loginRequest, ip);
+
         return ResponseEntity.ok("Código de verificação enviado para o seu e-mail.");
     }
 
@@ -40,7 +44,6 @@ public class AuthController {
     public ResponseEntity<TokenResponseDTO> verify2FA(@Valid @RequestBody Verify2FARequestDTO verifyRequest) {
         String token = authService.verify2FAAndGenerateToken(verifyRequest);
         
-        // Retorna o DTO imutável (record) contendo o token gerado
         return ResponseEntity.ok(new TokenResponseDTO(token));
     }
 }

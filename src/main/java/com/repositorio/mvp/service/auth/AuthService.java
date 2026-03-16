@@ -2,7 +2,6 @@ package com.repositorio.mvp.service.auth;
 
 import java.security.SecureRandom;
 import java.time.LocalDateTime;
-import java.util.Random;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

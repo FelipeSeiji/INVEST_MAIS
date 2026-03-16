@@ -12,7 +12,6 @@ import com.repositorio.mvp.DTO.auth.Verify2FARequestDTO;
 import com.repositorio.mvp.service.auth.AuthService;
 
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
@@ -21,18 +20,24 @@ import jakarta.servlet.http.HttpServletRequest;
 @RestController
 @RequestMapping("/auth")
 @RequiredArgsConstructor
-@Tag(name = "Autenticação", description = "Endpoints para login e verificação de 2 fatores (2FA)")
 public class AuthController {
 
     private final AuthService authService;
     private final HttpServletRequest request;
 
+    private String getClientIp(HttpServletRequest httpServletRequest) {
+        String ip = httpServletRequest.getHeader("X-FORWARDED-FOR");
+        if(ip == null || ip.isEmpty() || !ip.contains(httpServletRequest.getRemoteAddr())) {
+            return httpServletRequest.getRemoteAddr();
+        }
+        return ip;
+    }
 
     // POST /auth/login
     @PostMapping("/login")
     @Operation(summary = "Inicia o login e envia código 2FA", description = "Valida e-mail e senha. Se corretos, envia um e-mail com o código de 6 dígitos para o usuário.")
-    public ResponseEntity<String> login(@Valid @RequestBody LoginRequestDTO loginRequest) {
-        String ip = request.getRemoteAddr();
+    public ResponseEntity<String> login(@Valid @RequestBody LoginRequestDTO loginRequest, HttpServletRequest httpServletRequest) {
+        String ip = httpServletRequest.getRemoteAddr();
         authService.initiateLogin(loginRequest, ip);
 
         return ResponseEntity.ok("Código de verificação enviado para o seu e-mail.");

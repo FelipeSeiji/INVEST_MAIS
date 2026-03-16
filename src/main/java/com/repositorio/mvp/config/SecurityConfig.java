@@ -20,8 +20,6 @@ import lombok.RequiredArgsConstructor;
 public class SecurityConfig {
     private final SecurityFilter securityFilter;
 
-
-
     @Bean
 public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
     http
@@ -29,8 +27,8 @@ public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Excepti
         .authorizeHttpRequests(auth -> auth
             .requestMatchers(HttpMethod.POST, "/auth/login").permitAll() 
             .requestMatchers(HttpMethod.POST, "/api/users").permitAll() 
-            .requestMatchers("/h2-console/**", "/swagger-ui/**", "/v3/api-docs/**").permitAll() 
-            .requestMatchers(HttpMethod.POST, "/auth/login", "/auth/verify-2fa").permitAll()
+            .requestMatchers("/h2-console/**", "/swagger-ui/**", "/v3/api-docs/**", "/swagger-ui.html").permitAll() 
+            .requestMatchers(HttpMethod.POST, "/auth/login", "/auth/verify-2fa", "/api/users").permitAll()
 
             .anyRequest().authenticated() 
         )

@@ -1,4 +1,4 @@
-package com.repositorio.mvp.security.token;
+package com.repositorio.mvp.service.token;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -46,7 +46,7 @@ public class TokenService {
     }
 
     private Instant genExpirationDate(){
-        return LocalDateTime.now().plusDays(2).toInstant(ZoneOffset.of("-03:00"));
+        return LocalDateTime.now().plusMinutes(10).toInstant(ZoneOffset.of("-03:00"));
     }
     public Instant getExpiration(String token) {
     try {

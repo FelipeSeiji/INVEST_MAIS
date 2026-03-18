@@ -1,17 +1,24 @@
 package com.repositorio.mvp.service.auth;
 
+import com.repositorio.mvp.repository.token.InvalidTokenRepository;
+import com.repositorio.mvp.repository.token.PasswordResetTokenRepository;
+
 import java.security.SecureRandom;
 import java.time.LocalDateTime;
+import java.util.UUID;
+
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import com.repositorio.mvp.DTO.auth.LoginRequestDTO;
 import com.repositorio.mvp.DTO.auth.Verify2FARequestDTO;
 import com.repositorio.mvp.model.User;
+import com.repositorio.mvp.model.token.InvalidToken;
+import com.repositorio.mvp.model.token.PasswordResetToken;
 import com.repositorio.mvp.repository.UserRepository;
-import com.repositorio.mvp.security.token.TokenService;
 import com.repositorio.mvp.service.interfaces.TwoFactorNotification;
 import com.repositorio.mvp.service.login.LoginAttemptService;
+import com.repositorio.mvp.service.token.TokenService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -19,13 +26,14 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class AuthService {
 
+    private final InvalidTokenRepository invalidTokenRepository;
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final TokenService tokenService;
     private final TwoFactorNotification twoFactorStrategy;
     private final LoginAttemptService loginAttemptService;
     private final SecureRandom secureRandom = new SecureRandom();
-
+    private final PasswordResetTokenRepository passwordResetTokenRepository;
 
     @Transactional
     public void initiateLogin(LoginRequestDTO loginRequest, String ip) {
@@ -71,5 +79,39 @@ public class AuthService {
 
     private String generateRandomCode() {
         return String.format("%06d", secureRandom.nextInt(999999));
+    }
+
+    public void logout(String token){
+        String tokenJWT = token.replace("Bearer ","");
+        InvalidToken invalidToken = new InvalidToken(tokenJWT, tokenService.getExpiration(tokenJWT));
+        invalidTokenRepository.save(invalidToken);
+    }
+
+    @Transactional
+    public void createPasswordResetTokenForUser(String email) {
+        userRepository.findByEmail(email).ifPresent(user -> {
+            String token = UUID.randomUUID().toString();
+            PasswordResetToken myToken = new PasswordResetToken(token, user);
+            passwordResetTokenRepository.save(myToken);
+        });
+    }
+
+    @Transactional
+    public void resetPassword(String token, String newPassword) {
+        PasswordResetToken resetToken = passwordResetTokenRepository.findByToken(token)
+                .orElseThrow(() -> {
+                    return new IllegalArgumentException("Token inválido.");
+                });
+
+        if (resetToken.getExpiryDate().isBefore(LocalDateTime.now())) {
+            passwordResetTokenRepository.delete(resetToken);
+            throw new IllegalArgumentException("Token expirado.");
+        }
+
+        User user = resetToken.getUser();
+        user.setPassword(passwordEncoder.encode(newPassword));
+        userRepository.save(user);
+        
+        passwordResetTokenRepository.delete(resetToken);
     }
 }

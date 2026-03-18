@@ -42,12 +42,14 @@ public class UserController {
     
     //GET /api/users
     @GetMapping
+    @Operation(summary = "Lista todos os usuarios", description = "Lista todos os usuarios do banco de dados")
     public ResponseEntity<List<UserResponseDTO>> getAllUsers() {
         return ResponseEntity.ok(userQueryService.listAllUsers());
     }
 
     //DELETE /api/users/{id}
     @DeleteMapping("/{id}")
+    @Operation(summary = "Deleta um usuario", description = "Deleta um usuario do banco de dados pelo id")
     public ResponseEntity<Void> deleteUser(@PathVariable UUID id) {
         userCommandService.deleteUserById(id);
         return ResponseEntity.noContent().build();
@@ -55,12 +57,14 @@ public class UserController {
 
     //GET /api/users/{id}
     @GetMapping("/{id}")
+    @Operation(summary = "Busca um usuario pelo id", description = "Busca um usuario do banco de dados pelo id")
     public ResponseEntity<UserResponseDTO> findUserByID(@PathVariable UUID id) {
         return ResponseEntity.ok(userQueryService.findUserById(id));
     }
 
     //PUT /api/users/{id}
     @PutMapping("/{id}")
+    @Operation(summary = "Atualiza um usuario", description = "Atualiza um usuario do banco de dados pelo id")
     public ResponseEntity<UserResponseDTO> updateUser(@PathVariable UUID id, @Valid @RequestBody UserUpdateRequestDTO userUpdateRequestDTO) {
         return ResponseEntity.ok(userCommandService.updateUserById(id, userUpdateRequestDTO));
     }

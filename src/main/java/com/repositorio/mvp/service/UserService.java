@@ -3,6 +3,7 @@ package com.repositorio.mvp.service;
 import java.util.List;
 import java.util.UUID;
 
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -10,10 +11,11 @@ import org.springframework.transaction.annotation.Transactional;
 import com.repositorio.mvp.DTO.user.UserRequestDTO;
 import com.repositorio.mvp.DTO.user.UserResponseDTO;
 import com.repositorio.mvp.DTO.user.UserUpdateRequestDTO;
-import com.repositorio.mvp.enums.UserRole;
 import com.repositorio.mvp.mapper.UserMapper;
 import com.repositorio.mvp.model.User;
+import com.repositorio.mvp.model.enums.UserRole;
 import com.repositorio.mvp.repository.UserRepository;
+import com.repositorio.mvp.security.UserDetailsImpl;
 import com.repositorio.mvp.service.interfaces.UserCommandService;
 import com.repositorio.mvp.service.interfaces.UserQueryService;
 import com.repositorio.mvp.service.validation.UserValidation;
@@ -84,5 +86,12 @@ public class UserService implements UserQueryService, UserCommandService{
         user.setEmail(userUpdateRequestDTO.email());
 
         return userMapper.toUserResponseDTO(userRepository.save(user));
+    }
+
+    @Transactional(readOnly = true)
+    public UserDetails loadUserDetailsById(String subjectId) {
+        User user = userRepository.findById(UUID.fromString(subjectId))
+            .orElseThrow(() -> new IllegalArgumentException("Usuário não encontrado para o token fornecido."));
+        return new UserDetailsImpl(user);
     }
 }

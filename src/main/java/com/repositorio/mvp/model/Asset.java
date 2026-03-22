@@ -7,7 +7,7 @@ import java.util.UUID;
 
 import org.hibernate.annotations.Formula;
 
-import com.repositorio.mvp.enums.AssetCategory;
+import com.repositorio.mvp.model.enums.AssetCategory;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -34,14 +34,13 @@ import lombok.Setter;
 import lombok.ToString;
 
 @Entity
-@Table(name = "TB_ACTIVE")
+@Table(name = "TB_ASSET")
 @Getter
-@Setter
 @ToString
 @RequiredArgsConstructor
 @Builder
 @AllArgsConstructor
-public class Active {
+public class Asset {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     @Setter(AccessLevel.NONE)

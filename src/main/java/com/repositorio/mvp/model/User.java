@@ -2,7 +2,8 @@ package com.repositorio.mvp.model;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
-import com.repositorio.mvp.enums.UserRole;
+
+import com.repositorio.mvp.model.enums.UserRole;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

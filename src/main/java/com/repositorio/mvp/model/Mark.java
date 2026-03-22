@@ -3,7 +3,7 @@ package com.repositorio.mvp.model;
 import java.math.BigDecimal;
 import java.util.UUID;
 
-import com.repositorio.mvp.enums.AssetCategory;
+import com.repositorio.mvp.model.enums.AssetCategory;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

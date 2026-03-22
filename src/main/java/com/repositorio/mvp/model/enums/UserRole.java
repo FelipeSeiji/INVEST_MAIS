@@ -1,4 +1,4 @@
-package com.repositorio.mvp.enums;
+package com.repositorio.mvp.model.enums;
 
 import java.util.Collection;
 import java.util.List;

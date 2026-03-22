@@ -7,8 +7,6 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
@@ -21,25 +19,29 @@ public class SecurityConfig {
     private final SecurityFilter securityFilter;
 
     @Bean
-public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
     http
         .csrf(csrf -> csrf.disable()) 
         .authorizeHttpRequests(auth -> auth
-            .requestMatchers(HttpMethod.POST, "/auth/login").permitAll() 
-            .requestMatchers(HttpMethod.POST, "/api/users").permitAll() 
-            .requestMatchers("/h2-console/**", "/swagger-ui/**", "/v3/api-docs/**", "/swagger-ui.html").permitAll() 
-            .requestMatchers(HttpMethod.POST, "/auth/login", "/auth/verify-2fa", "/api/users").permitAll()
-
-            .anyRequest().authenticated() 
+            .requestMatchers(
+            "/h2-console/**", 
+            "/swagger-ui/**", 
+            "/v3/api-docs/**", 
+            "/swagger-ui.html"
+        ).permitAll() 
+        .requestMatchers(HttpMethod.POST, 
+            "/auth/login", 
+            "/auth/verify-2fa",
+            "/api/users",
+            "/auth/forgot-password",
+            "/auth/reset-password"
+        ).permitAll().anyRequest().authenticated() 
         )
         .headers(headers -> headers.frameOptions(frame -> frame.disable()))
-        .addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class);
+        .addFilterBefore(
+            securityFilter,
+            UsernamePasswordAuthenticationFilter.class);
     return http.build();
-}
-
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder(12);
     }
 
     @Bean

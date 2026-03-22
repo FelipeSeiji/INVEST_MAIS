@@ -1,4 +1,4 @@
-package com.repositorio.mvp.enums;
+package com.repositorio.mvp.model.enums;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

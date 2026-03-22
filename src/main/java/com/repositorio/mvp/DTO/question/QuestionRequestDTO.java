@@ -1,6 +1,6 @@
 package com.repositorio.mvp.DTO.question;
 
-import com.repositorio.mvp.enums.AssetCategory;
+import com.repositorio.mvp.model.enums.AssetCategory;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;

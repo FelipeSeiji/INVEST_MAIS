@@ -1,9 +1,10 @@
-package com.repositorio.mvp.DTO.active;
+package com.repositorio.mvp.DTO.asset;
 
 import java.util.UUID;
-import com.repositorio.mvp.enums.AssetCategory;
 
-public record ActiveResponseDTO(
+import com.repositorio.mvp.model.enums.AssetCategory;
+
+public record AssetResponseDTO(
     UUID id,
     String name,
     Integer amount,

@@ -1,6 +1,7 @@
 package com.repositorio.mvp.DTO.mark;
 
-import com.repositorio.mvp.enums.AssetCategory;
+import com.repositorio.mvp.model.enums.AssetCategory;
+
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PositiveOrZero;

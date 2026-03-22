@@ -1,6 +1,7 @@
 package com.repositorio.mvp.service.validation;
 
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.repositorio.mvp.repository.UserRepository;
 
@@ -8,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 
 @Component
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class UserValidation {
     private final UserRepository userRepository;
 

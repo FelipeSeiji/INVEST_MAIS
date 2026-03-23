@@ -1,11 +1,13 @@
 package com.repositorio.mvp.controller.auth;
 
+import com.repositorio.mvp.service.login.LoginAttemptService;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import com.repositorio.mvp.DTO.auth.TokenResponseDTO;
 import com.repositorio.mvp.DTO.auth.Verify2FARequestDTO;
+import com.repositorio.mvp.DTO.auth.ForgotPasswordRequestDTO;
 import com.repositorio.mvp.DTO.auth.LoginRequestDTO;
 import com.repositorio.mvp.DTO.auth.ResetPasswordRequestDTO; 
 import com.repositorio.mvp.DTO.common.MessageResponseDTO;
@@ -19,14 +21,27 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import jakarta.servlet.http.HttpServletRequest;
 
+/**
+ * Controlador responsável por gerenciar todo o fluxo de autenticação pública da API.
+ * Lida com login, verificação de dois fatores (2FA), logout e recuperação de senhas.
+ */
+
 @RestController
 @RequestMapping("/auth")
 @RequiredArgsConstructor
 public class AuthController {
+    private final LoginAttemptService loginAttemptService;
     private final LoginService loginService;
     private final SessionService sessionService;
     private final PasswordRecoveryService passwordRecoveryService;
 
+    /**
+     * Inicia o processo de login do usuário.
+     * Valida as credenciais e, em caso de sucesso, gera um código 2FA e envia por e-mail.
+     * * @param loginRequest DTO contendo e-mail e senha do usuário.
+     * @param request Objeto HTTP da requisição usado para extrair o IP do cliente (para proteção contra força bruta).
+     * @return Mensagem de sucesso indicando o envio do e-mail.
+     */
     // POST /auth/login
     @PostMapping("/login")
     @ResponseStatus(HttpStatus.OK)
@@ -38,15 +53,28 @@ public class AuthController {
         return new MessageResponseDTO("Código de verificação enviado para o seu e-mail.");
     }
 
+    /**
+     * Conclui o processo de login verificando o código de dois fatores (2FA).
+     * Se o código for válido e não estiver expirado, libera o token JWT.
+     * * @param verifyRequest DTO contendo o e-mail e o código numérico recebido.
+     * @param request Objeto HTTP usado para extrair o IP e validar limites de tentativas.
+     * @return Token JWT para autenticação nas rotas protegidas.
+     */
     // POST /auth/verify-2fa
     @PostMapping("/verify-2fa")
     @ResponseStatus(HttpStatus.OK)
     @Operation(summary = "Valida o código 2FA e retorna o JWT", description = "Valida o código recebido por e-mail. Se correto e no prazo, devolve o token de acesso (JWT).")
-    public TokenResponseDTO verify2FA(@Valid @RequestBody Verify2FARequestDTO verifyRequest) {
-        String token = loginService.verify2FAAndGenerateToken(verifyRequest);
+    public TokenResponseDTO verify2FA(@Valid @RequestBody Verify2FARequestDTO verifyRequest, HttpServletRequest request) {
+        String ip = ClientIp.getClientIp(request);
+        String token = loginService.verify2FAAndGenerateToken(verifyRequest, ip);
         return new TokenResponseDTO(token);
     }
 
+    /**
+     * Encerra a sessão ativa do usuário invalidando o token JWT atual.
+     * O token é adicionado a uma Blacklist no banco de dados para impedir reuso.
+     * * @param token Token JWT enviado no cabeçalho Authorization.
+     */
     // POST /auth/logout
     @PostMapping("/logout")
     @ResponseStatus(HttpStatus.NO_CONTENT) 
@@ -56,15 +84,28 @@ public class AuthController {
         sessionService.logout(token);  
     }
 
+    /**
+     * Solicita o envio de um link de recuperação de senha para o e-mail informado.
+     * * @param request DTO contendo o e-mail do usuário no corpo da requisição.
+     * @return Mensagem genérica de sucesso (evita vazamento de informações sobre quais e-mails existem no sistema).
+     */
     // POST /auth/forgot-password
     @PostMapping("/forgot-password")
     @ResponseStatus(HttpStatus.OK)
     @Operation(summary = "Solicita a recuperação de senha", description = "Gera um token de redefinição e envia um link para o e-mail informado.")
-    public MessageResponseDTO forgotPassword(@RequestParam String email) {
-        passwordRecoveryService.createPasswordResetTokenForUser(email);
+    public MessageResponseDTO forgotPassword(@Valid @RequestBody ForgotPasswordRequestDTO forgotPasswordRequestDTO, HttpServletRequest request) {
+        String ip = ClientIp.getClientIp(request);
+        if(loginAttemptService.isBlocked(ip))
+        
+        passwordRecoveryService.createPasswordResetTokenForUser(forgotPasswordRequestDTO.email());
         return new MessageResponseDTO("Se o e-mail existir, um link de recuperação foi enviado.");
     }
 
+    /**
+     * Efetiva a troca de senha utilizando um token válido gerado no processo de recuperação.
+     * * @param request DTO contendo o token de recuperação e a nova senha desejada.
+     * @return Mensagem confirmando a alteração da senha.
+     */
     // POST /auth/reset-password
     @PostMapping("/reset-password")
     @ResponseStatus(HttpStatus.OK)

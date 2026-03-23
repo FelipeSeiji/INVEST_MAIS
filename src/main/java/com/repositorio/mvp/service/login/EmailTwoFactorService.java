@@ -7,11 +7,19 @@ import com.repositorio.mvp.model.User;
 import com.repositorio.mvp.service.interfaces.TwoFactorNotification;
 import lombok.RequiredArgsConstructor;
 
+/**
+ * Implementação da estratégia de notificação de Dois Fatores (2FA) utilizando E-mail.
+ */
 @Component
 @RequiredArgsConstructor
 public class EmailTwoFactorService implements TwoFactorNotification{
     private final JavaMailSender mailSender;
 
+    /**
+     * Prepara e envia o e-mail contendo o código de segurança para o usuário.
+     * @param user Entidade do usuário que solicitou o login.
+     * @param code Código numérico de 6 dígitos gerado previamente.
+     */
     @Override
     public void sendTwoFactorCode(User user, String code) {
         

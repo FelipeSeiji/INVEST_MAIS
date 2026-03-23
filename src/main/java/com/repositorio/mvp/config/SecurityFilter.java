@@ -18,6 +18,11 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 
+/**
+ * Filtro de Segurança executado em todas as requisições HTTP da API.
+ * Responsável por extrair o token JWT, validá-lo contra expiração e blacklist, 
+ * e injetar a identidade do usuário no contexto do Spring Security.
+ */
 @Component
 @RequiredArgsConstructor
 public class SecurityFilter extends OncePerRequestFilter {
@@ -26,6 +31,13 @@ public class SecurityFilter extends OncePerRequestFilter {
     private final UserService userService;
     private final TokenBlackListService invalidatedTokenService;
 
+    /**
+     * Método principal do filtro. Intercepta a requisição para verificar a presença 
+     * e a validade de um Token JWT antes de permitir que ela alcance os Controllers.
+     * @param request Requisição HTTP de entrada.
+     * @param response Resposta HTTP de saída.
+     * @param filterChain Cadeia de filtros de segurança do Spring.
+     */
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) 
         throws ServletException, IOException {       
@@ -37,6 +49,12 @@ public class SecurityFilter extends OncePerRequestFilter {
         filterChain.doFilter(request, response);
     }
 
+    /**
+     * Descriptografa o token, carrega os dados do usuário e estabelece a sessão segura atual.
+     * Em caso de falha (token corrompido, expirado ou usuário deletado), registra o incidente nos logs.
+     * @param token String contendo o JWT (sem o prefixo Bearer).
+     * @param request Requisição HTTP usada para capturar o IP do cliente em caso de fraude.
+     */
     private void authenticateClient(String token) {
         try {
             String subjectId = tokenService.validateToken(token);
@@ -55,6 +73,11 @@ public class SecurityFilter extends OncePerRequestFilter {
         }
     }
 
+    /**
+     * Extrai a string do JWT do cabeçalho "Authorization" no formato padrão (Bearer).
+     * @param request Requisição HTTP contendo os cabeçalhos.
+     * @return O token limpo (se presente) ou null caso o formato seja incorreto.
+     */
     private String recoverToken(HttpServletRequest request) {
         var authHeader = request.getHeader("Authorization");
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {

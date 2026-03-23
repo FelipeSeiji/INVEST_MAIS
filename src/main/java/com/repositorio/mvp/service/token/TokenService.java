@@ -10,6 +10,9 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 
+/**
+ * Serviço core de criptografia e gerenciamento de JSON Web Tokens (JWT).
+ */
 @Service
 public class TokenService {
     @Value("${api.security.token.secret}")
@@ -18,6 +21,11 @@ public class TokenService {
     private static final String ISSUER = "auth-api";
     private static final long EXPIRATION_MINUTES = 10;
 
+    /**
+     * Gera um novo token JWT assinado usando o algoritmo HMAC256.
+     * @param userId Identificador único do usuário a ser embutido no payload (Subject).
+     * @return Token JWT serializado em Base64Url.
+     */
     public String generateToken(UUID userId){
         Algorithm algorithm = Algorithm.HMAC256(secret);
         Instant now = Instant.now();
@@ -30,6 +38,12 @@ public class TokenService {
             .sign(algorithm);   
     }
 
+    /**
+     * Valida a integridade, o emissor e a data de expiração do token.
+     * @param token Token JWT recebido nas requisições protegidas.
+     * @return O ID do usuário (Subject) em formato String caso o token seja válido.
+     * @throws IllegalArgumentException Se a assinatura for inválida, o token estiver adulterado ou expirado.
+     */
     public String validateToken(String token){
         try {
             Algorithm algorithm = Algorithm.HMAC256(secret);
@@ -45,6 +59,12 @@ public class TokenService {
         }
     }
 
+    /**
+     * Descriptografa o token apenas para extrair o momento exato de sua expiração (útil para blacklists).
+     * @param token Token JWT a ser analisado.
+     * @return Data e hora da expiração (Instant).
+     * @throws IllegalArgumentException Se o token estiver malformado ou inválido.
+     */
     public Instant getExpiration(String token) {
         try {
             Algorithm algorithm = Algorithm.HMAC256(secret);

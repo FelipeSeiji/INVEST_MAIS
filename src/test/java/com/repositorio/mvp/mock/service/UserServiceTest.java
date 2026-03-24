@@ -62,8 +62,6 @@ public class UserServiceTest {
         UserResponseDTO expectedResponse =
             new UserResponseDTO(userId, USER.name(), USER.email());
 
-        // 🔹 NÃO precisa mais mockar existsByEmail
-
         when(userMapper.toUser(any(UserRequestDTO.class))).thenReturn(user);
         when(passwordEncoder.encode(anyString())).thenReturn("senha_encriptada");
         when(userRepository.save(any(User.class))).thenReturn(user);

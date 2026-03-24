@@ -8,6 +8,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+import com.repositorio.mvp.controller.auth.util.ClientIp;
 import com.repositorio.mvp.service.UserService;
 import com.repositorio.mvp.service.token.TokenBlackListService;
 import com.repositorio.mvp.service.token.TokenService;
@@ -17,12 +18,14 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Filtro de Segurança executado em todas as requisições HTTP da API.
  * Responsável por extrair o token JWT, validá-lo contra expiração e blacklist, 
  * e injetar a identidade do usuário no contexto do Spring Security.
  */
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class SecurityFilter extends OncePerRequestFilter {
@@ -44,7 +47,7 @@ public class SecurityFilter extends OncePerRequestFilter {
         String token = this.recoverToken(request);
 
         if (token != null && !invalidatedTokenService.isBlacklisted(token)) {
-            authenticateClient(token);
+            authenticateClient(token, request);
         }
         filterChain.doFilter(request, response);
     }
@@ -55,7 +58,7 @@ public class SecurityFilter extends OncePerRequestFilter {
      * @param token String contendo o JWT (sem o prefixo Bearer).
      * @param request Requisição HTTP usada para capturar o IP do cliente em caso de fraude.
      */
-    private void authenticateClient(String token) {
+    private void authenticateClient(String token, HttpServletRequest request) {
         try {
             String subjectId = tokenService.validateToken(token);
             
@@ -69,6 +72,9 @@ public class SecurityFilter extends OncePerRequestFilter {
 
             SecurityContextHolder.getContext().setAuthentication(authentication);
         } catch (Exception e) {
+            String ip = ClientIp.getClientIp(request);
+            log.warn("ACESSO NEGADO: Falha na validação do JWT. IP: {} | URI: {} | Motivo: {}", 
+            ip, request.getRequestURI(), e.getMessage());
             SecurityContextHolder.clearContext();
         }
     }

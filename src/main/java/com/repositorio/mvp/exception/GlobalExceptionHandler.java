@@ -10,7 +10,9 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import com.repositorio.mvp.exception.util.ProblemDetailBuilder;
 
 import jakarta.persistence.EntityNotFoundException;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
     //400
@@ -40,6 +42,8 @@ public class GlobalExceptionHandler {
     //500
     @ExceptionHandler(Exception.class)
     public ProblemDetail handleGenericException(Exception ex) {
+        log.error("ERRO INTERNO SEVERO (500): Ocorreu uma exceção não tratada.", ex);
+        
         return ProblemDetailBuilder.build(HttpStatus.INTERNAL_SERVER_ERROR, "Erro interno do servidor", "Ocorreu um erro inesperado.");
     }
 }

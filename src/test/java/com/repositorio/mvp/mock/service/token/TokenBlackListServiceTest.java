@@ -1,67 +1,92 @@
 package com.repositorio.mvp.mock.service.token;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 import java.time.Instant;
 
-import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.repositorio.mvp.model.token.InvalidToken;
 import com.repositorio.mvp.repository.token.InvalidTokenRepository;
+import com.repositorio.mvp.service.token.TokenBlackListService;
 
-import lombok.RequiredArgsConstructor;
-
-/**
- * Serviço responsável por gerenciar a Blacklist de tokens JWT (usados em logouts).
- */
-@Service
-@RequiredArgsConstructor
+@ExtendWith(MockitoExtension.class)
 public class TokenBlackListServiceTest {
 
-    private final TokenServiceTest tokenService;
-    private final InvalidTokenRepository invalidTokenRepository;
+    @InjectMocks
+    private TokenBlackListService tokenBlackListService;
 
-    /**
-     * Verifica no banco de dados se um token específico foi invalidado (logout).
-     * @param token Token JWT a ser verificado.
-     * @return true se o token estiver na blacklist.
-     */
-    @Transactional(readOnly = true)
-    public boolean isTokenInvalidated(String token) {
-        return invalidTokenRepository.existsById(token);
+    @Mock
+    private InvalidTokenRepository invalidTokenRepository;
+
+    @Captor
+    private ArgumentCaptor<InvalidToken> invalidTokenCaptor;
+
+    @Test
+    public void invalidateToken_SavesTokenToBlacklist() {
+        String token = "secret_token";
+        Instant expiredAt = Instant.now().plusSeconds(3600);
+
+        tokenBlackListService.invalidateToken(token, expiredAt);
+
+        verify(invalidTokenRepository).save(invalidTokenCaptor.capture());
+        InvalidToken savedToken = invalidTokenCaptor.getValue();
+
+        assertEquals(token, savedToken.getToken());
+        assertEquals(expiredAt, savedToken.getExpiresAt());
     }
 
-    /**
-     * Adiciona manualmente um token à blacklist.
-     * @param token Token JWT.
-     * @param expiresAt Data/hora exata em que o token perde sua validade original.
-     */
-    @Transactional
-    public void invalidateToken(String token, Instant expiresAt) {
-        InvalidToken invalidToken = new InvalidToken(token, expiresAt);
-        invalidTokenRepository.save(invalidToken);
+
+    @Test
+    public void isBlacklisted_WithNullOrBlankToken_ReturnsFalse() {
+        assertFalse(tokenBlackListService.isBlacklisted(null));
+        assertFalse(tokenBlackListService.isBlacklisted(""));
+        assertFalse(tokenBlackListService.isBlacklisted(" "));
+
+        verify(invalidTokenRepository, never()).existsById(anyString());
     }
 
-    /**
-     * Método auxiliar de segurança (fail-safe) para checar se o token é válido antes da validação da blacklist.
-     * @param token Token JWT.
-     * @return true se o token for nulo, em branco, ou já estiver na blacklist.
-     */
-    public boolean isBlacklisted(String token) {
-        if (tokenService == null || token.isBlank()) {
-            return false;
-        }
-        return invalidTokenRepository.existsById(token);
+    @Test
+    public void isBlacklisted_WithValidToken_QueriesRepository() {
+        String token = "valid_token";
+        when(invalidTokenRepository.existsById(token)).thenReturn(true);
+
+        boolean isBlacklisted = tokenBlackListService.isBlacklisted(token);
+
+        assertTrue(isBlacklisted);
+
+        verify(invalidTokenRepository).existsById(token);
     }
 
-    /**
-     * Rotina agendada (Cron Job) que executa automaticamente todos os dias às 03:00 da manhã.
-     * Remove do banco de dados os tokens da blacklist que já expiraram de forma natural,
-     * economizando espaço de armazenamento no banco de dados.
-     */
-    @Scheduled(cron = "0 0 3 * * *")
-    @Transactional
-    public void removeExpiredTokens() {
-        invalidTokenRepository.deleteByExpiresAtBefore(Instant.now());
+    @Test
+    public void isBlacklisted_WithInvalidToken_QueriesRepository() {
+        String token = "invalid_token";
+        when(invalidTokenRepository.existsById(token)).thenReturn(false);
+
+        boolean isBlacklisted = tokenBlackListService.isBlacklisted(token);
+
+        assertFalse(isBlacklisted);
+
+        verify(invalidTokenRepository).existsById(token);
+    }
+
+    @Test
+    public void removeExpiredTokens_CallsRepositoryToDeleteOldTokens() {
+        tokenBlackListService.removeExpiredTokens();
+
+        verify(invalidTokenRepository).deleteByExpiresAtBefore(any(Instant.class));
     }
 }

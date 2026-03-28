@@ -18,7 +18,6 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class TokenBlackListService {
 
-    private final TokenService tokenService;
     private final InvalidTokenRepository invalidTokenRepository;
 
     /**
@@ -48,7 +47,7 @@ public class TokenBlackListService {
      * @return true se o token for nulo, em branco, ou já estiver na blacklist.
      */
     public boolean isBlacklisted(String token) {
-        if (tokenService == null || token.isBlank()) {
+        if (token == null || token.isBlank()) {
             return false;
         }
         return invalidTokenRepository.existsById(token);

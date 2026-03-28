@@ -7,9 +7,9 @@ import com.repositorio.mvp.model.User;
 
 public class UserConstants {
     public static final UserRequestDTO USER = new UserRequestDTO(
-        "Usuario",
-        "exemplo@gmail.com",
-        "Senha@123"
+        "User",
+        "example@gmail.com",
+        "Password@123"
     );
 
     public static final UserRequestDTO INVALID_USER = new UserRequestDTO(

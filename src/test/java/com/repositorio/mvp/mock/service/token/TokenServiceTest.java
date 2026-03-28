@@ -1,82 +1,73 @@
 package com.repositorio.mvp.mock.service.token;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 import java.time.Instant;
 import java.util.UUID;
 
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.test.util.ReflectionTestUtils;
 
-import com.auth0.jwt.JWT;
-import com.auth0.jwt.algorithms.Algorithm;
-import com.auth0.jwt.exceptions.JWTVerificationException;
+import com.repositorio.mvp.service.token.TokenService;
 
-/**
- * Serviço core de criptografia e gerenciamento de JSON Web Tokens (JWT).
- */
-@Service
+@ExtendWith(MockitoExtension.class)
 public class TokenServiceTest {
-    @Value("${api.security.token.secret}")
-    private String secret;
 
-    private static final String ISSUER = "auth-api";
-    private static final long EXPIRATION_MINUTES = 10;
+    @InjectMocks
+    private TokenService tokenService;
 
-    /**
-     * Gera um novo token JWT assinado usando o algoritmo HMAC256.
-     * @param userId Identificador único do usuário a ser embutido no payload (Subject).
-     * @return Token JWT serializado em Base64Url.
-     */
-    public String generateToken(UUID userId){
-        Algorithm algorithm = Algorithm.HMAC256(secret);
-        Instant now = Instant.now();
-            
-        return JWT.create()
-            .withIssuer(ISSUER)
-            .withSubject(userId.toString())
-            .withIssuedAt(now)
-            .withExpiresAt(now.plusSeconds(EXPIRATION_MINUTES * 60))
-            .sign(algorithm);   
+    private final UUID mockUserId = UUID.randomUUID();
+    private final String mockSecret = "secret-key";
+
+    @BeforeEach
+    void setUp() {
+        tokenService = new TokenService();
+        
+        ReflectionTestUtils.setField(tokenService, "secret", mockSecret);
     }
 
-    /**
-     * Valida a integridade, o emissor e a data de expiração do token.
-     * @param token Token JWT recebido nas requisições protegidas.
-     * @return O ID do usuário (Subject) em formato String caso o token seja válido.
-     * @throws IllegalArgumentException Se a assinatura for inválida, o token estiver adulterado ou expirado.
-     */
-    public String validateToken(String token){
-        try {
-            Algorithm algorithm = Algorithm.HMAC256(secret);
+    @Test
+    public void generateToken_ReturnsValidJwtString() {
+        String token = tokenService.generateToken(mockUserId);
 
-            return JWT.require(algorithm)
-                .withIssuer(ISSUER)
-                .build()
-                .verify(token)
-                .getSubject();
-
-        } catch (JWTVerificationException exception){
-            throw new IllegalArgumentException("Token inválido");
-        }
+        assertNotNull(token, "O token não pode ser nulo");
+        assertFalse(token.isBlank(), "O token não pode estar em branco");
+        
+        String[] jwtParts = token.split("\\.");
+        assertEquals(3, jwtParts.length, "O JWT gerado deve conter 3 partes (Header, Payload e Signature)");
     }
 
-    /**
-     * Descriptografa o token apenas para extrair o momento exato de sua expiração (útil para blacklists).
-     * @param token Token JWT a ser analisado.
-     * @return Data e hora da expiração (Instant).
-     * @throws IllegalArgumentException Se o token estiver malformado ou inválido.
-     */
-    public Instant getExpiration(String token) {
-        try {
-            Algorithm algorithm = Algorithm.HMAC256(secret);
+    @Test
+    public void validateToken_WithValidToken_ReturnsSubjectId() {
+        String validToken = tokenService.generateToken(mockUserId);
 
-            return JWT.require(algorithm)
-                .withIssuer(ISSUER)
-                .build()
-                .verify(token)
-                .getExpiresAt()
-                .toInstant();
-    } catch (JWTVerificationException exception) {
-        throw new IllegalArgumentException("Token inválido");
+        String subject = tokenService.validateToken(validToken);
+
+        assertEquals(mockUserId.toString(), subject);
     }
-}
+
+    @Test
+    public void validateToken_WithInvalidOrTamperedToken_ThrowsException() {
+        String tamperedToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJhdXRoLWFwaSIsInN1YiI6IjEyMyIsImlhdCI6MTcxMDAwMDAwMCwiZXhwIjoxNzEwMDAzNjAwfQ.assinatura_falsa_inventada";
+
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+            tokenService.validateToken(tamperedToken);
+        });
+
+        assertEquals("Token inválido", exception.getMessage());
+    }
+
+    @Test
+    public void getExpiration_WithValidToken_ReturnsFutureInstant() {
+        String validToken = tokenService.generateToken(mockUserId);
+
+        Instant expiration = tokenService.getExpiration(validToken);
+
+        assertNotNull(expiration);
+        assertTrue(expiration.isAfter(Instant.now()), "A data de expiração do token deve ser no futuro");
+    }
 }

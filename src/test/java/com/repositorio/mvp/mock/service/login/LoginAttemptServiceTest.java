@@ -1,74 +1,56 @@
 package com.repositorio.mvp.mock.service.login;
 
-import java.time.Instant;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import org.springframework.stereotype.Service;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-/**
- * Serviço responsável por prevenir ataques de força bruta (Brute Force) e preenchimento de credenciais (Credential Stuffing).
- * Controla o número de tentativas falhas de login por IP ou E-mail, aplicando bloqueios temporários.
- */
-@Service
+import com.repositorio.mvp.service.login.LoginAttemptService;
+
+
+@ExtendWith(MockitoExtension.class)
 public class LoginAttemptServiceTest {
-    private static final int MAX_ATTEMPTS = 5;
-    private static final long BLOCK_DURATION_SECONDS = 900; 
+    private LoginAttemptService loginAttemptService;
 
-    private final Map<String, Integer> attemptsCache = new ConcurrentHashMap<>();
-    private final Map<String, Instant> blockedIps = new ConcurrentHashMap<>();
+    private final String IP = "182.168.0.1";
 
-    /**
-     * Registra um login bem-sucedido e limpa o histórico de falhas daquela chave (IP ou E-mail).
-     * @param key Chave de identificação (IP do cliente ou E-mail do usuário).
-     */
-    public void loginSucceeded(String ip) {
-        attemptsCache.remove(ip);
-        blockedIps.remove(ip);
+    @BeforeEach
+    void setUp() {
+        loginAttemptService = new LoginAttemptService();
     }
 
-    /**
-     * Registra uma tentativa falha de login.
-     * Se o limite de tentativas for atingido, a chave é bloqueada temporariamente.
-     * @param key Chave de identificação (IP do cliente ou E-mail do usuário).
-     */
-    public void loginFailed(String ip) {
-        int attempts = attemptsCache.getOrDefault(ip, 0) + 1;
-        attemptsCache.put(ip, attempts);
+    @Test
+    public void loginFailed_IncrementsAttemptsCounter() {
+        loginAttemptService.loginFailed(IP);
 
-        if (attempts >= MAX_ATTEMPTS) {
-            blockedIps.put(ip, Instant.now().plusSeconds(BLOCK_DURATION_SECONDS));
-        }
+        assertEquals(1, loginAttemptService.getAttempts(IP));
+        assertFalse(loginAttemptService.isBlocked(IP));
     }
 
-    /**
-     * Verifica se uma determinada chave (IP ou E-mail) está atualmente bloqueada.
-     * Caso o tempo de bloqueio já tenha expirado, a chave é liberada automaticamente.
-     * @param key Chave de identificação (IP do cliente ou E-mail do usuário).
-     * @return true se estiver bloqueado, false caso contrário.
-     */
-    public boolean isBlocked(String ip) {
-        Instant blockedUntil = blockedIps.get(ip);
-
-        if (blockedUntil == null) {
-            return false;
+    @Test
+    public void loginFailed_ReachesMaxAttempts_BlocksTheKey() {
+        for (int i = 0; i < 5; i++) {
+            loginAttemptService.loginFailed(IP);
         }
 
-        if (blockedUntil.isBefore(Instant.now())) {
-            blockedIps.remove(ip);
-            attemptsCache.remove(ip);
-            return false;
-        }
-
-        return true;
+        assertEquals(5, loginAttemptService.getAttempts(IP));
+        assertTrue(loginAttemptService.isBlocked(IP), "A chave deveria estar bloqueada após 5 tentativas falhas");
     }
 
-    /**
-     * Consulta a quantidade atual de tentativas falhas registradas para uma chave.
-     * @param key Chave de identificação (IP do cliente ou E-mail do usuário).
-     * @return Número inteiro representando a quantidade de falhas.
-     */
-    public int getAttempts(String ip) {
-        return attemptsCache.getOrDefault(ip, 0);
+    @Test
+    public void loginSucceeded_ResetsAttemptsAndRemovesBlock() {
+        loginAttemptService.loginFailed(IP);
+        loginAttemptService.loginFailed(IP);
+        loginAttemptService.loginFailed(IP);
+        assertEquals(3, loginAttemptService.getAttempts(IP));
+
+        loginAttemptService.loginSucceeded(IP);
+
+        assertEquals(0, loginAttemptService.getAttempts(IP));
+        assertFalse(loginAttemptService.isBlocked(IP));
     }
 }

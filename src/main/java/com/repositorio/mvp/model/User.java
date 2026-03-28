@@ -3,9 +3,11 @@ package com.repositorio.mvp.model;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+import com.repositorio.mvp.config.AttributeEncryptor;
 import com.repositorio.mvp.model.enums.UserRole;
 
 import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -38,12 +40,14 @@ public class User {
     private UUID id;
 
     @NotBlank
-    @Column(nullable = false, length = 50)
+    @Column(nullable = false, length = 255)
+    @Convert(converter = AttributeEncryptor.class)
     private String name;
 
     @NotBlank
     @Email
-    @Column(nullable = false, unique = true, length = 50)
+    @Column(nullable = false, unique = true, length = 255)
+    @Convert(converter = AttributeEncryptor.class)
     private String email;
 
     @NotBlank

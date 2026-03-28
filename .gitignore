@@ -34,3 +34,11 @@ build/
 
 ### Environment Variables / Secrets ###
 .env
+*.p12
+*.jks
+*.pem
+
+### OS & Logs (Recomendado) ###
+*.log
+.DS_Store
+Thumbs.db

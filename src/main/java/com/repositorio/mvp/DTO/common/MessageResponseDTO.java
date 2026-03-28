@@ -1,5 +1,5 @@
 package com.repositorio.mvp.DTO.common;
 
-public record MessageResponseDTO (
-    String message
-){}
+public record MessageResponseDTO(
+    String message) {
+}

@@ -1,78 +1,127 @@
 package com.repositorio.mvp.mock.service.auth;
 
-import java.security.SecureRandom;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 import java.time.LocalDateTime;
-import java.util.Base64;
+import java.util.Optional;
 
-import org.springframework.scheduling.annotation.Async;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import com.repositorio.mvp.model.User;
 import com.repositorio.mvp.model.token.PasswordResetToken;
 import com.repositorio.mvp.repository.UserRepository;
 import com.repositorio.mvp.repository.token.PasswordResetTokenRepository;
+import com.repositorio.mvp.service.auth.PasswordRecoveryService;
+import com.repositorio.mvp.shared.UserConstants;
 
-import lombok.RequiredArgsConstructor;
-
-/**
- * Serviço responsável por gerenciar o ciclo de vida da recuperação de contas.
- * Implementa defesas contra ataques de tempo (Timing Attacks) e geração criptográfica segura de tokens.
- */
-
-@Service
-@RequiredArgsConstructor
+@ExtendWith(MockitoExtension.class)
 public class PasswordRecoveryServiceTest {
 
-    private final UserRepository userRepository;
-    private final PasswordResetTokenRepository passwordResetTokenRepository;
-    private final PasswordEncoder passwordEncoder;
-    private final SecureRandom secureRandom = new SecureRandom();
+    @InjectMocks
+    private PasswordRecoveryService passwordRecoveryService;
 
-    /**
-     * Cria um token de recuperação seguro e o associa ao e-mail do usuário.
-     * O método é assíncrono (@Async) para mascarar o tempo de resposta da API,
-     * impedindo que hackers descubram quais e-mails estão cadastrados na plataforma.
-     * @param email Endereço de e-mail do usuário que solicitou a recuperação.
-     */
-    @Async
-    @Transactional
-    public void createPasswordResetTokenForUser(String email) {
-        userRepository.findByEmail(email).ifPresent(user -> {
-            byte[] tokenBytes = new byte[32];
-            secureRandom.nextBytes(tokenBytes);
-            String token = Base64.getUrlEncoder().withoutPadding().encodeToString(tokenBytes);
-            
-            PasswordResetToken myToken = new PasswordResetToken(token, user);
-            passwordResetTokenRepository.save(myToken);
-            
-            // TODO: Integrar com uma estratégia de envio de e-mail (ex: JavaMailSender, SendGrid, AWS SES)
-            // para enviar o link com o token para o usuário.
-        });
+    @Mock
+    private UserRepository userRepository;
+    
+    @Mock
+    private PasswordResetTokenRepository passwordResetTokenRepository;
+    
+    @Mock
+    private PasswordEncoder passwordEncoder;
+
+    private User mockUser;
+
+    @BeforeEach
+    void setUp() {
+        mockUser = UserConstants.createMockUser();
+    }
+    
+    @Test
+    public void createToken_WhenUserExists_GeneratesAndSavesToken() {
+        String email = mockUser.getEmail();
+
+        when(userRepository.findByEmail(email)).thenReturn(Optional.of(mockUser));
+
+        passwordRecoveryService.createPasswordResetTokenForUser(email);
+
+        verify(passwordResetTokenRepository).save(any(PasswordResetToken.class));
     }
 
-    /**
-     * Valida o token de recuperação fornecido e, se válido, altera a senha do usuário.
-     * O token é de uso único e tem prazo de validade rígido.
-     * @param token Hash de verificação recebido pelo usuário via e-mail.
-     * @param newPassword Nova senha desejada pelo usuário (já validada pelos DTOs).
-     * @throws IllegalArgumentException Se o token for inexistente ou estiver expirado.
-     */
-    @Transactional
-    public void resetPassword(String token, String newPassword) {
-        PasswordResetToken resetToken = passwordResetTokenRepository.findByToken(token)
-                .orElseThrow(() -> new IllegalArgumentException("Token inválido ou não encontrado."));
-
-        if (resetToken.getExpiryDate().isBefore(LocalDateTime.now())) {
-            passwordResetTokenRepository.delete(resetToken);
-            throw new IllegalArgumentException("Token expirado.");
-        }
-
-        User user = resetToken.getUser();
-        user.setPassword(passwordEncoder.encode(newPassword));
-        userRepository.save(user);
+    @Test
+    public void createToken_WhenUserDoesNotExist_DoesNothing() {
+        String email = "not_exist@gmail.com";
         
-        passwordResetTokenRepository.delete(resetToken);
+        when(userRepository.findByEmail(email)).thenReturn(Optional.empty());
+
+        passwordRecoveryService.createPasswordResetTokenForUser(email);
+
+        verify(passwordResetTokenRepository, never()).save(any());
+    }
+
+    @Test
+    public void resetPassword_WithValidToken_UpdatesPasswordAndDeletesToken() {
+        String token = "valid_token";
+        String newPassword = "newPassword@123";
+        String encoderPassword = "encodedPassword";
+
+        PasswordResetToken passwordResetToken = new PasswordResetToken(newPassword, mockUser);
+
+        passwordResetToken.setExpiryDate(LocalDateTime.now().plusMinutes(10));
+
+        when(passwordResetTokenRepository.findByToken(token)).thenReturn(Optional.of(passwordResetToken));
+        when(passwordEncoder.encode(newPassword)).thenReturn(encoderPassword);
+
+        passwordRecoveryService.resetPassword(token, newPassword);
+
+        assertEquals(encoderPassword, mockUser.getPassword());
+        verify(userRepository).save(mockUser);
+        verify(passwordResetTokenRepository).delete(passwordResetToken);
+    }
+
+    @Test
+    public void resetPassword_WithInvalidToken_ThrowsException() {
+        String invalidToken = "invalid_token";
+        String newPassword = "newPassword@123";
+        
+        when(passwordResetTokenRepository.findByToken(invalidToken)).thenReturn(Optional.empty());
+
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+            passwordRecoveryService.resetPassword(invalidToken, newPassword);
+        });
+
+        assertEquals("Token inválido ou não encontrado.", exception.getMessage());
+
+        verify(userRepository, never()).save(any());
+    }
+
+    @Test
+    public void resetPassword_WithExpiredToken_ThrowsExceptionAndDeletesToken() {
+        String token = "token_expirado";
+        String newPassword = "newPassword@123";   
+        PasswordResetToken expiredToken = new PasswordResetToken(token, mockUser);
+
+        expiredToken.setExpiryDate(LocalDateTime.now().minusMinutes(5));
+
+        when(passwordResetTokenRepository.findByToken(token)).thenReturn(Optional.of(expiredToken));
+
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+            passwordRecoveryService.resetPassword(token, newPassword);
+        });
+
+        assertTrue(exception.getMessage().contains("expirado"));
+
+        verify(passwordResetTokenRepository).delete(expiredToken);
+        verify(userRepository, never()).save(any());
     }
 }

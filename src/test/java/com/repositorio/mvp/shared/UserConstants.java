@@ -1,10 +1,13 @@
 package com.repositorio.mvp.shared;
 
+import java.util.UUID;
+
 import com.repositorio.mvp.DTO.user.UserRequestDTO;
+import com.repositorio.mvp.model.User;
 
 public class UserConstants {
     public static final UserRequestDTO USER = new UserRequestDTO(
-        "Felipe",
+        "Usuario",
         "exemplo@gmail.com",
         "Senha@123"
     );
@@ -14,4 +17,13 @@ public class UserConstants {
         "invalid-email",
         ""
     );
+
+    public static User createMockUser() {
+        return User.builder()
+        .id(UUID.randomUUID())
+        .name(USER.name())
+        .email(USER.email())
+        .password("password")
+        .build();
+    }
 }

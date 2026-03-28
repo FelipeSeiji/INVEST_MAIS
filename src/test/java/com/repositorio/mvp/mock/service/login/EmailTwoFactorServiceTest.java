@@ -1,33 +1,56 @@
 package com.repositorio.mvp.mock.service.login;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.verify;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.stereotype.Component;
 import com.repositorio.mvp.model.User;
-import com.repositorio.mvp.service.interfaces.TwoFactorNotification;
-import lombok.RequiredArgsConstructor;
+import com.repositorio.mvp.service.login.EmailTwoFactorService;
+import com.repositorio.mvp.shared.UserConstants;
 
-/**
- * Implementação da estratégia de notificação de Dois Fatores (2FA) utilizando E-mail.
- */
-@Component
-@RequiredArgsConstructor
-public class EmailTwoFactorServiceTest implements TwoFactorNotification{
-    private final JavaMailSender mailSender;
+@ExtendWith(MockitoExtension.class)
+public class EmailTwoFactorServiceTest{
 
-    /**
-     * Prepara e envia o e-mail contendo o código de segurança para o usuário.
-     * @param user Entidade do usuário que solicitou o login.
-     * @param code Código numérico de 6 dígitos gerado previamente.
-     */
-    @Override
-    public void sendTwoFactorCode(User user, String code) {
-        
-        SimpleMailMessage message = new SimpleMailMessage();
-        message.setTo(user.getEmail());
-        message.setSubject("Seu código de acesso (2FA) - MVP");
-        message.setText("Olá " + user.getName() + ",\n\nSeu código de acesso é: " + code + "\nVálido por 5 minutos.");
-        
-        mailSender.send(message);
+    @InjectMocks
+    private EmailTwoFactorService emailTwoFactorService;
+
+    @Mock
+    private JavaMailSender mailSender;
+
+    @Captor
+    private ArgumentCaptor<SimpleMailMessage> messageCaptor;
+
+    private User mockUser;
+
+
+    @BeforeEach
+    void setUp() {
+        mockUser = UserConstants.createMockUser();
+    }
+
+    @Test
+    public void sendTwoFactorCode_SendsEmailWithCorrectContent() {
+        String mockCode = "123456";
+
+        emailTwoFactorService.sendTwoFactorCode(mockUser, mockCode);
+
+        verify(mailSender).send(messageCaptor.capture());
+        SimpleMailMessage sentMessage = messageCaptor.getValue();
+
+        assertEquals(mockUser.getEmail(), sentMessage.getTo()[0]);
+
+        assertEquals("Seu código de acesso (2FA) - MVP", sentMessage.getSubject());   
+        assertTrue(sentMessage.getText().contains(mockUser.getName()), "O e-mail deve conter o nome do usuário");
+        assertTrue(sentMessage.getText().contains(mockCode), "O e-mail deve conter o código 2FA");
     }
 }

@@ -7,7 +7,7 @@ import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
 public record AuthenticationDTO(
-    @Schema(description = "Email do usuário",example = "felipe@gmail.com")
+    @Schema(description = "Email do usuário",example = "example@gmail.com")
     @NotBlank(message = "O email é obrigatório")
     @Email(message = "O email não é válido")
     @Size(min = 8, max = 50, message = "O email não pode ter mais de 50 caracteres")

@@ -32,6 +32,7 @@ public class LoginAttemptService {
      * Se o limite de tentativas for atingido, a chave é bloqueada temporariamente.
      * @param key Chave de identificação (IP do cliente ou E-mail do usuário).
      */
+    
     public void loginFailed(String ip) {
         int attempts = attemptsCache.getOrDefault(ip, 0) + 1;
         attemptsCache.put(ip, attempts);

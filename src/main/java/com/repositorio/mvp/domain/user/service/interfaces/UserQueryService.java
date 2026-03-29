@@ -1,4 +1,4 @@
-package com.repositorio.mvp.domain.user.service;
+package com.repositorio.mvp.domain.user.service.interfaces;
 
 import java.util.List;
 import java.util.UUID;

@@ -1,4 +1,4 @@
-package com.repositorio.mvp.domain.user.service;
+package com.repositorio.mvp.domain.user.service.interfaces;
 
 import java.util.UUID;
 import org.springframework.security.core.userdetails.UserDetails;

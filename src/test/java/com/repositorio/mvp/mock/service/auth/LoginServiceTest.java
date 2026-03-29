@@ -26,10 +26,10 @@ import com.repositorio.mvp.domain.auth.DTO.LoginRequestDTO;
 import com.repositorio.mvp.domain.auth.DTO.Verify2FARequestDTO;
 import com.repositorio.mvp.domain.user.model.User;
 import com.repositorio.mvp.domain.user.repository.UserRepository;
-import com.repositorio.mvp.service.interfaces.TwoFactorNotification;
-import com.repositorio.mvp.service.login.LoginAttemptService;
-import com.repositorio.mvp.service.login.LoginService;
-import com.repositorio.mvp.service.token.TokenService;
+import com.repositorio.mvp.domain.auth.service.interfaces.TwoFactorNotification;
+import com.repositorio.mvp.domain.auth.service.login.LoginAttemptService;
+import com.repositorio.mvp.domain.auth.service.login.LoginService;
+import com.repositorio.mvp.domain.auth.service.token.TokenService;
 import com.repositorio.mvp.shared.UserConstants;
 
 import org.mockito.InjectMocks;

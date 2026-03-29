@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.repositorio.mvp.domain.user.DTO.UserResponseDTO;
 import com.repositorio.mvp.domain.user.mapper.UserMapper;
 import com.repositorio.mvp.domain.user.repository.UserRepository;
+import com.repositorio.mvp.domain.user.service.interfaces.UserQueryService;
 
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;

@@ -8,7 +8,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import com.repositorio.mvp.domain.user.service.UserCommandService;
+import com.repositorio.mvp.domain.user.service.interfaces.UserCommandService;
 import com.repositorio.mvp.infrastructure.security.util.ClientIp;
 import com.repositorio.mvp.domain.auth.service.token.TokenBlackListService;
 import com.repositorio.mvp.domain.auth.service.token.TokenService;

@@ -12,7 +12,7 @@ import org.mockito.InjectMocks;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 
-import com.repositorio.mvp.service.token.TokenService;
+import com.repositorio.mvp.domain.auth.service.token.TokenService;
 
 @ExtendWith(MockitoExtension.class)
 public class TokenServiceTest {

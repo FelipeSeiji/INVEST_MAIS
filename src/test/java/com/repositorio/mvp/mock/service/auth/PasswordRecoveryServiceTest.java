@@ -23,7 +23,7 @@ import com.repositorio.mvp.domain.auth.model.PasswordResetToken;
 import com.repositorio.mvp.domain.auth.repository.PasswordResetTokenRepository;
 import com.repositorio.mvp.domain.user.model.User;
 import com.repositorio.mvp.domain.user.repository.UserRepository;
-import com.repositorio.mvp.service.auth.PasswordRecoveryService;
+import com.repositorio.mvp.domain.auth.service.auth.PasswordRecoveryService;
 import com.repositorio.mvp.shared.UserConstants;
 
 @ExtendWith(MockitoExtension.class)

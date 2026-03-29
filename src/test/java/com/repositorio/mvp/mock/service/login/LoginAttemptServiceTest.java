@@ -9,7 +9,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import com.repositorio.mvp.service.login.LoginAttemptService;
+import com.repositorio.mvp.domain.auth.service.login.LoginAttemptService;
 
 
 @ExtendWith(MockitoExtension.class)

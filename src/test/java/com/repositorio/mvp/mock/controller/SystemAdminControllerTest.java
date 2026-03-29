@@ -12,7 +12,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.repositorio.mvp.common.DTO.MessageResponseDTO;
 import com.repositorio.mvp.domain.admin.controller.SystemAdminController;
-import com.repositorio.mvp.service.token.TokenBlackListService;
+import com.repositorio.mvp.domain.auth.service.token.TokenBlackListService;
 
 @ExtendWith(MockitoExtension.class)
 public class SystemAdminControllerTest {

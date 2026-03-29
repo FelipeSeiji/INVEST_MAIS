@@ -18,8 +18,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import com.repositorio.mvp.domain.user.DTO.UserRequestDTO;
 import com.repositorio.mvp.domain.user.DTO.UserResponseDTO;
 import com.repositorio.mvp.domain.user.DTO.UserUpdateRequestDTO;
-import com.repositorio.mvp.domain.user.service.UserCommandService;
-import com.repositorio.mvp.domain.user.service.UserQueryService;
+import com.repositorio.mvp.domain.user.service.interfaces.UserCommandService;
+import com.repositorio.mvp.domain.user.service.interfaces.UserQueryService;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;

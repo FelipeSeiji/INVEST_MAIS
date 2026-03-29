@@ -15,8 +15,8 @@ import org.mockito.Mock;
 
 import com.repositorio.mvp.domain.auth.model.InvalidToken;
 import com.repositorio.mvp.domain.auth.repository.InvalidTokenRepository;
-import com.repositorio.mvp.service.auth.SessionService;
-import com.repositorio.mvp.service.token.TokenService;
+import com.repositorio.mvp.domain.auth.service.auth.SessionService;
+import com.repositorio.mvp.domain.auth.service.token.TokenService;
 
 import org.mockito.junit.jupiter.MockitoExtension;
 

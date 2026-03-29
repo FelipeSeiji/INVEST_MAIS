@@ -14,6 +14,7 @@ import com.repositorio.mvp.domain.user.mapper.UserMapper;
 import com.repositorio.mvp.domain.user.model.User;
 import com.repositorio.mvp.domain.user.model.enums.UserRole;
 import com.repositorio.mvp.domain.user.repository.UserRepository;
+import com.repositorio.mvp.domain.user.service.interfaces.UserCommandService;
 import com.repositorio.mvp.domain.user.validation.UserValidation;
 import com.repositorio.mvp.infrastructure.security.UserDetailsImpl;
 
@@ -74,7 +75,7 @@ public class UserCommandServiceImpl implements UserCommandService {
     public UserResponseDTO updateUserById(UUID id, UserUpdateRequestDTO userUpdateRequestDTO) {
         User user = userRepository.findById(id)
             .orElseThrow(() -> new EntityNotFoundException("Usuário não encontrado."));
-
+        
         userValidation.validadeUpdateEmail(userUpdateRequestDTO.email(), user.getEmail());
 
         user.setName(userUpdateRequestDTO.name());

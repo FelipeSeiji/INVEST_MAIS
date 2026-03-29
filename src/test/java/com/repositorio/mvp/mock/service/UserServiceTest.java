@@ -20,14 +20,14 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-import com.repositorio.mvp.DTO.user.UserRequestDTO;
-import com.repositorio.mvp.DTO.user.UserResponseDTO;
-import com.repositorio.mvp.mapper.UserMapper;
-import com.repositorio.mvp.model.User;
-import com.repositorio.mvp.repository.UserRepository;
-import com.repositorio.mvp.service.UserCommandServiceImpl;
-import com.repositorio.mvp.service.UserQueryServiceImpl;
-import com.repositorio.mvp.service.validation.UserValidation;
+import com.repositorio.mvp.domain.user.DTO.UserRequestDTO;
+import com.repositorio.mvp.domain.user.DTO.UserResponseDTO;
+import com.repositorio.mvp.domain.user.mapper.UserMapper;
+import com.repositorio.mvp.domain.user.model.User;
+import com.repositorio.mvp.domain.user.repository.UserRepository;
+import com.repositorio.mvp.domain.user.service.UserCommandServiceImpl;
+import com.repositorio.mvp.domain.user.service.UserQueryServiceImpl;
+import com.repositorio.mvp.domain.user.validation.UserValidation;
 
 import jakarta.persistence.EntityNotFoundException;
 

@@ -12,8 +12,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import com.repositorio.mvp.repository.UserRepository;
-import com.repositorio.mvp.service.validation.UserValidation;
+import com.repositorio.mvp.domain.user.repository.UserRepository;
+import com.repositorio.mvp.domain.user.validation.UserValidation;
 
 @ExtendWith(MockitoExtension.class)
 public class UserValidationTest {

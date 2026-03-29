@@ -17,12 +17,12 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import com.repositorio.mvp.DTO.user.UserRequestDTO;
-import com.repositorio.mvp.DTO.user.UserResponseDTO;
-import com.repositorio.mvp.DTO.user.UserUpdateRequestDTO;
-import com.repositorio.mvp.controller.UserController;
-import com.repositorio.mvp.service.interfaces.UserCommandService;
-import com.repositorio.mvp.service.interfaces.UserQueryService;
+import com.repositorio.mvp.domain.user.DTO.UserRequestDTO;
+import com.repositorio.mvp.domain.user.DTO.UserResponseDTO;
+import com.repositorio.mvp.domain.user.DTO.UserUpdateRequestDTO;
+import com.repositorio.mvp.domain.user.controller.UserController;
+import com.repositorio.mvp.domain.user.service.UserCommandService;
+import com.repositorio.mvp.domain.user.service.UserQueryService;
 import com.repositorio.mvp.shared.UserConstants;
 
 @ExtendWith(MockitoExtension.class)

@@ -10,8 +10,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import com.repositorio.mvp.DTO.common.MessageResponseDTO;
-import com.repositorio.mvp.controller.SystemAdminController;
+import com.repositorio.mvp.common.DTO.MessageResponseDTO;
+import com.repositorio.mvp.domain.admin.controller.SystemAdminController;
 import com.repositorio.mvp.service.token.TokenBlackListService;
 
 @ExtendWith(MockitoExtension.class)

@@ -19,8 +19,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import com.repositorio.mvp.model.token.InvalidToken;
-import com.repositorio.mvp.repository.token.InvalidTokenRepository;
+import com.repositorio.mvp.domain.auth.model.InvalidToken;
+import com.repositorio.mvp.domain.auth.repository.InvalidTokenRepository;
 import com.repositorio.mvp.service.token.TokenBlackListService;
 
 @ExtendWith(MockitoExtension.class)

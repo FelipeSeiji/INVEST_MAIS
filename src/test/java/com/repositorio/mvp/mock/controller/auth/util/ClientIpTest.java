@@ -10,7 +10,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import com.repositorio.mvp.controller.auth.util.ClientIp;
+import com.repositorio.mvp.infrastructure.security.util.ClientIp;
 
 import jakarta.servlet.http.HttpServletRequest;
 

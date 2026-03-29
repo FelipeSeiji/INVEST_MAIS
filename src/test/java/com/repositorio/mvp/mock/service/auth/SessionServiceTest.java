@@ -12,8 +12,9 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import com.repositorio.mvp.model.token.InvalidToken;
-import com.repositorio.mvp.repository.token.InvalidTokenRepository;
+
+import com.repositorio.mvp.domain.auth.model.InvalidToken;
+import com.repositorio.mvp.domain.auth.repository.InvalidTokenRepository;
 import com.repositorio.mvp.service.auth.SessionService;
 import com.repositorio.mvp.service.token.TokenService;
 

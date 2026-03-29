@@ -11,17 +11,17 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import com.repositorio.mvp.DTO.auth.ForgotPasswordRequestDTO;
-import com.repositorio.mvp.DTO.auth.LoginRequestDTO;
-import com.repositorio.mvp.DTO.auth.ResetPasswordRequestDTO;
-import com.repositorio.mvp.DTO.auth.TokenResponseDTO;
-import com.repositorio.mvp.DTO.auth.Verify2FARequestDTO;
-import com.repositorio.mvp.DTO.common.MessageResponseDTO;
-import com.repositorio.mvp.controller.auth.AuthController;
-import com.repositorio.mvp.service.auth.LoginService;
+import com.repositorio.mvp.common.DTO.MessageResponseDTO;
+import com.repositorio.mvp.domain.auth.DTO.ForgotPasswordRequestDTO;
+import com.repositorio.mvp.domain.auth.DTO.LoginRequestDTO;
+import com.repositorio.mvp.domain.auth.DTO.ResetPasswordRequestDTO;
+import com.repositorio.mvp.domain.auth.DTO.TokenResponseDTO;
+import com.repositorio.mvp.domain.auth.DTO.Verify2FARequestDTO;
+import com.repositorio.mvp.domain.auth.controller.AuthController;
 import com.repositorio.mvp.service.auth.PasswordRecoveryService;
 import com.repositorio.mvp.service.auth.SessionService;
 import com.repositorio.mvp.service.login.LoginAttemptService;
+import com.repositorio.mvp.service.login.LoginService;
 import com.repositorio.mvp.shared.UserConstants;
 
 import jakarta.servlet.http.HttpServletRequest;

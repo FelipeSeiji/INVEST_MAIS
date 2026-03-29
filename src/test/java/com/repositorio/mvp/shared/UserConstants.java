@@ -2,8 +2,8 @@ package com.repositorio.mvp.shared;
 
 import java.util.UUID;
 
-import com.repositorio.mvp.DTO.user.UserRequestDTO;
-import com.repositorio.mvp.model.User;
+import com.repositorio.mvp.domain.user.DTO.UserRequestDTO;
+import com.repositorio.mvp.domain.user.model.User;
 
 public class UserConstants {
     public static final UserRequestDTO USER = new UserRequestDTO(

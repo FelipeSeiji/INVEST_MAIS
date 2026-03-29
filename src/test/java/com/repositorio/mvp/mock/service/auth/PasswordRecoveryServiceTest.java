@@ -18,10 +18,11 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import com.repositorio.mvp.model.User;
-import com.repositorio.mvp.model.token.PasswordResetToken;
-import com.repositorio.mvp.repository.UserRepository;
-import com.repositorio.mvp.repository.token.PasswordResetTokenRepository;
+
+import com.repositorio.mvp.domain.auth.model.PasswordResetToken;
+import com.repositorio.mvp.domain.auth.repository.PasswordResetTokenRepository;
+import com.repositorio.mvp.domain.user.model.User;
+import com.repositorio.mvp.domain.user.repository.UserRepository;
 import com.repositorio.mvp.service.auth.PasswordRecoveryService;
 import com.repositorio.mvp.shared.UserConstants;
 

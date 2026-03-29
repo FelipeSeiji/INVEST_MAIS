@@ -16,10 +16,14 @@ public class ClientIp {
     public static String getClientIp(HttpServletRequest request) {
         String ipAddress = request.getHeader("X-Forwarded-For");
 
-        if(ipAddress == null || ipAddress.isEmpty() || "unknown".equalsIgnoreCase(ipAddress)) {
-            return request.getRemoteAddr();
-        } else {
-            return ipAddress.split(",")[0].trim();
+        if (ipAddress != null && !ipAddress.isEmpty() && !"unknown".equalsIgnoreCase(ipAddress)) {
+            String cleanIp = ipAddress.split(",")[0].trim();
+            
+            if (cleanIp.length() <= 45) { 
+                return cleanIp;
+            }
         }
+
+        return request.getRemoteAddr();
     }
 }

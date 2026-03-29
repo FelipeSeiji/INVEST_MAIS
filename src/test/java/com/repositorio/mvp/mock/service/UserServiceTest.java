@@ -25,7 +25,8 @@ import com.repositorio.mvp.DTO.user.UserResponseDTO;
 import com.repositorio.mvp.mapper.UserMapper;
 import com.repositorio.mvp.model.User;
 import com.repositorio.mvp.repository.UserRepository;
-import com.repositorio.mvp.service.UserService;
+import com.repositorio.mvp.service.UserCommandServiceImpl;
+import com.repositorio.mvp.service.UserQueryServiceImpl;
 import com.repositorio.mvp.service.validation.UserValidation;
 
 import jakarta.persistence.EntityNotFoundException;
@@ -34,7 +35,10 @@ import jakarta.persistence.EntityNotFoundException;
 public class UserServiceTest {
 
     @InjectMocks
-    private UserService userServiceImpl;
+    private UserCommandServiceImpl userCommandService;
+
+    @InjectMocks
+    private UserQueryServiceImpl userQueryService;
 
     @Mock
     private UserRepository userRepository;
@@ -67,7 +71,7 @@ public class UserServiceTest {
         when(userRepository.save(any(User.class))).thenReturn(user);
         when(userMapper.toUserResponseDTO(any(User.class))).thenReturn(expectedResponse);
 
-        UserResponseDTO createdUser = userServiceImpl.createUser(USER);
+        UserResponseDTO createdUser = userCommandService.createUser(USER);
 
         assertThat(createdUser).isNotNull();
         assertThat(createdUser.id()).isEqualTo(userId);
@@ -83,7 +87,7 @@ public class UserServiceTest {
             .validadeNewEmail(anyString());
 
         assertThatThrownBy(() -> {
-            userServiceImpl.createUser(INVALID_USER);
+            userCommandService.createUser(INVALID_USER);
         }).isInstanceOf(IllegalArgumentException.class)
           .hasMessage("Email já está em uso");
     }
@@ -103,7 +107,7 @@ public class UserServiceTest {
         when(userRepository.findById(userId)).thenReturn(Optional.of(user));
         when(userMapper.toUserResponseDTO(user)).thenReturn(expectedResponse);
 
-        UserResponseDTO foundUser = userServiceImpl.findUserById(userId);
+        UserResponseDTO foundUser = userQueryService.findUserById(userId);
 
         assertThat(foundUser).isNotNull();
         assertThat(foundUser.id()).isEqualTo(userId);
@@ -116,7 +120,7 @@ public class UserServiceTest {
         when(userRepository.findById(userId)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> {
-            userServiceImpl.findUserById(userId);
+            userQueryService.findUserById(userId);
         }).isInstanceOf(EntityNotFoundException.class)
           .hasMessage("Usuário não encontrado");
     }
@@ -149,7 +153,7 @@ public class UserServiceTest {
         when(userMapper.toUserResponseDTO(user1)).thenReturn(expectedResponse1);
         when(userMapper.toUserResponseDTO(user2)).thenReturn(expectedResponse2);
 
-        List<UserResponseDTO> users = userServiceImpl.listAllUsers();
+        List<UserResponseDTO> users = userQueryService.listAllUsers();
 
         assertThat(users).isNotNull();
         assertThat(users.size()).isEqualTo(2);

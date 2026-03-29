@@ -1,75 +1,36 @@
 package com.repositorio.mvp.service.login;
 
-import java.time.Instant;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
 import org.springframework.stereotype.Service;
+import java.util.concurrent.TimeUnit;
 
-/**
- * Serviço responsável por prevenir ataques de força bruta (Brute Force) e preenchimento de credenciais (Credential Stuffing).
- * Controla o número de tentativas falhas de login por IP ou E-mail, aplicando bloqueios temporários.
- */
 @Service
 public class LoginAttemptService {
     private static final int MAX_ATTEMPTS = 5;
-    private static final long BLOCK_DURATION_SECONDS = 900; 
 
-    private final Map<String, Integer> attemptsCache = new ConcurrentHashMap<>();
-    private final Map<String, Instant> blockedIps = new ConcurrentHashMap<>();
+    // Proteção de Memória: Guarda no máximo 10.000 IPs e expira automaticamente após 15 minutos.
+    private final Cache<String, Integer> attemptsCache = Caffeine.newBuilder()
+            .expireAfterWrite(15, TimeUnit.MINUTES)
+            .maximumSize(10000)
+            .build();
 
-    /**
-     * Registra um login bem-sucedido e limpa o histórico de falhas daquela chave (IP ou E-mail).
-     * @param key Chave de identificação (IP do cliente ou E-mail do usuário).
-     */
-    public void loginSucceeded(String ip) {
-        attemptsCache.remove(ip);
-        blockedIps.remove(ip);
+    public void loginSucceeded(String key) {
+        attemptsCache.invalidate(key);
     }
 
-    /**
-     * Registra uma tentativa falha de login.
-     * Se o limite de tentativas for atingido, a chave é bloqueada temporariamente.
-     * @param key Chave de identificação (IP do cliente ou E-mail do usuário).
-     */
-    
-    public void loginFailed(String ip) {
-        int attempts = attemptsCache.getOrDefault(ip, 0) + 1;
-        attemptsCache.put(ip, attempts);
-
-        if (attempts >= MAX_ATTEMPTS) {
-            blockedIps.put(ip, Instant.now().plusSeconds(BLOCK_DURATION_SECONDS));
-        }
+    public void loginFailed(String key) {
+        // Se a chave não existir, inicializa com 0 e soma 1.
+        int attempts = attemptsCache.get(key, k -> 0) + 1;
+        attemptsCache.put(key, attempts);
     }
 
-    /**
-     * Verifica se uma determinada chave (IP ou E-mail) está atualmente bloqueada.
-     * Caso o tempo de bloqueio já tenha expirado, a chave é liberada automaticamente.
-     * @param key Chave de identificação (IP do cliente ou E-mail do usuário).
-     * @return true se estiver bloqueado, false caso contrário.
-     */
-    public boolean isBlocked(String ip) {
-        Instant blockedUntil = blockedIps.get(ip);
-
-        if (blockedUntil == null) {
-            return false;
-        }
-
-        if (blockedUntil.isBefore(Instant.now())) {
-            blockedIps.remove(ip);
-            attemptsCache.remove(ip);
-            return false;
-        }
-
-        return true;
+    public boolean isBlocked(String key) {
+        return attemptsCache.get(key, k -> 0) >= MAX_ATTEMPTS;
     }
 
-    /**
-     * Consulta a quantidade atual de tentativas falhas registradas para uma chave.
-     * @param key Chave de identificação (IP do cliente ou E-mail do usuário).
-     * @return Número inteiro representando a quantidade de falhas.
-     */
-    public int getAttempts(String ip) {
-        return attemptsCache.getOrDefault(ip, 0);
+    public int getAttempts(String key) {
+        Integer attempts = attemptsCache.getIfPresent(key);
+        return attempts != null ? attempts : 0;
     }
 }

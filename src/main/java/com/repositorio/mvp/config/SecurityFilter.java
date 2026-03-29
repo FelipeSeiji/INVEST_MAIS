@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import com.repositorio.mvp.controller.auth.util.ClientIp;
-import com.repositorio.mvp.service.UserService;
+import com.repositorio.mvp.service.interfaces.UserCommandService;
 import com.repositorio.mvp.service.token.TokenBlackListService;
 import com.repositorio.mvp.service.token.TokenService;
 
@@ -31,7 +31,7 @@ import lombok.extern.slf4j.Slf4j;
 public class SecurityFilter extends OncePerRequestFilter {
 
     private final TokenService tokenService;
-    private final UserService userService;
+    private final UserCommandService userService;
     private final TokenBlackListService invalidatedTokenService;
 
     /**

@@ -1,6 +1,5 @@
 package com.repositorio.mvp.service;
 
-import java.util.List;
 import java.util.UUID;
 
 import org.springframework.security.core.userdetails.UserDetails;
@@ -17,20 +16,14 @@ import com.repositorio.mvp.model.enums.UserRole;
 import com.repositorio.mvp.repository.UserRepository;
 import com.repositorio.mvp.security.UserDetailsImpl;
 import com.repositorio.mvp.service.interfaces.UserCommandService;
-import com.repositorio.mvp.service.interfaces.UserQueryService;
 import com.repositorio.mvp.service.validation.UserValidation;
 
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 
-/**
- * Serviço que concentra as regras de negócio para a gestão do cadastro de usuários.
- * Implementa os padrões de Segregação de Comando e Consulta (CQRS) através das interfaces Command e Query.
- */
-
 @Service
 @RequiredArgsConstructor
-public class UserService implements UserQueryService, UserCommandService{
+public class UserCommandServiceImpl implements UserCommandService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final UserMapper userMapper;
@@ -56,39 +49,12 @@ public class UserService implements UserQueryService, UserCommandService{
     }
 
     /**
-     * Busca um usuário específico pelo seu identificador único (UUID).
-     * * @param id UUID do usuário.
-     * @return DTO contendo os dados do usuário.
-     * @throws EntityNotFoundException Se o UUID não existir na base de dados.
-     */
-    @Override
-    @Transactional(readOnly = true)
-    public UserResponseDTO findUserById(UUID id) {
-        return userRepository.findById(id)
-            .map(userMapper::toUserResponseDTO)
-            .orElseThrow(() -> new EntityNotFoundException("Usuário não encontrado"));
-    }
-
-    /**
-     * Lista todos os usuários cadastrados no sistema.
-     * Nota: Idealmente, em produção, este método deve implementar paginação (Pageable).
-     * * @return Lista contendo DTOs de todos os usuários.
-     */
-    @Transactional(readOnly = true)
-    @Override
-    public List<UserResponseDTO> listAllUsers() {
-        return userRepository.findAll().stream()
-            .map(userMapper::toUserResponseDTO)
-            .toList();
-    }
-
-    /**
      * Remove um usuário permanentemente da base de dados.
      * * @param id UUID do usuário a ser excluído.
      * @throws EntityNotFoundException Caso o usuário não seja encontrado.
      */
-    @Transactional
     @Override
+    @Transactional
     public void deleteUserById(UUID id) {
         if (!userRepository.existsById(id)) {
             throw new EntityNotFoundException("Usuário não encontrado com o ID: " + id);
@@ -104,8 +70,8 @@ public class UserService implements UserQueryService, UserCommandService{
      * @return DTO com o perfil atualizado do usuário.
      * @throws IllegalArgumentException Se a senha de confirmação estiver incorreta.
      */
-    @Transactional
     @Override
+    @Transactional
     public UserResponseDTO updateUserById(UUID id, UserUpdateRequestDTO userUpdateRequestDTO) {
         User user = userRepository.findById(id)
             .orElseThrow(() -> new EntityNotFoundException("Usuário não encontrado."));

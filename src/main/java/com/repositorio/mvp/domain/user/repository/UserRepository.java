@@ -11,7 +11,9 @@ import com.repositorio.mvp.domain.user.model.User;
 @Repository
 public interface UserRepository extends JpaRepository<User, UUID> {
 
-    boolean existsByEmail(String email);
+    boolean existsByEmailHash(String emailHash);
 
     Optional<User> findByEmail(String email);
+
+    Optional<User> findByEmailHash(String emailHash);
 }

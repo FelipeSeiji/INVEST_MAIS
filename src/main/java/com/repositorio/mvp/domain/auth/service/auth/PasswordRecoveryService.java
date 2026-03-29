@@ -1,5 +1,6 @@
 package com.repositorio.mvp.domain.auth.service.auth;
 
+import java.security.MessageDigest;
 import java.security.SecureRandom;
 import java.time.LocalDateTime;
 import java.util.Base64;
@@ -44,7 +45,7 @@ public class PasswordRecoveryService {
             secureRandom.nextBytes(tokenBytes);
             String token = Base64.getUrlEncoder().withoutPadding().encodeToString(tokenBytes);
             
-            PasswordResetToken myToken = new PasswordResetToken(token, user);
+            PasswordResetToken myToken = new PasswordResetToken(hashToken(token), user);
             passwordResetTokenRepository.save(myToken);
             
             // TODO: Integrar com uma estratégia de envio de e-mail (ex: JavaMailSender, SendGrid, AWS SES)
@@ -61,7 +62,7 @@ public class PasswordRecoveryService {
      */
     @Transactional
     public void resetPassword(String token, String newPassword) {
-        PasswordResetToken resetToken = passwordResetTokenRepository.findByToken(token)
+        PasswordResetToken resetToken = passwordResetTokenRepository.findByToken(hashToken(token))
                 .orElseThrow(() -> new IllegalArgumentException("Token inválido ou não encontrado."));
 
         if (resetToken.getExpiryDate().isBefore(LocalDateTime.now())) {
@@ -74,5 +75,15 @@ public class PasswordRecoveryService {
         userRepository.save(user);
         
         passwordResetTokenRepository.delete(resetToken);
+    }
+
+    private String hashToken(String token) {
+        try {
+            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+            byte[] hash = digest.digest(token.getBytes());
+            return Base64.getUrlEncoder().withoutPadding().encodeToString(hash);
+        } catch (Exception e) {
+            throw new RuntimeException("Erro ao gerar hash do token.", e);
+        }
     }
 }

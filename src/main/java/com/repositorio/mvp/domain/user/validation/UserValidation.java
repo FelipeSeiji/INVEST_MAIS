@@ -6,6 +6,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.repositorio.mvp.domain.user.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.codec.digest.DigestUtils;
 
 /**
  * Componente dedicado à execução de validações de regras de negócios avançadas para a entidade User.
@@ -23,7 +24,8 @@ public class UserValidation {
      * @throws IllegalArgumentException Se o e-mail já estiver associado a outra conta.
      */
     public void validadeNewEmail(String email){
-        if (userRepository.existsByEmail(email)) {
+        String hash = DigestUtils.sha256Hex(email.toLowerCase());
+        if (userRepository.existsByEmailHash(hash)) {
             throw new IllegalArgumentException("Email já está em uso");
         }
     }
@@ -36,7 +38,8 @@ public class UserValidation {
      * @throws IllegalArgumentException Se o e-mail desejado já for propriedade de outro usuário.
      */
     public void validadeUpdateEmail(String email, String currentEmail) {
-        if (userRepository.existsByEmail(email) && !currentEmail.equals(email)){
+        String hash = DigestUtils.sha256Hex(email.toLowerCase());
+        if (userRepository.existsByEmailHash(hash) && !currentEmail.equals(email)){
             throw new IllegalArgumentException("Email já está em uso por outro usuário.");
         }
     }

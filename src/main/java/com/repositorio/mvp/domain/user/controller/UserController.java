@@ -1,8 +1,10 @@
 package com.repositorio.mvp.domain.user.controller;
 
-import java.util.List;
 import java.util.UUID;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -59,9 +61,11 @@ public class UserController {
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
     @PreAuthorize("hasRole('ADMIN')")
-    @Operation(summary = "Lista todos os usuarios", description = "Lista todos os usuarios do banco de dados")
-    public List<UserResponseDTO> getAllUsers() {
-        return userQueryService.listAllUsers();
+    @Operation(summary = "Lista os usuarios com paginação", description = "Retorna uma página de usuários do sistema")
+    public Page<UserResponseDTO> getAllUsers(@PageableDefault(size = 20) Pageable pageable) {
+        // Você precisará atualizar a interface UserQueryService e a implementação
+        // para usar o findAll(pageable) do UserRepository.
+        return userQueryService.listAllUsers(pageable);
     }
 
     /**

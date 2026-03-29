@@ -6,6 +6,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.apache.commons.codec.digest.DigestUtils;
 
 import com.repositorio.mvp.domain.user.DTO.UserRequestDTO;
 import com.repositorio.mvp.domain.user.DTO.UserResponseDTO;
@@ -42,6 +43,7 @@ public class UserCommandServiceImpl implements UserCommandService {
 
         User user = userMapper.toUser(userRequestDTO);
         user.setPassword(passwordEncoder.encode(userRequestDTO.password()));
+        user.setEmailHash(DigestUtils.sha256Hex(userRequestDTO.email().toLowerCase()));
         user.setRole(UserRole.USER);
         userRepository.save(user);
 
@@ -75,6 +77,10 @@ public class UserCommandServiceImpl implements UserCommandService {
     public UserResponseDTO updateUserById(UUID id, UserUpdateRequestDTO userUpdateRequestDTO) {
         User user = userRepository.findById(id)
             .orElseThrow(() -> new EntityNotFoundException("Usuário não encontrado."));
+        
+        if (!passwordEncoder.matches(userUpdateRequestDTO.currentPassword(), user.getPassword())) {
+            throw new IllegalArgumentException("A senha atual informada está incorreta.");
+        }
         
         userValidation.validadeUpdateEmail(userUpdateRequestDTO.email(), user.getEmail());
 

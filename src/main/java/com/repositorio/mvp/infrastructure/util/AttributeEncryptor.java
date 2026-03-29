@@ -25,7 +25,11 @@ public class AttributeEncryptor implements AttributeConverter<String, String> {
     private final Key key;
     private final SecureRandom secureRandom;
 
-    public AttributeEncryptor(@Value("${api.security.db.encryption.key:ChaveSecretaDe32CaracteresParaO!}") String secretKey) {
+    public AttributeEncryptor(@Value("${api.security.db.encryption.key:#{null}}") String secretKey) {
+        if (secretKey == null || secretKey.length() < 32) {
+            throw new IllegalArgumentException("CRÍTICO: Chave de criptografia inválida ou ausente. O sistema não pode iniciar de forma segura.");
+        }
+        
         this.key = new SecretKeySpec(secretKey.getBytes(), ALGORITHM);
         this.secureRandom = new SecureRandom();
     }

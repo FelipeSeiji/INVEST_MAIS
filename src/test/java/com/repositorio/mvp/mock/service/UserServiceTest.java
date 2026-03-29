@@ -13,6 +13,11 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -126,7 +131,7 @@ public class UserServiceTest {
     }
 
     @Test
-    public void listAllUsers_ReturnsListOfUserResponseDTO() {
+    public void listAllUsers_ReturnsPageOfUserResponseDTO() {
         UUID userId2 = UUID.randomUUID();
 
         User user1 = User.builder()
@@ -149,11 +154,15 @@ public class UserServiceTest {
         UserResponseDTO expectedResponse2 =
             new UserResponseDTO(userId2, "Maria", "maria@gmail.com");
 
-        when(userRepository.findAll()).thenReturn(List.of(user1, user2));
+        Pageable pageable = PageRequest.of(0, 20);
+        Page<User> usersPage = new PageImpl<>(List.of(user1, user2));
+
+        when(userRepository.findAll(pageable)).thenReturn(usersPage);
         when(userMapper.toUserResponseDTO(user1)).thenReturn(expectedResponse1);
         when(userMapper.toUserResponseDTO(user2)).thenReturn(expectedResponse2);
 
-        List<UserResponseDTO> users = userQueryService.listAllUsers();
+        Page<UserResponseDTO> resultPage = userQueryService.listAllUsers(pageable);
+        List<UserResponseDTO> users = resultPage.getContent();
 
         assertThat(users).isNotNull();
         assertThat(users.size()).isEqualTo(2);

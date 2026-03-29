@@ -21,6 +21,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.apache.commons.codec.digest.DigestUtils;
 
 import com.repositorio.mvp.domain.auth.DTO.LoginRequestDTO;
 import com.repositorio.mvp.domain.auth.DTO.Verify2FARequestDTO;
@@ -70,7 +71,7 @@ public class LoginServiceTest {
 
         when(loginAttemptService.isBlocked(MOCK_IP)).thenReturn(false);
         when(loginAttemptService.isBlocked(loginRequestDTO.email())).thenReturn(false);
-        when(userRepository.findByEmail(loginRequestDTO.email())).thenReturn(Optional.of(mockUser));
+        when(userRepository.findByEmailHash(DigestUtils.sha256Hex(loginRequestDTO.email().toLowerCase()))).thenReturn(Optional.of(mockUser));
         when(passwordEncoder.matches(loginRequestDTO.password(), mockUser.getPassword())).thenReturn(true);
 
         assertDoesNotThrow(() -> loginService.initiateLogin(loginRequestDTO, MOCK_IP));
@@ -91,7 +92,7 @@ public class LoginServiceTest {
 
         when(loginAttemptService.isBlocked(MOCK_IP)).thenReturn(false);
         when(loginAttemptService.isBlocked(loginRequestDTO.email())).thenReturn(false);
-        when(userRepository.findByEmail(loginRequestDTO.email())).thenReturn(Optional.of(mockUser));
+        when(userRepository.findByEmailHash(DigestUtils.sha256Hex(loginRequestDTO.email().toLowerCase()))).thenReturn(Optional.of(mockUser));
         when(passwordEncoder.matches(loginRequestDTO.password(), mockUser.getPassword())).thenReturn(false);
 
         IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
@@ -117,7 +118,7 @@ public class LoginServiceTest {
 
         assertTrue(exception.getMessage().contains("Muitas tentativas falhas"));
 
-        verify(userRepository, never()).findByEmail(anyString());
+        verify(userRepository, never()).findByEmailHash(anyString());
     }
 
     @Test
@@ -129,7 +130,7 @@ public class LoginServiceTest {
         String expectedJwt = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.mocked_token";
 
         when(loginAttemptService.isBlocked(MOCK_IP)).thenReturn(false);
-        when(userRepository.findByEmail(verify2faRequestDTO.email())).thenReturn(Optional.of(mockUser));
+        when(userRepository.findByEmailHash(DigestUtils.sha256Hex(verify2faRequestDTO.email().toLowerCase()))).thenReturn(Optional.of(mockUser));
         when(tokenService.generateToken(mockUser.getId())).thenReturn(expectedJwt);
 
         String actualJwt = loginService.verify2FAAndGenerateToken(verify2faRequestDTO, MOCK_IP);
@@ -145,7 +146,7 @@ public class LoginServiceTest {
         Verify2FARequestDTO request = new Verify2FARequestDTO(mockUser.getEmail(), "999999"); 
         
         when(loginAttemptService.isBlocked(MOCK_IP)).thenReturn(false);
-        when(userRepository.findByEmail(request.email())).thenReturn(Optional.of(mockUser));
+        when(userRepository.findByEmailHash(DigestUtils.sha256Hex(request.email().toLowerCase()))).thenReturn(Optional.of(mockUser));
 
         IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
             loginService.verify2FAAndGenerateToken(request, MOCK_IP);
@@ -165,7 +166,7 @@ public class LoginServiceTest {
         Verify2FARequestDTO request = new Verify2FARequestDTO(mockUser.getEmail(), validCode);
         
         when(loginAttemptService.isBlocked(MOCK_IP)).thenReturn(false);
-        when(userRepository.findByEmail(request.email())).thenReturn(Optional.of(mockUser));
+        when(userRepository.findByEmailHash(DigestUtils.sha256Hex(request.email().toLowerCase()))).thenReturn(Optional.of(mockUser));
 
         IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
             loginService.verify2FAAndGenerateToken(request, MOCK_IP);

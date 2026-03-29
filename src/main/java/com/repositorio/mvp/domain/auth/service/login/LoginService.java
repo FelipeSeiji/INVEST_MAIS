@@ -19,7 +19,8 @@ import lombok.extern.slf4j.Slf4j;
 
 /**
  * Serviço responsável por orquestrar a lógica de negócio da autenticação.
- * Garante a verificação segura de senhas, controle de ataques de força bruta e gestão do ciclo de vida do 2FA.
+ * Garante a verificação segura de senhas, controle de ataques de força bruta e
+ * gestão do ciclo de vida do 2FA.
  */
 
 @Slf4j
@@ -32,7 +33,7 @@ public class LoginService {
     private final TokenService tokenService;
     private final TwoFactorNotification twoFactorStrategy;
     private final LoginAttemptService loginAttemptService;
-    
+
     private final SecureRandom secureRandom = new SecureRandom();
 
     /**
@@ -40,22 +41,27 @@ public class LoginService {
      * Verifica se o IP ou a conta estão bloqueados por excesso de tentativas,
      * valida a senha e aciona o envio do código de 2FA.
      * * @param loginRequest Dados de acesso (e-mail e senha).
+     * 
      * @param ip Endereço IP do cliente requisitante.
-     * @throws IllegalArgumentException Se as credenciais forem inválidas ou houver bloqueio de segurança.
+     * @throws IllegalArgumentException Se as credenciais forem inválidas ou houver
+     *                                  bloqueio de segurança.
      */
     @Transactional
     public void initiateLogin(LoginRequestDTO loginRequest, String ip) {
-        if (loginAttemptService.isBlocked(ip) || loginAttemptService.isBlocked(loginRequest.email())){
-            log.warn("ALERTA: Tentativa de login bloqueada (Força Bruta). IP: {} | Conta alvo: {}", ip, loginRequest.email());
+        if (loginAttemptService.isBlocked(ip) || loginAttemptService.isBlocked(loginRequest.email())) {
+            log.warn("ALERTA: Tentativa de login bloqueada (Força Bruta). IP: {} | Conta alvo: {}", ip,
+                    loginRequest.email());
             throw new IllegalArgumentException("Muitas tentativas falhas.");
         }
-        
-        User user = userRepository.findByEmail(loginRequest.email())
-            .orElseThrow(() -> {
-                loginAttemptService.loginFailed(ip);
-                log.warn("FALHA DE LOGIN: Usuário não existe. IP: {} | E-mail tentado: {}", ip, loginRequest.email());
-                return new IllegalArgumentException("Credenciais inválidas.");
-                });        
+
+        String searchHash = org.apache.commons.codec.digest.DigestUtils.sha256Hex(loginRequest.email().toLowerCase());
+        User user = userRepository.findByEmailHash(searchHash)
+                .orElseThrow(() -> {
+                    loginAttemptService.loginFailed(ip);
+                    log.warn("FALHA DE LOGIN: Usuário não existe. IP: {} | E-mail tentado: {}", ip,
+                            maskEmail(loginRequest.email()));
+                    return new IllegalArgumentException("Credenciais inválidas.");
+                });
 
         if (!passwordEncoder.matches(loginRequest.password(), user.getPassword())) {
             loginAttemptService.loginFailed(ip);
@@ -78,24 +84,30 @@ public class LoginService {
 
     /**
      * Processa a segunda etapa do login verificando o código 2FA.
-     * * @param verifyRequest Dados contendo o e-mail e o código digitado pelo usuário.
+     * * @param verifyRequest Dados contendo o e-mail e o código digitado pelo
+     * usuário.
+     * 
      * @param ip Endereço IP do cliente requisitante.
      * @return Uma String contendo o Token JWT assinado para a sessão.
-     * @throws IllegalArgumentException Se o código for inválido, não bater ou estiver expirado.
+     * @throws IllegalArgumentException Se o código for inválido, não bater ou
+     *                                  estiver expirado.
      */
     @Transactional
     public String verify2FAAndGenerateToken(Verify2FARequestDTO verifyRequest, String ip) {
-        if (loginAttemptService.isBlocked(ip)){
-            log.warn("ALERTA: Tentativa de 2FA bloqueada (Força Bruta). IP: {} | Conta alvo: {}", ip, verifyRequest.email());
+        if (loginAttemptService.isBlocked(ip) || loginAttemptService.isBlocked("2FA:" + verifyRequest.email())) {
+            log.warn("ALERTA: Tentativa de 2FA bloqueada (Força Bruta). IP: {} | Conta alvo: {}", ip,
+                    verifyRequest.email());
             throw new IllegalArgumentException("Muitas tentativas falhas. Tente novamente mais tarde.");
         }
-        
-        User user = userRepository.findByEmail(verifyRequest.email())
-            .orElseThrow(() -> new IllegalArgumentException("Usuário não encontrado."));
+
+        String searchHash = org.apache.commons.codec.digest.DigestUtils.sha256Hex(verifyRequest.email().toLowerCase());
+        User user = userRepository.findByEmailHash(searchHash)
+                .orElseThrow(() -> new IllegalArgumentException("Usuário não encontrado."));
 
         if (user.getTwoFactorCode() == null || !user.getTwoFactorCode().equals(verifyRequest.code())) {
             loginAttemptService.loginFailed(ip);
-            log.warn("FALHA 2FA: Código inválido. IP: {} | E-mail: {}", ip, user.getEmail());
+            loginAttemptService.loginFailed("2FA:" + user.getEmail());
+            log.warn("FALHA 2FA: Código inválido. IP: {} | E-mail: {}", ip, maskEmail(user.getEmail()));
             throw new IllegalArgumentException("Código 2FA inválido.");
         }
 
@@ -109,9 +121,9 @@ public class LoginService {
         loginAttemptService.loginSucceeded(ip);
         user.clearTwoFactorCode();
         userRepository.save(user);
-      
+
         log.info("LOGIN SUCESSO: 2FA validado. Token JWT emitido para o usuário {}. IP: {}", user.getId(), ip);
-        
+
         return tokenService.generateToken(user.getId());
     }
 
@@ -121,5 +133,12 @@ public class LoginService {
      */
     private String generateRandomCode() {
         return String.format("%06d", secureRandom.nextInt(1000000));
+    }
+
+    private String maskEmail(String email) {
+        if (email == null || !email.contains("@"))
+            return "***";
+        String[] parts = email.split("@");
+        return parts[0].substring(0, Math.min(2, parts[0].length())) + "***@" + parts[1];
     }
 }

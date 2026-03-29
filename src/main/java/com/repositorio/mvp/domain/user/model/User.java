@@ -3,6 +3,8 @@ package com.repositorio.mvp.domain.user.model;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+import org.apache.commons.codec.digest.DigestUtils;
+
 import com.repositorio.mvp.domain.user.model.enums.UserRole;
 import com.repositorio.mvp.infrastructure.util.AttributeEncryptor;
 
@@ -42,16 +44,18 @@ public class User {
     @NotBlank
     @Column(nullable = false, length = 255)
     @Convert(converter = AttributeEncryptor.class)
+    @ToString.Exclude
     private String name;
 
     @NotBlank
     @Email
-    @Column(nullable = false, unique = true, length = 255)
+    @Column(nullable = false, unique = true, length = 500)
     @Convert(converter = AttributeEncryptor.class)
+    @ToString.Exclude
     private String email;
 
     @NotBlank
-    @Column(nullable = false, length = 60)
+    @Column(nullable = false, length = 255)
     @ToString.Exclude
     private String password;
 
@@ -60,10 +64,14 @@ public class User {
     private UserRole role;
 
     @Column(name = "two_factor_code", length = 6)
+    @ToString.Exclude
     private String twoFactorCode;
 
     @Column(name = "two_factor_expiry")
     private LocalDateTime twoFactorExpiry;
+
+    @Column(nullable = false, unique = true, length = 64)
+    private String emailHash;
 
     public void generateTwoFactorCode(String code, LocalDateTime expiry) {
         this.twoFactorCode = code;
@@ -78,5 +86,6 @@ public class User {
     public void updateProfile(String name, String email) {
         this.name = name;
         this.email = email;
+        this.emailHash = DigestUtils.sha256Hex(email.toLowerCase());
     }
 }

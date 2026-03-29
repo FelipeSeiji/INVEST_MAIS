@@ -14,6 +14,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.repositorio.mvp.domain.user.repository.UserRepository;
 import com.repositorio.mvp.domain.user.validation.UserValidation;
+import org.apache.commons.codec.digest.DigestUtils;
 
 @ExtendWith(MockitoExtension.class)
 public class UserValidationTest {
@@ -28,16 +29,18 @@ public class UserValidationTest {
 
     @Test
     public void validadeNewEmail_WhenEmailDoesNotExist_DoesNotThrowException() {
-        when(userRepository.existsByEmail(TEST_EMAIL)).thenReturn(false);
+        String hash = DigestUtils.sha256Hex(TEST_EMAIL.toLowerCase());
+        when(userRepository.existsByEmailHash(hash)).thenReturn(false);
 
         assertDoesNotThrow(() -> userValidation.validadeNewEmail(TEST_EMAIL));
         
-        verify(userRepository).existsByEmail(TEST_EMAIL);
+        verify(userRepository).existsByEmailHash(hash);
     }
 
     @Test
     public void validadeNewEmail_WhenEmailExists_ThrowsException() {
-        when(userRepository.existsByEmail(TEST_EMAIL)).thenReturn(true);
+        String hash = DigestUtils.sha256Hex(TEST_EMAIL.toLowerCase());
+        when(userRepository.existsByEmailHash(hash)).thenReturn(true);
 
         IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
             userValidation.validadeNewEmail(TEST_EMAIL);
@@ -48,21 +51,24 @@ public class UserValidationTest {
 
     @Test
     public void validadeUpdateEmail_WhenEmailDoesNotExist_DoesNotThrowException() {
-        when(userRepository.existsByEmail(TEST_EMAIL)).thenReturn(false);
+        String hash = DigestUtils.sha256Hex(TEST_EMAIL.toLowerCase());
+        when(userRepository.existsByEmailHash(hash)).thenReturn(false);
 
         assertDoesNotThrow(() -> userValidation.validadeUpdateEmail(TEST_EMAIL, "old_email@gmail.com"));
     }
 
     @Test
     public void validadeUpdateEmail_WhenEmailExistsButIsTheSame_DoesNotThrowException() {
-        when(userRepository.existsByEmail(TEST_EMAIL)).thenReturn(true);
+        String hash = DigestUtils.sha256Hex(TEST_EMAIL.toLowerCase());
+        when(userRepository.existsByEmailHash(hash)).thenReturn(true);
 
         assertDoesNotThrow(() -> userValidation.validadeUpdateEmail(TEST_EMAIL, TEST_EMAIL));
     }
 
     @Test
     public void validadeUpdateEmail_WhenEmailExistsAndIsDifferent_ThrowsException() {
-        when(userRepository.existsByEmail(TEST_EMAIL)).thenReturn(true);
+        String hash = DigestUtils.sha256Hex(TEST_EMAIL.toLowerCase());
+        when(userRepository.existsByEmailHash(hash)).thenReturn(true);
 
         IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
             userValidation.validadeUpdateEmail(TEST_EMAIL, "old_email@gmail.com");

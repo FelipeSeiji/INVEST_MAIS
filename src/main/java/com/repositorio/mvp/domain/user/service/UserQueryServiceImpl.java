@@ -1,7 +1,9 @@
 package com.repositorio.mvp.domain.user.service;
 
-import java.util.List;
 import java.util.UUID;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -41,9 +43,8 @@ public class UserQueryServiceImpl implements UserQueryService {
      */
     @Override
     @Transactional(readOnly = true)
-    public List<UserResponseDTO> listAllUsers() {
-        return userRepository.findAll().stream()
-            .map(userMapper::toUserResponseDTO)
-            .toList();
+    public Page<UserResponseDTO> listAllUsers(Pageable pageable) {
+        return userRepository.findAll(pageable)
+            .map(userMapper::toUserResponseDTO);
     }
 }

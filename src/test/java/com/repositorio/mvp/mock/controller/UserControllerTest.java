@@ -10,6 +10,11 @@ import static org.mockito.Mockito.when;
 import java.util.List;
 import java.util.UUID;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -61,7 +66,7 @@ public class UserControllerTest {
 
     @Test
     public void updateUser_PassesDataToService_AndReturnsUpdatedUser() {
-        UserUpdateRequestDTO updateRequest = new UserUpdateRequestDTO("User Updated", "newEmail@gmail.com");
+        UserUpdateRequestDTO updateRequest = new UserUpdateRequestDTO("User Updated", "newEmail@gmail.com", "Password@123");
         UserResponseDTO updatedResponse = new UserResponseDTO(mockUserId, "User Updated", "newEmail@gmail.com");
 
         when(userCommandService.updateUserById(eq(mockUserId), any(UserUpdateRequestDTO.class)))
@@ -92,14 +97,15 @@ public class UserControllerTest {
     }
 
     @Test
-    public void getAllUsers_ReturnsListFromService() {
-        List<UserResponseDTO> expectedList = List.of(mockResponseDTO);
-        when(userQueryService.listAllUsers()).thenReturn(expectedList);
+    public void getAllUsers_ReturnsPageFromService() {
+        Pageable pageable = PageRequest.of(0, 20);
+        Page<UserResponseDTO> expectedPage = new PageImpl<>(List.of(mockResponseDTO));
+        when(userQueryService.listAllUsers(pageable)).thenReturn(expectedPage);
 
-        List<UserResponseDTO> responseList = userController.getAllUsers();
+        Page<UserResponseDTO> responsePage = userController.getAllUsers(pageable);
 
-        assertEquals(1, responseList.size());
-        assertEquals(mockResponseDTO, responseList.get(0));
-        verify(userQueryService).listAllUsers();
+        assertEquals(1, responsePage.getTotalElements());
+        assertEquals(mockResponseDTO, responsePage.getContent().get(0));
+        verify(userQueryService).listAllUsers(pageable);
     }
 }

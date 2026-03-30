@@ -38,10 +38,6 @@ public class UserValidationTest {
     private final String TEST_EMAIL = "example@gmail.com";
     private final UUID userId = UUID.randomUUID();
 
-    // ==========================================
-    // TESTES DE REGISTRO (UserRegisterValidator)
-    // ==========================================
-
     @Test
     public void validateRegister_WhenEmailDoesNotExist_DoesNotThrowException() {
         String hash = DigestUtils.sha256Hex(TEST_EMAIL.toLowerCase());

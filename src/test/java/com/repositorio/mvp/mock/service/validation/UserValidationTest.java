@@ -6,72 +6,97 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.util.UUID;
+
+import org.apache.commons.codec.digest.DigestUtils;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import com.repositorio.mvp.domain.user.DTO.UserRequestDTO;
+import com.repositorio.mvp.domain.user.DTO.UserUpdateRequestDTO;
+import com.repositorio.mvp.domain.user.model.User;
 import com.repositorio.mvp.domain.user.repository.UserRepository;
-import com.repositorio.mvp.domain.user.validation.UserValidation;
-import org.apache.commons.codec.digest.DigestUtils;
+
+import com.repositorio.mvp.domain.user.validation.UserRegisterValidatorImpl;
+import com.repositorio.mvp.domain.user.validation.UserUpdateValidatorImpl;
 
 @ExtendWith(MockitoExtension.class)
 public class UserValidationTest {
 
     @InjectMocks
-    private UserValidation userValidation;
+    private UserRegisterValidatorImpl registerValidator;
+
+    @InjectMocks
+    private UserUpdateValidatorImpl updateValidator;
 
     @Mock
     private UserRepository userRepository;
 
     private final String TEST_EMAIL = "example@gmail.com";
+    private final UUID userId = UUID.randomUUID();
+
+    // ==========================================
+    // TESTES DE REGISTRO (UserRegisterValidator)
+    // ==========================================
 
     @Test
-    public void validadeNewEmail_WhenEmailDoesNotExist_DoesNotThrowException() {
+    public void validateRegister_WhenEmailDoesNotExist_DoesNotThrowException() {
         String hash = DigestUtils.sha256Hex(TEST_EMAIL.toLowerCase());
         when(userRepository.existsByEmailHash(hash)).thenReturn(false);
 
-        assertDoesNotThrow(() -> userValidation.validadeNewEmail(TEST_EMAIL));
+        UserRequestDTO requestDTO = new UserRequestDTO("Teste", TEST_EMAIL, "senha123");
+
+        assertDoesNotThrow(() -> registerValidator.validate(requestDTO));
         
         verify(userRepository).existsByEmailHash(hash);
     }
 
     @Test
-    public void validadeNewEmail_WhenEmailExists_ThrowsException() {
+    public void validateRegister_WhenEmailExists_ThrowsException() {
         String hash = DigestUtils.sha256Hex(TEST_EMAIL.toLowerCase());
         when(userRepository.existsByEmailHash(hash)).thenReturn(true);
 
+        UserRequestDTO requestDTO = new UserRequestDTO("Teste", TEST_EMAIL, "senha123");
+
         IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
-            userValidation.validadeNewEmail(TEST_EMAIL);
+            registerValidator.validate(requestDTO);
         });
 
         assertEquals("Email já está em uso", exception.getMessage());
     }
 
     @Test
-    public void validadeUpdateEmail_WhenEmailDoesNotExist_DoesNotThrowException() {
+    public void validateUpdate_WhenEmailDoesNotExist_DoesNotThrowException() {
         String hash = DigestUtils.sha256Hex(TEST_EMAIL.toLowerCase());
         when(userRepository.existsByEmailHash(hash)).thenReturn(false);
 
-        assertDoesNotThrow(() -> userValidation.validadeUpdateEmail(TEST_EMAIL, "old_email@gmail.com"));
+        UserUpdateRequestDTO requestDTO = new UserUpdateRequestDTO("Novo Nome", TEST_EMAIL, "Password@123");
+        User existingUser = User.builder().id(userId).email("old_email@gmail.com").build();
+
+        assertDoesNotThrow(() -> updateValidator.validate(requestDTO, existingUser));
     }
 
     @Test
-    public void validadeUpdateEmail_WhenEmailExistsButIsTheSame_DoesNotThrowException() {
-        String hash = DigestUtils.sha256Hex(TEST_EMAIL.toLowerCase());
-        when(userRepository.existsByEmailHash(hash)).thenReturn(true);
+    public void validateUpdate_WhenEmailExistsButIsTheSame_DoesNotThrowException() {
+        UserUpdateRequestDTO requestDTO = new UserUpdateRequestDTO("Novo Nome", TEST_EMAIL, "Password@123");
+        User existingUser = User.builder().id(userId).email(TEST_EMAIL).build();
 
-        assertDoesNotThrow(() -> userValidation.validadeUpdateEmail(TEST_EMAIL, TEST_EMAIL));
+        assertDoesNotThrow(() -> updateValidator.validate(requestDTO, existingUser));
     }
 
     @Test
-    public void validadeUpdateEmail_WhenEmailExistsAndIsDifferent_ThrowsException() {
+    public void validateUpdate_WhenEmailExistsAndIsDifferent_ThrowsException() {
         String hash = DigestUtils.sha256Hex(TEST_EMAIL.toLowerCase());
         when(userRepository.existsByEmailHash(hash)).thenReturn(true);
+
+        UserUpdateRequestDTO requestDTO = new UserUpdateRequestDTO("Novo Nome", TEST_EMAIL, "Password@123");
+        User existingUser = User.builder().id(userId).email("old_email@gmail.com").build();
 
         IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
-            userValidation.validadeUpdateEmail(TEST_EMAIL, "old_email@gmail.com");
+            updateValidator.validate(requestDTO, existingUser);
         });
 
         assertEquals("Email já está em uso por outro usuário.", exception.getMessage());

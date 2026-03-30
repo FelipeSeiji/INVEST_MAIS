@@ -1,5 +1,6 @@
 package com.repositorio.mvp.domain.user.service;
 
+import java.util.List;
 import java.util.UUID;
 
 import org.springframework.security.core.userdetails.UserDetails;
@@ -16,7 +17,8 @@ import com.repositorio.mvp.domain.user.model.User;
 import com.repositorio.mvp.domain.user.model.enums.UserRole;
 import com.repositorio.mvp.domain.user.repository.UserRepository;
 import com.repositorio.mvp.domain.user.service.interfaces.UserCommandService;
-import com.repositorio.mvp.domain.user.validation.UserValidation;
+import com.repositorio.mvp.domain.user.validation.interfaces.UserRegisterValidator;
+import com.repositorio.mvp.domain.user.validation.interfaces.UserUpdateValidator;
 import com.repositorio.mvp.infrastructure.security.UserDetailsImpl;
 
 import jakarta.persistence.EntityNotFoundException;
@@ -28,7 +30,8 @@ public class UserCommandServiceImpl implements UserCommandService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final UserMapper userMapper;
-    private final UserValidation userValidation;
+    private final List<UserRegisterValidator> registerValidators;
+    private final List<UserUpdateValidator> updateValidators;
 
     /**
      * Cria e registra um novo usuário no banco de dados.
@@ -39,7 +42,7 @@ public class UserCommandServiceImpl implements UserCommandService {
     @Override
     @Transactional
     public UserResponseDTO createUser(UserRequestDTO userRequestDTO) {
-        userValidation.validadeNewEmail(userRequestDTO.email());
+        registerValidators.forEach(v -> v.validate(userRequestDTO));
 
         User user = userMapper.toUser(userRequestDTO);
         user.setPassword(passwordEncoder.encode(userRequestDTO.password()));
@@ -82,7 +85,7 @@ public class UserCommandServiceImpl implements UserCommandService {
             throw new IllegalArgumentException("A senha atual informada está incorreta.");
         }
         
-        userValidation.validadeUpdateEmail(userUpdateRequestDTO.email(), user.getEmail());
+        updateValidators.forEach(v -> v.validate(userUpdateRequestDTO, user));
 
         user.setName(userUpdateRequestDTO.name());
         user.setEmail(userUpdateRequestDTO.email());

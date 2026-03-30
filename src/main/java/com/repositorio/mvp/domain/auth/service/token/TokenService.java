@@ -14,7 +14,7 @@ import com.auth0.jwt.exceptions.JWTVerificationException;
  * Serviço core de criptografia e gerenciamento de JSON Web Tokens (JWT).
  */
 @Service
-public class TokenService {
+public class TokenService implements TokenProvider {
     @Value("${api.security.token.secret}")
     private String secret;
 
@@ -26,6 +26,7 @@ public class TokenService {
      * @param userId Identificador único do usuário a ser embutido no payload (Subject).
      * @return Token JWT serializado em Base64Url.
      */
+    @Override
     public String generateToken(UUID userId){
         Algorithm algorithm = Algorithm.HMAC256(secret);
         Instant now = Instant.now();
@@ -44,6 +45,7 @@ public class TokenService {
      * @return O ID do usuário (Subject) em formato String caso o token seja válido.
      * @throws IllegalArgumentException Se a assinatura for inválida, o token estiver adulterado ou expirado.
      */
+    @Override
     public String validateToken(String token){
         try {
             Algorithm algorithm = Algorithm.HMAC256(secret);
@@ -65,6 +67,7 @@ public class TokenService {
      * @return Data e hora da expiração (Instant).
      * @throws IllegalArgumentException Se o token estiver malformado ou inválido.
      */
+    @Override
     public Instant getExpiration(String token) {
         try {
             Algorithm algorithm = Algorithm.HMAC256(secret);

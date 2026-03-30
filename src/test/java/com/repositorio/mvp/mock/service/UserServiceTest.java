@@ -17,13 +17,14 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import com.repositorio.mvp.domain.user.DTO.UserRequestDTO;
 import com.repositorio.mvp.domain.user.DTO.UserResponseDTO;
@@ -32,7 +33,8 @@ import com.repositorio.mvp.domain.user.model.User;
 import com.repositorio.mvp.domain.user.repository.UserRepository;
 import com.repositorio.mvp.domain.user.service.UserCommandServiceImpl;
 import com.repositorio.mvp.domain.user.service.UserQueryServiceImpl;
-import com.repositorio.mvp.domain.user.validation.UserValidation;
+import com.repositorio.mvp.domain.user.validation.interfaces.UserRegisterValidator;
+import com.repositorio.mvp.domain.user.validation.interfaces.UserUpdateValidator;
 
 import jakarta.persistence.EntityNotFoundException;
 
@@ -55,9 +57,22 @@ public class UserServiceTest {
     private UserMapper userMapper;
 
     @Mock
-    private UserValidation userValidation;
+    private UserRegisterValidator userRegisterValidator;
+
+    @Mock 
+    private UserUpdateValidator userUpdateValidator;
 
     UUID userId = UUID.randomUUID();
+
+    @BeforeEach
+    public void setUp() {
+
+        ReflectionTestUtils.setField(
+            userCommandService, 
+            "registerValidators",
+            List.of(userRegisterValidator)
+        );
+    }
 
     @Test
     public void createUser_WithValidData_ReturnsUserResponseDTO() {
@@ -86,10 +101,10 @@ public class UserServiceTest {
 
     @Test
     public void createUser_WithEmailAlreadyInUse_ThrowException() {
-
+        // CORREÇÃO AQUI: Usando o método real da interface e passando a classe correta
         doThrow(new IllegalArgumentException("Email já está em uso"))
-            .when(userValidation)
-            .validadeNewEmail(anyString());
+            .when(userRegisterValidator)
+            .validate(any(UserRequestDTO.class));
 
         assertThatThrownBy(() -> {
             userCommandService.createUser(INVALID_USER);

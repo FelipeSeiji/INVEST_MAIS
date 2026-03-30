@@ -4,7 +4,7 @@ import org.springframework.stereotype.Service;
 
 import com.repositorio.mvp.domain.auth.model.InvalidToken;
 import com.repositorio.mvp.domain.auth.repository.InvalidTokenRepository;
-import com.repositorio.mvp.domain.auth.service.token.TokenService;
+import com.repositorio.mvp.domain.auth.service.token.TokenProvider;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -17,7 +17,7 @@ import lombok.RequiredArgsConstructor;
 public class SessionService {
 
     private final InvalidTokenRepository invalidTokenRepository;
-    private final TokenService tokenService;
+    private final TokenProvider tokenProvider;
     
     private static final String BEARER_PREFIX = "Bearer ";
 
@@ -29,7 +29,7 @@ public class SessionService {
     @Transactional
     public void logout(String token){
         String tokenJWT = token.replace(BEARER_PREFIX,"");
-        InvalidToken invalidToken = new InvalidToken(tokenJWT, tokenService.getExpiration(tokenJWT));
+        InvalidToken invalidToken = new InvalidToken(tokenJWT, tokenProvider.getExpiration(tokenJWT));
         invalidTokenRepository.save(invalidToken);
     }
 }

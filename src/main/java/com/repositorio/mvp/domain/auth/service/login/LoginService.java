@@ -1,6 +1,5 @@
 package com.repositorio.mvp.domain.auth.service.login;
 
-import java.security.SecureRandom;
 import java.time.LocalDateTime;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -12,7 +11,7 @@ import com.repositorio.mvp.domain.auth.DTO.Verify2FARequestDTO;
 import com.repositorio.mvp.domain.user.model.User;
 import com.repositorio.mvp.domain.user.repository.UserRepository;
 import com.repositorio.mvp.domain.auth.service.interfaces.TwoFactorNotification;
-import com.repositorio.mvp.domain.auth.service.token.TokenService;
+import com.repositorio.mvp.domain.auth.service.token.TokenProvider;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -30,11 +29,10 @@ public class LoginService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
-    private final TokenService tokenService;
+    private final TokenProvider tokenProvider;
+    private final TwoFactorService twoFactorService;
     private final TwoFactorNotification twoFactorStrategy;
     private final LoginAttemptService loginAttemptService;
-
-    private final SecureRandom secureRandom = new SecureRandom();
 
     /**
      * Processa a primeira etapa do login.
@@ -75,11 +73,10 @@ public class LoginService {
 
         log.info("LOGIN FASE 1: Credenciais válidas. Gerando 2FA para o usuário {}. IP: {}", user.getId(), ip);
 
-        String code = generateRandomCode();
-        user.generateTwoFactorCode(code, LocalDateTime.now().plusMinutes(5));
+        twoFactorService.prepareTwoFactor(user);
         userRepository.save(user);
 
-        twoFactorStrategy.sendTwoFactorCode(user, code);
+        twoFactorStrategy.sendTwoFactorCode(user, user.getTwoFactorCode());
     }
 
     /**
@@ -124,16 +121,10 @@ public class LoginService {
 
         log.info("LOGIN SUCESSO: 2FA validado. Token JWT emitido para o usuário {}. IP: {}", user.getId(), ip);
 
-        return tokenService.generateToken(user.getId());
+        return tokenProvider.generateToken(user.getId());
     }
 
-    /**
-     * Gera de forma criptograficamente segura um código numérico de 6 dígitos.
-     * * @return String formatada com o código gerado.
-     */
-    private String generateRandomCode() {
-        return String.format("%06d", secureRandom.nextInt(1000000));
-    }
+
 
     private String maskEmail(String email) {
         if (email == null || !email.contains("@"))

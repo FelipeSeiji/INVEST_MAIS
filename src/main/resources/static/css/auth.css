@@ -1,0 +1,65 @@
+body { 
+    font-family: 'Segoe UI', Arial, sans-serif; 
+    display: flex; 
+    justify-content: center; 
+    padding-top: 50px; 
+    background-color: #f4f4f9; 
+    margin: 0;
+}
+
+.container { 
+    display: flex; 
+    gap: 50px; 
+    background: white; 
+    padding: 40px; 
+    border-radius: 12px; 
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1); 
+}
+
+.box { 
+    display: flex; 
+    flex-direction: column; 
+    width: 320px; 
+}
+
+h2 { 
+    color: #333; 
+    border-bottom: 3px solid #000000; 
+    padding-bottom: 10px; 
+    margin-bottom: 20px;
+}
+
+input { 
+    margin: 10px 0; 
+    padding: 12px; 
+    border: 1px solid #ddd; 
+    border-radius: 6px; 
+    font-size: 14px;
+}
+
+button { 
+    padding: 12px; 
+    background-color: #ffc000; 
+    color: white; 
+    border: none; 
+    border-radius: 6px; 
+    cursor: pointer; 
+    font-weight: bold;
+    transition: background 0.3s;
+}
+
+button:hover { 
+    background-color: #bd8e00; 
+}
+
+.message { 
+    margin-top: 15px; 
+    font-size: 0.85em; 
+    min-height: 1.2em;
+}
+
+#2faSection {
+    margin-top: 20px; 
+    border-top: 2px dashed #eee; 
+    padding-top: 20px;
+}

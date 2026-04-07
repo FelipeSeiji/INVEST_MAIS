@@ -1,5 +1,6 @@
 package com.repositorio.mvp.domain.auth.service.token;
 
+import java.time.Duration;
 import java.time.Instant;
 import java.util.UUID;
 
@@ -19,50 +20,56 @@ public class TokenService implements TokenProvider {
     private String secret;
 
     private static final String ISSUER = "auth-api";
-    private static final long EXPIRATION_MINUTES = 10;
+    private static final long EXPIRATION_MINUTES = 2800;
 
     /**
      * Gera um novo token JWT assinado usando o algoritmo HMAC256.
-     * @param userId Identificador único do usuário a ser embutido no payload (Subject).
+     * 
+     * @param userId Identificador único do usuário a ser embutido no payload
+     *               (Subject).
      * @return Token JWT serializado em Base64Url.
      */
     @Override
-    public String generateToken(UUID userId){
+    public String generateToken(UUID userId) {
         Algorithm algorithm = Algorithm.HMAC256(secret);
         Instant now = Instant.now();
-            
+
         return JWT.create()
-            .withIssuer(ISSUER)
-            .withSubject(userId.toString())
-            .withIssuedAt(now)
-            .withExpiresAt(now.plusSeconds(EXPIRATION_MINUTES * 60))
-            .sign(algorithm);   
+                .withIssuer(ISSUER)
+                .withSubject(userId.toString())
+                .withIssuedAt(now)
+                .withExpiresAt(now.plus(Duration.ofMinutes(EXPIRATION_MINUTES)))
+                .sign(algorithm);
     }
 
     /**
      * Valida a integridade, o emissor e a data de expiração do token.
+     * 
      * @param token Token JWT recebido nas requisições protegidas.
      * @return O ID do usuário (Subject) em formato String caso o token seja válido.
-     * @throws IllegalArgumentException Se a assinatura for inválida, o token estiver adulterado ou expirado.
+     * @throws IllegalArgumentException Se a assinatura for inválida, o token
+     *                                  estiver adulterado ou expirado.
      */
     @Override
-    public String validateToken(String token){
+    public String validateToken(String token) {
         try {
             Algorithm algorithm = Algorithm.HMAC256(secret);
 
             return JWT.require(algorithm)
-                .withIssuer(ISSUER)
-                .build()
-                .verify(token)
-                .getSubject();
+                    .withIssuer(ISSUER)
+                    .build()
+                    .verify(token)
+                    .getSubject();
 
-        } catch (JWTVerificationException exception){
+        } catch (JWTVerificationException exception) {
             throw new IllegalArgumentException("Token inválido");
         }
     }
 
     /**
-     * Descriptografa o token apenas para extrair o momento exato de sua expiração (útil para blacklists).
+     * Descriptografa o token apenas para extrair o momento exato de sua expiração
+     * (útil para blacklists).
+     * 
      * @param token Token JWT a ser analisado.
      * @return Data e hora da expiração (Instant).
      * @throws IllegalArgumentException Se o token estiver malformado ou inválido.
@@ -73,13 +80,13 @@ public class TokenService implements TokenProvider {
             Algorithm algorithm = Algorithm.HMAC256(secret);
 
             return JWT.require(algorithm)
-                .withIssuer(ISSUER)
-                .build()
-                .verify(token)
-                .getExpiresAt()
-                .toInstant();
-    } catch (JWTVerificationException exception) {
-        throw new IllegalArgumentException("Token inválido");
+                    .withIssuer(ISSUER)
+                    .build()
+                    .verify(token)
+                    .getExpiresAt()
+                    .toInstant();
+        } catch (JWTVerificationException exception) {
+            throw new IllegalArgumentException("Token inválido");
+        }
     }
-}
 }

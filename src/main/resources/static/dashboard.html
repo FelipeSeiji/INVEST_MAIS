@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - MVP Investimentos</title>
+    <link rel="stylesheet" href="css/dashboard.css">
+</head>
+<body>
+
+    <header class="header">
+        <div class="user-info">
+            Bem-vindo, <span id="userName">...</span>
+        </div>
+        <button class="btn-logout" onclick="handleLogout()">Logout</button>
+    </header>
+
+    <main class="token-section">
+        <h3>Autenticação Ativa (JWT)</h3>
+        <div class="token-container">
+            <span id="userToken">Verificando credenciais...</span>
+        </div>
+    </main>
+
+    <script src="js/dashboard.js"></script>
+</body>
+</html>

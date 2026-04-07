@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>INVEST</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div class="container">
+    <div class="box">
+        <h2>Entrar</h2>
+        <input type="email" id="loginEmail" placeholder="E-mail">
+        <input type="password" id="loginPassword" placeholder="Senha">
+        <button onclick="handleLogin()">Entrar</button>
+        <div id="loginMsg" class="message"></div>
+        
+        <div id="2faSection" style="display:none;">
+            <input type="text" id="2faCode" placeholder="Código de 6 dígitos">
+            <button onclick="handleVerify2FA()" style="background-color: #28a745; width: 100%;">Confirmar</button>
+        </div>
+    </div>
+
+    <div class="box">
+        <h2>Criar Conta</h2>
+        <input type="text" id="regName" placeholder="Nome Completo">
+        <input type="email" id="regEmail" placeholder="E-mail">
+        <input type="password" id="regPassword" placeholder="Senha">
+        <button onclick="handleRegister()" style="background-color: #6c757d;">Cadastrar</button>
+        <div id="regMsg" class="message"></div>
+    </div>
+</div>
+
+    <script src="js/auth.js"></script>
+</body>
+</html>

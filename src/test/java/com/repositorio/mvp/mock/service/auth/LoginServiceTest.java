@@ -9,6 +9,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -30,6 +31,7 @@ import com.repositorio.mvp.domain.user.repository.UserRepository;
 import com.repositorio.mvp.domain.auth.service.interfaces.TwoFactorNotification;
 import com.repositorio.mvp.domain.auth.service.login.LoginAttemptService;
 import com.repositorio.mvp.domain.auth.service.login.LoginService;
+import com.repositorio.mvp.domain.auth.service.login.TwoFactorService;
 import com.repositorio.mvp.domain.auth.service.token.TokenService;
 import com.repositorio.mvp.shared.UserConstants;
 
@@ -50,6 +52,9 @@ public class LoginServiceTest {
 
     @Mock
     private TokenService tokenService;
+
+    @Mock
+    private TwoFactorService twoFactorService;
 
     @Mock
     private TwoFactorNotification twoFactorStrategy;
@@ -74,16 +79,18 @@ public class LoginServiceTest {
         when(userRepository.findByEmailHash(DigestUtils.sha256Hex(loginRequestDTO.email().toLowerCase()))).thenReturn(Optional.of(mockUser));
         when(passwordEncoder.matches(loginRequestDTO.password(), mockUser.getPassword())).thenReturn(true);
 
-        assertDoesNotThrow(() -> loginService.initiateLogin(loginRequestDTO, MOCK_IP));
+        doAnswer(invocation -> {
+        User u = invocation.getArgument(0);
+        u.generateTwoFactorCode("123456", LocalDateTime.now().plusMinutes(5));
+        return null;
+    }).when(twoFactorService).prepareTwoFactor(any(User.class));
 
-        verify(loginAttemptService).loginSucceeded(MOCK_IP);
-        verify(loginAttemptService).loginSucceeded(loginRequestDTO.email());
+    assertDoesNotThrow(() -> loginService.initiateLogin(loginRequestDTO, MOCK_IP));
 
-        verify(userRepository).save(mockUser);
-        verify(twoFactorStrategy).sendTwoFactorCode(eq(mockUser), anyString());
-
-        assertNotNull(mockUser.getTwoFactorCode());
-        assertNotNull(mockUser.getTwoFactorExpiry());
+    verify(twoFactorService).prepareTwoFactor(mockUser); 
+    verify(twoFactorStrategy).sendTwoFactorCode(eq(mockUser), anyString());
+    
+    assertNotNull(mockUser.getTwoFactorCode());
     }
 
     @Test

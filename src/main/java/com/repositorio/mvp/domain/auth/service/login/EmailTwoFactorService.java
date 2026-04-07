@@ -21,6 +21,7 @@ public class EmailTwoFactorService implements TwoFactorNotification{
      * @param user Entidade do usuário que solicitou o login.
      * @param code Código numérico de 6 dígitos gerado previamente.
      */
+
     @Override
     public void sendTwoFactorCode(User user, String code) {
         
@@ -31,4 +32,5 @@ public class EmailTwoFactorService implements TwoFactorNotification{
         
         mailSender.send(message);
     }
+    
 }

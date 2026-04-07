@@ -7,14 +7,12 @@ import com.repositorio.mvp.domain.user.DTO.UserRequestDTO;
 import com.repositorio.mvp.domain.user.repository.UserRepository;
 import com.repositorio.mvp.domain.user.validation.interfaces.UserRegisterValidator;
 
+import lombok.RequiredArgsConstructor;
+
 @Component
+@RequiredArgsConstructor
 public class UserRegisterValidatorImpl implements UserRegisterValidator {
-
     private final UserRepository userRepository;
-
-    public UserRegisterValidatorImpl(UserRepository userRepository) {
-        this.userRepository = userRepository;
-    }
 
     @Override
     public void validate(UserRequestDTO request) {

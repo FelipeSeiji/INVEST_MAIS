@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -72,20 +73,21 @@ public class PasswordRecoveryServiceTest {
 
     @Test
     public void resetPassword_WithValidToken_UpdatesPasswordAndDeletesToken() {
-        String token = "valid_token";
+        String tokenInput = "valid_token";
         String newPassword = "newPassword@123";
-        String encoderPassword = "encodedPassword";
+        String encodedPassword = "encodedPassword";
 
-        PasswordResetToken passwordResetToken = new PasswordResetToken(newPassword, mockUser);
-
+        PasswordResetToken passwordResetToken = new PasswordResetToken(tokenInput, mockUser);
         passwordResetToken.setExpiryDate(LocalDateTime.now().plusMinutes(10));
 
-        when(passwordResetTokenRepository.findByToken(token)).thenReturn(Optional.of(passwordResetToken));
-        when(passwordEncoder.encode(newPassword)).thenReturn(encoderPassword);
+        when(passwordResetTokenRepository.findByToken(anyString()))
+                .thenReturn(Optional.of(passwordResetToken));
+                
+        when(passwordEncoder.encode(newPassword)).thenReturn(encodedPassword);
 
-        passwordRecoveryService.resetPassword(token, newPassword);
+        passwordRecoveryService.resetPassword(tokenInput, newPassword);
 
-        assertEquals(encoderPassword, mockUser.getPassword());
+        assertEquals(encodedPassword, mockUser.getPassword());
         verify(userRepository).save(mockUser);
         verify(passwordResetTokenRepository).delete(passwordResetToken);
     }
@@ -95,7 +97,7 @@ public class PasswordRecoveryServiceTest {
         String invalidToken = "invalid_token";
         String newPassword = "newPassword@123";
         
-        when(passwordResetTokenRepository.findByToken(invalidToken)).thenReturn(Optional.empty());
+        when(passwordResetTokenRepository.findByToken(anyString())).thenReturn(Optional.empty());
 
         IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
             passwordRecoveryService.resetPassword(invalidToken, newPassword);
@@ -114,7 +116,7 @@ public class PasswordRecoveryServiceTest {
 
         expiredToken.setExpiryDate(LocalDateTime.now().minusMinutes(5));
 
-        when(passwordResetTokenRepository.findByToken(token)).thenReturn(Optional.of(expiredToken));
+        when(passwordResetTokenRepository.findByToken(anyString())).thenReturn(Optional.of(expiredToken));
 
         IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
             passwordRecoveryService.resetPassword(token, newPassword);

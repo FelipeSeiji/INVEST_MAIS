@@ -6,6 +6,8 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
+import com.repositorio.mvp.common.validation.ValidPassword;
+
 public record AuthenticationDTO(
     @Schema(description = "Email do usuário",example = "example@gmail.com")
     @NotBlank(message = "O email é obrigatório")
@@ -15,8 +17,6 @@ public record AuthenticationDTO(
     String email,
 
     @Schema(description = "Senha do usuário", example = "Password@123")
-    @NotBlank(message = "A senha é obrigatória")
-    @Size(min = 8, max = 50, message = "A senha deve ter no mínimo 8 e no máximo 50 caracteres")
-    @Pattern(regexp = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=!_\\-]).*$", message = "A senha deve conter pelo menos uma letra maiúscula, uma minúscula, um número e um caractere especial")
+    @ValidPassword
     String password
 ) {}

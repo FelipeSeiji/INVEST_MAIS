@@ -25,6 +25,14 @@ public class SecurityConfig {
             .requiresChannel(channel -> channel.anyRequest().requiresSecure()) 
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers(
+                    "/",
+                    "/static/**",
+                    "/css/**", 
+                    "/js/**",
+                    "/templates/**",
+                    "/index.html",
+                    "/dashboard.html",
+                    "/reset-password.html",
                     "/h2-console/**", 
                     "/swagger-ui/**", 
                     "/v3/api-docs/**", 

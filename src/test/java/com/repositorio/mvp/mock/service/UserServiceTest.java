@@ -80,7 +80,7 @@ public class UserServiceTest {
             .id(userId)
             .name(USER.name())
             .email(USER.email())
-            .password("senha_encriptada")
+            .security(com.repositorio.mvp.domain.user.model.UserSecurity.builder().password("senha_encriptada").build())
             .build();
 
         UserResponseDTO expectedResponse =
@@ -118,7 +118,7 @@ public class UserServiceTest {
             .id(userId)
             .name(USER.name())
             .email(USER.email())
-            .password(USER.password())
+            .security(com.repositorio.mvp.domain.user.model.UserSecurity.builder().password(USER.password()).build())
             .build();
 
         UserResponseDTO expectedResponse =
@@ -153,14 +153,14 @@ public class UserServiceTest {
             .id(userId)
             .name(USER.name())
             .email(USER.email())
-            .password(USER.password())
+            .security(com.repositorio.mvp.domain.user.model.UserSecurity.builder().password(USER.password()).build())
             .build();
 
         User user2 = User.builder()
             .id(userId2)
             .name("Maria")
             .email("maria@gmail.com")
-            .password("1234")
+            .security(com.repositorio.mvp.domain.user.model.UserSecurity.builder().password("1234").build())
             .build();
 
         UserResponseDTO expectedResponse1 =

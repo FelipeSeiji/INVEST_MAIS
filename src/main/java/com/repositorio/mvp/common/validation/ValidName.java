@@ -4,7 +4,7 @@ import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
-import com.repositorio.mvp.common.validation.constants.PasswordConstraintValidator;
+import com.repositorio.mvp.common.validation.constants.NameConstraintValidator;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.RetentionPolicy;
@@ -15,13 +15,13 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
 @Documented
-@Constraint(validatedBy = PasswordConstraintValidator.class)
+@Constraint(validatedBy = NameConstraintValidator.class)
 @Target({ElementType.FIELD, ElementType.PARAMETER })
 @Retention(RetentionPolicy.RUNTIME)
-@NotBlank(message = "A senha é obrigatória")
-@Size(min = 8, max = 50, message = "A senha deve ter no mínimo 8 e no máximo 50 caracteres")
-public @interface ValidPassword {
-    String message() default "A senha deve conter pelo menos uma letra maiúscula, uma minúscula, um número e um caractere especial";
+@NotBlank(message = "O nome é obrigatório")
+@Size(max = 50, message = "O nome não pode ter mais de 50 caracteres")
+public @interface ValidName {
+    String message() default "O nome deve conter apenas letras";
 
     Class<?>[] groups() default {};
 

@@ -87,7 +87,7 @@ public class PasswordRecoveryServiceTest {
 
         passwordRecoveryService.resetPassword(tokenInput, newPassword);
 
-        assertEquals(encodedPassword, mockUser.getPassword());
+        assertEquals(encodedPassword, mockUser.getSecurity().getPassword());
         verify(userRepository).save(mockUser);
         verify(passwordResetTokenRepository).delete(passwordResetToken);
     }

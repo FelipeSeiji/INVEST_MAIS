@@ -76,12 +76,12 @@ public class LoginServiceTest {
 
         when(loginAttemptService.isBlocked(MOCK_IP)).thenReturn(false);
         when(loginAttemptService.isBlocked(loginRequestDTO.email())).thenReturn(false);
-        when(userRepository.findByEmailHash(DigestUtils.sha256Hex(loginRequestDTO.email().toLowerCase()))).thenReturn(Optional.of(mockUser));
-        when(passwordEncoder.matches(loginRequestDTO.password(), mockUser.getPassword())).thenReturn(true);
+        when(userRepository.findBySecurityEmailHash(DigestUtils.sha256Hex(loginRequestDTO.email().toLowerCase()))).thenReturn(Optional.of(mockUser));
+        when(passwordEncoder.matches(loginRequestDTO.password(), mockUser.getSecurity().getPassword())).thenReturn(true);
 
         doAnswer(invocation -> {
         User u = invocation.getArgument(0);
-        u.generateTwoFactorCode("123456", LocalDateTime.now().plusMinutes(5));
+        u.getSecurity().generateTwoFactorCode("123456", LocalDateTime.now().plusMinutes(5));
         return null;
     }).when(twoFactorService).prepareTwoFactor(any(User.class));
 
@@ -90,7 +90,7 @@ public class LoginServiceTest {
     verify(twoFactorService).prepareTwoFactor(mockUser); 
     verify(twoFactorStrategy).sendTwoFactorCode(eq(mockUser), anyString());
     
-    assertNotNull(mockUser.getTwoFactorCode());
+    assertNotNull(mockUser.getSecurity().getTwoFactorCode());
     }
 
     @Test
@@ -99,8 +99,8 @@ public class LoginServiceTest {
 
         when(loginAttemptService.isBlocked(MOCK_IP)).thenReturn(false);
         when(loginAttemptService.isBlocked(loginRequestDTO.email())).thenReturn(false);
-        when(userRepository.findByEmailHash(DigestUtils.sha256Hex(loginRequestDTO.email().toLowerCase()))).thenReturn(Optional.of(mockUser));
-        when(passwordEncoder.matches(loginRequestDTO.password(), mockUser.getPassword())).thenReturn(false);
+        when(userRepository.findBySecurityEmailHash(DigestUtils.sha256Hex(loginRequestDTO.email().toLowerCase()))).thenReturn(Optional.of(mockUser));
+        when(passwordEncoder.matches(loginRequestDTO.password(), mockUser.getSecurity().getPassword())).thenReturn(false);
 
         IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
             loginService.initiateLogin(loginRequestDTO, MOCK_IP);
@@ -125,35 +125,35 @@ public class LoginServiceTest {
 
         assertTrue(exception.getMessage().contains("Muitas tentativas falhas"));
 
-        verify(userRepository, never()).findByEmailHash(anyString());
+        verify(userRepository, never()).findBySecurityEmailHash(anyString());
     }
 
     @Test
     public void verify2FA_WithValidCode_ReturnsJwtToken() {
         String validCode = "123456";
-        mockUser.generateTwoFactorCode(validCode, LocalDateTime.now().plusMinutes(5));
+        mockUser.getSecurity().generateTwoFactorCode(validCode, LocalDateTime.now().plusMinutes(5));
         
         Verify2FARequestDTO verify2faRequestDTO = new Verify2FARequestDTO(mockUser.getEmail(), validCode);
         String expectedJwt = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.mocked_token";
 
         when(loginAttemptService.isBlocked(MOCK_IP)).thenReturn(false);
-        when(userRepository.findByEmailHash(DigestUtils.sha256Hex(verify2faRequestDTO.email().toLowerCase()))).thenReturn(Optional.of(mockUser));
+        when(userRepository.findBySecurityEmailHash(DigestUtils.sha256Hex(verify2faRequestDTO.email().toLowerCase()))).thenReturn(Optional.of(mockUser));
         when(tokenService.generateToken(mockUser.getId())).thenReturn(expectedJwt);
 
         String actualJwt = loginService.verify2FAAndGenerateToken(verify2faRequestDTO, MOCK_IP);
 
         assertEquals(expectedJwt, actualJwt);
-        assertNull(mockUser.getTwoFactorCode());
+        assertNull(mockUser.getSecurity().getTwoFactorCode());
         verify(loginAttemptService).loginSucceeded(MOCK_IP);
         verify(userRepository).save(mockUser);
     }
     @Test
     public void verify2FA_WithInvalidCode_ThrowsExceptionAndRegistersFailure() {
-        mockUser.generateTwoFactorCode("123456", LocalDateTime.now().plusMinutes(5));
+        mockUser.getSecurity().generateTwoFactorCode("123456", LocalDateTime.now().plusMinutes(5));
         Verify2FARequestDTO request = new Verify2FARequestDTO(mockUser.getEmail(), "999999"); 
         
         when(loginAttemptService.isBlocked(MOCK_IP)).thenReturn(false);
-        when(userRepository.findByEmailHash(DigestUtils.sha256Hex(request.email().toLowerCase()))).thenReturn(Optional.of(mockUser));
+        when(userRepository.findBySecurityEmailHash(DigestUtils.sha256Hex(request.email().toLowerCase()))).thenReturn(Optional.of(mockUser));
 
         IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
             loginService.verify2FAAndGenerateToken(request, MOCK_IP);
@@ -168,19 +168,19 @@ public class LoginServiceTest {
     public void verify2FA_WithExpiredCode_ThrowsException() {
         String validCode = "123456";
 
-        mockUser.generateTwoFactorCode(validCode, LocalDateTime.now().minusMinutes(1)); 
+        mockUser.getSecurity().generateTwoFactorCode(validCode, LocalDateTime.now().minusMinutes(1)); 
 
         Verify2FARequestDTO request = new Verify2FARequestDTO(mockUser.getEmail(), validCode);
         
         when(loginAttemptService.isBlocked(MOCK_IP)).thenReturn(false);
-        when(userRepository.findByEmailHash(DigestUtils.sha256Hex(request.email().toLowerCase()))).thenReturn(Optional.of(mockUser));
+        when(userRepository.findBySecurityEmailHash(DigestUtils.sha256Hex(request.email().toLowerCase()))).thenReturn(Optional.of(mockUser));
 
         IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
             loginService.verify2FAAndGenerateToken(request, MOCK_IP);
         });
 
         assertTrue(exception.getMessage().contains("expirado"));
-        assertNull(mockUser.getTwoFactorCode()); 
+        assertNull(mockUser.getSecurity().getTwoFactorCode()); 
         verify(userRepository).save(mockUser);
     }
 }

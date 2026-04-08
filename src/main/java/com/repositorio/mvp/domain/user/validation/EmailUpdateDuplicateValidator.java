@@ -18,7 +18,7 @@ public class EmailUpdateDuplicateValidator implements UserUpdateValidator {
     @Override
     public void validate(UserUpdateRequestDTO request, User user) {
         String hash = DigestUtils.sha256Hex(request.email().toLowerCase());
-        if (userRepository.existsByEmailHash(hash) && !user.getEmail().equals(request.email())) {
+        if (userRepository.existsBySecurityEmailHash(hash) && !user.getEmail().equals(request.email())) {
             throw new IllegalArgumentException("Email já está em uso por outro usuário.");
         }
     }

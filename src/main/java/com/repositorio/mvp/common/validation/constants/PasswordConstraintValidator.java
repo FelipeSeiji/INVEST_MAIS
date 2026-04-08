@@ -1,10 +1,11 @@
-package com.repositorio.mvp.common.validation;
+package com.repositorio.mvp.common.validation.constants;
+
+import com.repositorio.mvp.common.validation.ValidPassword;
 
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 
 public class PasswordConstraintValidator implements ConstraintValidator<ValidPassword, String> {
-    // A regra de negócio centralizada em um único lugar
     private static final String PASSWORD_PATTERN = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=!_\\-]).{8,50}$";
 
     @Override

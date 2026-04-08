@@ -41,19 +41,19 @@ public class UserValidationTest {
     @Test
     public void validateRegister_WhenEmailDoesNotExist_DoesNotThrowException() {
         String hash = DigestUtils.sha256Hex(TEST_EMAIL.toLowerCase());
-        when(userRepository.existsByEmailHash(hash)).thenReturn(false);
+        when(userRepository.existsBySecurityEmailHash(hash)).thenReturn(false);
 
         UserRequestDTO requestDTO = new UserRequestDTO("Teste", TEST_EMAIL, "senha123");
 
         assertDoesNotThrow(() -> registerValidator.validate(requestDTO));
         
-        verify(userRepository).existsByEmailHash(hash);
+        verify(userRepository).existsBySecurityEmailHash(hash);
     }
 
     @Test
     public void validateRegister_WhenEmailExists_ThrowsException() {
         String hash = DigestUtils.sha256Hex(TEST_EMAIL.toLowerCase());
-        when(userRepository.existsByEmailHash(hash)).thenReturn(true);
+        when(userRepository.existsBySecurityEmailHash(hash)).thenReturn(true);
 
         UserRequestDTO requestDTO = new UserRequestDTO("Teste", TEST_EMAIL, "senha123");
 
@@ -67,7 +67,7 @@ public class UserValidationTest {
     @Test
     public void validateUpdate_WhenEmailDoesNotExist_DoesNotThrowException() {
         String hash = DigestUtils.sha256Hex(TEST_EMAIL.toLowerCase());
-        when(userRepository.existsByEmailHash(hash)).thenReturn(false);
+        when(userRepository.existsBySecurityEmailHash(hash)).thenReturn(false);
 
         UserUpdateRequestDTO requestDTO = new UserUpdateRequestDTO("Novo Nome", TEST_EMAIL, "Password@123");
         User existingUser = User.builder().id(userId).email("old_email@gmail.com").build();
@@ -86,7 +86,7 @@ public class UserValidationTest {
     @Test
     public void validateUpdate_WhenEmailExistsAndIsDifferent_ThrowsException() {
         String hash = DigestUtils.sha256Hex(TEST_EMAIL.toLowerCase());
-        when(userRepository.existsByEmailHash(hash)).thenReturn(true);
+        when(userRepository.existsBySecurityEmailHash(hash)).thenReturn(true);
 
         UserUpdateRequestDTO requestDTO = new UserUpdateRequestDTO("Novo Nome", TEST_EMAIL, "Password@123");
         User existingUser = User.builder().id(userId).email("old_email@gmail.com").build();

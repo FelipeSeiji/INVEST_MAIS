@@ -26,7 +26,7 @@ public class UserUpdateValidatorImpl implements UserUpdateValidator {
 
         String hash = DigestUtils.sha256Hex(request.email().toLowerCase());
         
-        if (userRepository.existsByEmailHash(hash)) {
+        if (userRepository.existsBySecurityEmailHash(hash)) {
             throw new IllegalArgumentException("Email já está em uso por outro usuário.");
         }
     }

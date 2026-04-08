@@ -1,10 +1,8 @@
 package com.repositorio.mvp.domain.auth.DTO;
 
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
+import com.repositorio.mvp.common.validation.ValidEmail;
 
 public record ForgotPasswordRequestDTO(
-    @Email(message = "O email não é válido")
-    @NotBlank(message = "O email é obrigatório")
+    @ValidEmail
     String email
 ) {}

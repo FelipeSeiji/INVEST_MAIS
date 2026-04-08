@@ -17,7 +17,7 @@ public class EmailDuplicateValidator implements UserRegisterValidator {
     @Override
     public void validate(UserRequestDTO request) {
         String hash = DigestUtils.sha256Hex(request.email().toLowerCase());
-        if (userRepository.existsByEmailHash(hash)) {
+        if (userRepository.existsBySecurityEmailHash(hash)) {
             throw new IllegalArgumentException("Email já está em uso");
         }
     }

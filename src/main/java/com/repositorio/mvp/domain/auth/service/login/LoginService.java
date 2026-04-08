@@ -53,7 +53,7 @@ public class LoginService {
         }
 
         String searchHash = org.apache.commons.codec.digest.DigestUtils.sha256Hex(loginRequest.email().toLowerCase());
-        User user = userRepository.findByEmailHash(searchHash)
+        User user = userRepository.findBySecurityEmailHash(searchHash)
                 .orElseThrow(() -> {
                     loginAttemptService.loginFailed(ip);
                     log.warn("FALHA DE LOGIN: Usuário não existe. IP: {} | E-mail tentado: {}", ip,
@@ -61,7 +61,7 @@ public class LoginService {
                     return new IllegalArgumentException("Credenciais inválidas.");
                 });
 
-        if (!passwordEncoder.matches(loginRequest.password(), user.getPassword())) {
+        if (!passwordEncoder.matches(loginRequest.password(), user.getSecurity().getPassword())) {
             loginAttemptService.loginFailed(ip);
             loginAttemptService.loginFailed(user.getEmail());
             log.warn("FALHA DE LOGIN: Senha incorreta. IP: {} | E-mail: {}", ip, user.getEmail());
@@ -76,7 +76,7 @@ public class LoginService {
         twoFactorService.prepareTwoFactor(user);
         userRepository.save(user);
 
-        twoFactorStrategy.sendTwoFactorCode(user, user.getTwoFactorCode());
+        twoFactorStrategy.sendTwoFactorCode(user, user.getSecurity().getTwoFactorCode());
     }
 
     /**
@@ -98,25 +98,25 @@ public class LoginService {
         }
 
         String searchHash = org.apache.commons.codec.digest.DigestUtils.sha256Hex(verifyRequest.email().toLowerCase());
-        User user = userRepository.findByEmailHash(searchHash)
+        User user = userRepository.findBySecurityEmailHash(searchHash)
                 .orElseThrow(() -> new IllegalArgumentException("Usuário não encontrado."));
 
-        if (user.getTwoFactorCode() == null || !user.getTwoFactorCode().equals(verifyRequest.code())) {
+        if (user.getSecurity().getTwoFactorCode() == null || !user.getSecurity().getTwoFactorCode().equals(verifyRequest.code())) {
             loginAttemptService.loginFailed(ip);
             loginAttemptService.loginFailed("2FA:" + user.getEmail());
             log.warn("FALHA 2FA: Código inválido. IP: {} | E-mail: {}", ip, maskEmail(user.getEmail()));
             throw new IllegalArgumentException("Código 2FA inválido.");
         }
 
-        if (user.getTwoFactorExpiry().isBefore(LocalDateTime.now())) {
-            user.clearTwoFactorCode();
+        if (user.getSecurity().getTwoFactorExpiry().isBefore(LocalDateTime.now())) {
+            user.getSecurity().clearTwoFactorCode();
             userRepository.save(user);
             log.warn("FALHA 2FA: Código expirado. IP: {} | E-mail: {}", ip, user.getEmail());
             throw new IllegalArgumentException("Código 2FA expirado.");
         }
 
         loginAttemptService.loginSucceeded(ip);
-        user.clearTwoFactorCode();
+        user.getSecurity().clearTwoFactorCode();
         userRepository.save(user);
 
         log.info("LOGIN SUCESSO: 2FA validado. Token JWT emitido para o usuário {}. IP: {}", user.getId(), ip);

@@ -47,7 +47,7 @@ public class PasswordRecoveryService {
         
         String emailHash = generateEmailHash(email);
 
-        userRepository.findByEmailHash(emailHash).ifPresent(user -> {
+        userRepository.findBySecurityEmailHash(emailHash).ifPresent(user -> {
             byte[] tokenBytes = new byte[32];
             secureRandom.nextBytes(tokenBytes);
             String token = Base64.getUrlEncoder().withoutPadding().encodeToString(tokenBytes);
@@ -84,7 +84,7 @@ public class PasswordRecoveryService {
         }
 
         User user = resetToken.getUser();
-        user.setPassword(passwordEncoder.encode(newPassword));
+        user.getSecurity().setPassword(passwordEncoder.encode(newPassword));
         userRepository.save(user);
         
         passwordResetTokenRepository.delete(resetToken);

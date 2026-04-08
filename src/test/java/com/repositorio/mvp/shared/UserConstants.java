@@ -23,7 +23,7 @@ public class UserConstants {
         .id(UUID.randomUUID())
         .name(USER.name())
         .email(USER.email())
-        .password("password")
+        .security(com.repositorio.mvp.domain.user.model.UserSecurity.builder().password("password").build())
         .build();
     }
 }

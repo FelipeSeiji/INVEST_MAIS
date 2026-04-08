@@ -14,6 +14,7 @@ import com.repositorio.mvp.domain.user.DTO.UserResponseDTO;
 import com.repositorio.mvp.domain.user.DTO.UserUpdateRequestDTO;
 import com.repositorio.mvp.domain.user.mapper.UserMapper;
 import com.repositorio.mvp.domain.user.model.User;
+import com.repositorio.mvp.domain.user.model.UserSecurity;
 import com.repositorio.mvp.domain.user.model.enums.UserRole;
 import com.repositorio.mvp.domain.user.repository.UserRepository;
 import com.repositorio.mvp.domain.user.service.interfaces.UserCommandService;
@@ -45,9 +46,12 @@ public class UserCommandServiceImpl implements UserCommandService {
         registerValidators.forEach(v -> v.validate(userRequestDTO));
 
         User user = userMapper.toUser(userRequestDTO);
-        user.setPassword(passwordEncoder.encode(userRequestDTO.password()));
-        user.setEmailHash(DigestUtils.sha256Hex(userRequestDTO.email().toLowerCase()));
-        user.setRole(UserRole.USER);
+        UserSecurity security = UserSecurity.builder()
+            .password(passwordEncoder.encode(userRequestDTO.password()))
+            .emailHash(DigestUtils.sha256Hex(userRequestDTO.email().toLowerCase()))
+            .role(UserRole.USER)
+            .build();
+        user.setSecurity(security);
         userRepository.save(user);
 
         return userMapper.toUserResponseDTO(user);
@@ -81,7 +85,7 @@ public class UserCommandServiceImpl implements UserCommandService {
         User user = userRepository.findById(id)
             .orElseThrow(() -> new EntityNotFoundException("Usuário não encontrado."));
         
-        if (!passwordEncoder.matches(userUpdateRequestDTO.currentPassword(), user.getPassword())) {
+        if (!passwordEncoder.matches(userUpdateRequestDTO.currentPassword(), user.getSecurity().getPassword())) {
             throw new IllegalArgumentException("A senha atual informada está incorreta.");
         }
         

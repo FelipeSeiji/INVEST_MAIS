@@ -12,6 +12,7 @@ import static org.mockito.Mockito.when;
 import java.time.LocalDateTime;
 import java.util.Optional;
 
+import org.apache.commons.codec.digest.DigestUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -51,9 +52,10 @@ public class PasswordRecoveryServiceTest {
     
     @Test
     public void createToken_WhenUserExists_GeneratesAndSavesToken() {
-        String email = mockUser.getEmail();
+        String email = "felipe@email.com";
+        String expectedHash = org.apache.commons.codec.digest.DigestUtils.sha256Hex(email.toLowerCase());
 
-        when(userRepository.findByEmail(email)).thenReturn(Optional.of(mockUser));
+        when(userRepository.findBySecurityEmailHash(expectedHash)).thenReturn(Optional.of(mockUser));
 
         passwordRecoveryService.createPasswordResetTokenForUser(email);
 
@@ -63,8 +65,9 @@ public class PasswordRecoveryServiceTest {
     @Test
     public void createToken_WhenUserDoesNotExist_DoesNothing() {
         String email = "not_exist@gmail.com";
+        String expectedHash = DigestUtils.sha256Hex(email.toLowerCase());
         
-        when(userRepository.findByEmail(email)).thenReturn(Optional.empty());
+        when(userRepository.findBySecurityEmailHash(expectedHash)).thenReturn(Optional.empty());
 
         passwordRecoveryService.createPasswordResetTokenForUser(email);
 

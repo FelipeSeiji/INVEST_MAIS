@@ -33,6 +33,11 @@ import jakarta.servlet.http.HttpServletRequest;
 @RequestMapping("/auth")
 @RequiredArgsConstructor
 public class AuthController {
+    private static final String MESSAGE_LOGIN_2FA_SENT = "Código de verificação enviado para o seu e-mail.";
+    private static final String MESSAGE_TOO_MANY_REQUESTS = "Muitas requisições. Tente novamente mais tarde.";
+    private static final String MESSAGE_FORGOT_PASSWORD_SENT = "Se o e-mail existir, um link de recuperação foi enviado.";
+    private static final String MESSAGE_PASSWORD_RESET_SUCCESS = "Senha redefinida com sucesso.";
+
     private final LoginAttemptService loginAttemptService;
     private final LoginService loginService;
     private final SessionService sessionService;
@@ -53,7 +58,7 @@ public class AuthController {
         String ip = ClientIp.getClientIp(request);
         loginService.initiateLogin(loginRequest, ip);
 
-        return new MessageResponseDTO("Código de verificação enviado para o seu e-mail.");
+        return new MessageResponseDTO(MESSAGE_LOGIN_2FA_SENT);
     }
 
     /**
@@ -69,7 +74,11 @@ public class AuthController {
     @Operation(summary = "Valida o código 2FA e retorna o JWT", description = "Valida o código recebido por e-mail. Se correto e no prazo, devolve o token de acesso (JWT).")
     public TokenResponseDTO verify2FA(@Valid @RequestBody Verify2FARequestDTO verifyRequest, HttpServletRequest request) {
         String ip = ClientIp.getClientIp(request);
-        String token = loginService.verify2FAAndGenerateToken(verifyRequest, ip);
+        String token = loginService.verify2FAAndGenerateToken(
+            verifyRequest, 
+            ip
+        );
+
         return new TokenResponseDTO(token);
     }
 
@@ -100,14 +109,18 @@ public class AuthController {
         String ip = ClientIp.getClientIp(request);
 
         if(loginAttemptService.isBlocked(ip)) {
-            return new MessageResponseDTO("Muitas requisições. Tente novamente mais tarde.");
+            return new MessageResponseDTO(
+                MESSAGE_TOO_MANY_REQUESTS
+            );
         }
         
-        passwordRecoveryService.createPasswordResetTokenForUser(forgotPasswordRequestDTO.email());
+        passwordRecoveryService.createPasswordResetTokenForUser(
+            forgotPasswordRequestDTO.email()
+        );
         
         log.info("RECUPERAÇÃO DE SENHA: Solicitação iniciada para o e-mail: {} a partir do IP: {}", forgotPasswordRequestDTO.email(), ip);
         
-        return new MessageResponseDTO("Se o e-mail existir, um link de recuperação foi enviado.");
+        return new MessageResponseDTO(MESSAGE_FORGOT_PASSWORD_SENT);
     }
 
     /**
@@ -122,10 +135,13 @@ public class AuthController {
     public MessageResponseDTO resetPassword(@Valid @RequestBody ResetPasswordRequestDTO request, HttpServletRequest httpRequest) {
         String ip = ClientIp.getClientIp(httpRequest);
 
-        passwordRecoveryService.resetPassword(request.token(), request.newPassword());
+        passwordRecoveryService.resetPassword(
+            request.token(), 
+            request.newPassword()
+        );
 
         log.info("ALERTA DE SEGURANÇA: Senha redefinida com sucesso via token. IP de origem: {}", ip);
 
-        return new MessageResponseDTO("Senha redefinida com sucesso.");
+        return new MessageResponseDTO(MESSAGE_PASSWORD_RESET_SUCCESS);
     }
 }

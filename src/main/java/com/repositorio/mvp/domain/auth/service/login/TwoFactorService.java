@@ -16,6 +16,10 @@ public class TwoFactorService {
     
     public void prepareTwoFactor(User user) {
         String code = codeGenerator.generate(6);
-        user.getSecurity().generateTwoFactorCode(code, LocalDateTime.now().plusMinutes(5));
+        user.getSecurity().generateTwoFactorCode(
+            code, 
+            LocalDateTime.now()
+                .plusMinutes(5)
+        );
     }
 }

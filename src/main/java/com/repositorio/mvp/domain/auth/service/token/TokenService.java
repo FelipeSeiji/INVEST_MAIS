@@ -16,6 +16,8 @@ import com.auth0.jwt.exceptions.JWTVerificationException;
  */
 @Service
 public class TokenService implements TokenProvider {
+    private static final String MESSAGE_ERR_INVALID_TOKEN = "Token inválido";
+
     @Value("${api.security.token.secret}")
     private String secret;
 
@@ -35,11 +37,14 @@ public class TokenService implements TokenProvider {
         Instant now = Instant.now();
 
         return JWT.create()
-                .withIssuer(ISSUER)
-                .withSubject(userId.toString())
-                .withIssuedAt(now)
-                .withExpiresAt(now.plus(Duration.ofMinutes(EXPIRATION_MINUTES)))
-                .sign(algorithm);
+            .withIssuer(ISSUER)
+            .withSubject(userId.toString())
+            .withIssuedAt(now)
+            .withExpiresAt(now.plus(
+                Duration.ofMinutes(EXPIRATION_MINUTES)
+                )
+            )
+            .sign(algorithm);
     }
 
     /**
@@ -56,13 +61,13 @@ public class TokenService implements TokenProvider {
             Algorithm algorithm = Algorithm.HMAC256(secret);
 
             return JWT.require(algorithm)
-                    .withIssuer(ISSUER)
-                    .build()
-                    .verify(token)
-                    .getSubject();
+                .withIssuer(ISSUER)
+                .build()
+                .verify(token)
+                .getSubject();
 
         } catch (JWTVerificationException exception) {
-            throw new IllegalArgumentException("Token inválido");
+            throw new IllegalArgumentException(MESSAGE_ERR_INVALID_TOKEN);
         }
     }
 
@@ -80,13 +85,13 @@ public class TokenService implements TokenProvider {
             Algorithm algorithm = Algorithm.HMAC256(secret);
 
             return JWT.require(algorithm)
-                    .withIssuer(ISSUER)
-                    .build()
-                    .verify(token)
-                    .getExpiresAt()
-                    .toInstant();
+                .withIssuer(ISSUER)
+                .build()
+                .verify(token)
+                .getExpiresAt()
+                .toInstant();
         } catch (JWTVerificationException exception) {
-            throw new IllegalArgumentException("Token inválido");
+            throw new IllegalArgumentException(MESSAGE_ERR_INVALID_TOKEN);
         }
     }
 }

@@ -18,7 +18,6 @@ import java.io.IOException;
 @Slf4j
 @Component
 public class RateLimitFilter extends OncePerRequestFilter {
-
     private final RateLimitingService rateLimitingService;
     private final HandlerExceptionResolver handlerExceptionResolver;
 

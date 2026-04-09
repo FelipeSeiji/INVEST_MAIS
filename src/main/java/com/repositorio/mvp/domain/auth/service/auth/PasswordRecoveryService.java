@@ -29,6 +29,12 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 @RequiredArgsConstructor
 public class PasswordRecoveryService {
+    private static final String MESSAGE_EMAIL_SUBJECT = "Recuperação de Senha - MVP";
+    private static final String MESSAGE_EMAIL_BODY_TEMPLATE = "Olá %s,\n\nVocê solicitou a recuperação de senha.\nUtilize o token abaixo para redefinir sua senha:\n\n%s\n\nSe você não solicitou isso, ignore este e-mail.";
+    private static final String MESSAGE_ERR_INVALID_TOKEN = "Token inválido ou não encontrado.";
+    private static final String MESSAGE_ERR_EXPIRED_TOKEN = "Token expirado.";
+    private static final String MESSAGE_ERR_HASH_EMAIL = "Erro ao gerar hash do e-mail para busca.";
+    private static final String MESSAGE_ERR_HASH_TOKEN = "Erro ao gerar hash do token.";
 
     private final UserRepository userRepository;
     private final PasswordResetTokenRepository passwordResetTokenRepository;
@@ -44,28 +50,42 @@ public class PasswordRecoveryService {
     @Async
     @Transactional
     public void createPasswordResetTokenForUser(String email) {
-        
         String emailHash = generateEmailHash(email);
 
-        userRepository.findBySecurityEmailHash(emailHash).ifPresent(user -> {
-            byte[] tokenBytes = new byte[32];
-            secureRandom.nextBytes(tokenBytes);
-            String token = Base64.getUrlEncoder().withoutPadding().encodeToString(tokenBytes);
-            
-            PasswordResetToken myToken = new PasswordResetToken(hashToken(token), user);
-            passwordResetTokenRepository.save(myToken);
+        userRepository.findBySecurityEmailHash(emailHash)
+            .ifPresent(user -> {
+                byte[] tokenBytes = new byte[32];
+                secureRandom.nextBytes(tokenBytes);
+                String token = Base64
+                .getUrlEncoder()
+                .withoutPadding()
+                .encodeToString(tokenBytes);
+                PasswordResetToken myToken = new PasswordResetToken(
+                    hashToken(token), 
+                    user
+                );
+
+                passwordResetTokenRepository.save(myToken);
 
             try {
                 SimpleMailMessage message = new SimpleMailMessage();
                 message.setTo(email); 
-                message.setSubject("Recuperação de Senha - MVP");
-                message.setText("Olá " + user.getName() + ",\n\nVocê solicitou a recuperação de senha.\n"
-                        + "Utilize o token abaixo para redefinir sua senha:\n\n"
-                        + token + "\n\nSe você não solicitou isso, ignore este e-mail.");
+                message.setSubject(MESSAGE_EMAIL_SUBJECT);
+                message.setText(
+                    String.format(
+                        MESSAGE_EMAIL_BODY_TEMPLATE, 
+                        user.getName(), 
+                        token
+                    )
+                );
                 mailSender.send(message);
-                log.info("E-mail de recuperação enviado para {}", email);
+                log.info("E-mail de recuperação enviado para {}", 
+                email
+                );
             } catch (Exception e) {
-                log.error("Erro ao enviar e-mail de recuperação", e);
+                log.error("Erro ao enviar e-mail de recuperação", 
+                e
+                );
             }
         });
     }
@@ -75,28 +95,39 @@ public class PasswordRecoveryService {
      */
     @Transactional
     public void resetPassword(String token, String newPassword) {
-        PasswordResetToken resetToken = passwordResetTokenRepository.findByToken(hashToken(token))
-                .orElseThrow(() -> new IllegalArgumentException("Token inválido ou não encontrado."));
+        PasswordResetToken resetToken = passwordResetTokenRepository
+            .findByToken(hashToken(token))
+            .orElseThrow(() -> new IllegalArgumentException(
+                MESSAGE_ERR_INVALID_TOKEN
+            ));
 
-        if (resetToken.getExpiryDate().isBefore(LocalDateTime.now())) {
-            passwordResetTokenRepository.delete(resetToken);
-            throw new IllegalArgumentException("Token expirado.");
+        if (resetToken.getExpiryDate()
+            .isBefore(LocalDateTime.now())) {
+                passwordResetTokenRepository.delete(resetToken);
+                throw new IllegalArgumentException(
+                    MESSAGE_ERR_EXPIRED_TOKEN
+                );
         }
 
         User user = resetToken.getUser();
-        user.getSecurity().setPassword(passwordEncoder.encode(newPassword));
+
+        user.getSecurity().setPassword(passwordEncoder
+            .encode(newPassword));
         userRepository.save(user);
-        
         passwordResetTokenRepository.delete(resetToken);
     }
 
     private String generateEmailHash(String email) {
         try {
             MessageDigest digest = MessageDigest.getInstance("SHA-256");
-            byte[] hashBytes = digest.digest(email.toLowerCase().getBytes(StandardCharsets.UTF_8));
+            byte[] hashBytes = digest.digest(
+                email.toLowerCase().getBytes(StandardCharsets.UTF_8)
+            );
             StringBuilder hexString = new StringBuilder(2 * hashBytes.length);
+            
             for (byte b : hashBytes) {
                 String hex = Integer.toHexString(0xff & b);
+
                 if (hex.length() == 1) {
                     hexString.append('0');
                 }
@@ -104,7 +135,10 @@ public class PasswordRecoveryService {
             }
             return hexString.toString();
         } catch (Exception e) {
-            throw new RuntimeException("Erro ao gerar hash do e-mail para busca.", e);
+            throw new RuntimeException(
+                MESSAGE_ERR_HASH_EMAIL,
+                e
+            );
         }
     }
 
@@ -114,10 +148,17 @@ public class PasswordRecoveryService {
     private String hashToken(String token) {
         try {
             MessageDigest digest = MessageDigest.getInstance("SHA-256");
-            byte[] hash = digest.digest(token.getBytes(StandardCharsets.UTF_8));
-            return Base64.getUrlEncoder().withoutPadding().encodeToString(hash);
+            byte[] hash = digest.digest(
+                token.getBytes(StandardCharsets.UTF_8)
+            );
+            return Base64.getUrlEncoder()
+                .withoutPadding()
+                .encodeToString(hash);
         } catch (Exception e) {
-            throw new RuntimeException("Erro ao gerar hash do token.", e);
+            throw new RuntimeException(
+                MESSAGE_ERR_HASH_TOKEN,
+                e
+            );
         }
     }
 }

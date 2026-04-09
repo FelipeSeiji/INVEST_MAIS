@@ -2,6 +2,7 @@ package com.repositorio.mvp.domain.auth.service.login;
 
 import java.time.LocalDateTime;
 
+import org.apache.commons.codec.digest.DigestUtils;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,6 +27,14 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 @RequiredArgsConstructor
 public class LoginService {
+    private static final String MESSAGE_PREFIX_2FA_ATTEMPT = "2FA:";    
+
+    private static final String MESSAGE_ERR_TOO_MANY_ATTEMPTS = "Muitas tentativas falhas.";
+    private static final String MESSAGE_ERR_TOO_MANY_ATTEMPTS_2FA = "Muitas tentativas falhas. Tente novamente mais tarde.";
+    private static final String MESSAGE_ERR_INVALID_CREDENTIALS = "Credenciais inválidas.";
+    private static final String MESSAGE_ERR_USER_NOT_FOUND = "Usuário não encontrado.";
+    private static final String ERR_INVALID_2FA = "Código 2FA inválido.";
+    private static final String ERR_EXPIRED_2FA = "Código 2FA expirado.";
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
@@ -47,36 +56,54 @@ public class LoginService {
     @Transactional
     public void initiateLogin(LoginRequestDTO loginRequest, String ip) {
         if (loginAttemptService.isBlocked(ip) || loginAttemptService.isBlocked(loginRequest.email())) {
-            log.warn("ALERTA: Tentativa de login bloqueada (Força Bruta). IP: {} | Conta alvo: {}", ip,
-                    loginRequest.email());
-            throw new IllegalArgumentException("Muitas tentativas falhas.");
+            log.warn("ALERTA: Tentativa de login bloqueada (Força Bruta). IP: {} | Conta alvo: {}", 
+                ip, 
+                loginRequest.email());
+            throw new IllegalArgumentException(MESSAGE_ERR_TOO_MANY_ATTEMPTS);
         }
 
-        String searchHash = org.apache.commons.codec.digest.DigestUtils.sha256Hex(loginRequest.email().toLowerCase());
+        String searchHash = DigestUtils
+            .sha256Hex(
+                loginRequest.email()
+                    .toLowerCase()
+            );
         User user = userRepository.findBySecurityEmailHash(searchHash)
                 .orElseThrow(() -> {
                     loginAttemptService.loginFailed(ip);
-                    log.warn("FALHA DE LOGIN: Usuário não existe. IP: {} | E-mail tentado: {}", ip,
-                            maskEmail(loginRequest.email()));
-                    return new IllegalArgumentException("Credenciais inválidas.");
+                    log.warn("FALHA DE LOGIN: Usuário não existe. IP: {} | E-mail tentado: {}", 
+                        ip, 
+                        maskEmail(loginRequest.email())
+                    );
+                    return new IllegalArgumentException(MESSAGE_ERR_INVALID_CREDENTIALS);
                 });
 
-        if (!passwordEncoder.matches(loginRequest.password(), user.getSecurity().getPassword())) {
-            loginAttemptService.loginFailed(ip);
-            loginAttemptService.loginFailed(user.getEmail());
-            log.warn("FALHA DE LOGIN: Senha incorreta. IP: {} | E-mail: {}", ip, user.getEmail());
-            throw new IllegalArgumentException("Credenciais inválidas.");
+        if (!passwordEncoder.matches(loginRequest.password(), 
+            user.getSecurity()
+                .getPassword())) {
+                loginAttemptService.loginFailed(ip);
+                loginAttemptService.loginFailed(user.getEmail());
+                log.warn("FALHA DE LOGIN: Senha incorreta. IP: {} | E-mail: {}", 
+                    ip, 
+                    maskEmail(user.getEmail()));
+                throw new IllegalArgumentException(MESSAGE_ERR_INVALID_CREDENTIALS);
         }
 
         loginAttemptService.loginSucceeded(ip);
         loginAttemptService.loginSucceeded(user.getEmail());
 
-        log.info("LOGIN FASE 1: Credenciais válidas. Gerando 2FA para o usuário {}. IP: {}", user.getId(), ip);
+        log.info("LOGIN FASE 1: Credenciais válidas. Gerando 2FA para o usuário {}. IP: {}", 
+            user.getId(), 
+            ip
+        );
 
         twoFactorService.prepareTwoFactor(user);
         userRepository.save(user);
 
-        twoFactorStrategy.sendTwoFactorCode(user, user.getSecurity().getTwoFactorCode());
+        twoFactorStrategy.sendTwoFactorCode(
+            user, 
+            user.getSecurity()
+                .getTwoFactorCode()
+        );
     }
 
     /**
@@ -91,31 +118,43 @@ public class LoginService {
      */
     @Transactional
     public String verify2FAAndGenerateToken(Verify2FARequestDTO verifyRequest, String ip) {
-        if (loginAttemptService.isBlocked(ip) || loginAttemptService.isBlocked("2FA:" + verifyRequest.email())) {
-            log.warn("ALERTA: Tentativa de 2FA bloqueada (Força Bruta). IP: {} | Conta alvo: {}", ip,
-                    verifyRequest.email());
-            throw new IllegalArgumentException("Muitas tentativas falhas. Tente novamente mais tarde.");
+        String attemptKey = MESSAGE_PREFIX_2FA_ATTEMPT + verifyRequest.email();
+
+        if (loginAttemptService.isBlocked(ip) || loginAttemptService.isBlocked(attemptKey)) {
+            log.warn("ALERTA: Tentativa de 2FA bloqueada (Força Bruta). IP: {} | Conta alvo: {}", 
+                ip, 
+                verifyRequest.email());
+            throw new IllegalArgumentException(MESSAGE_ERR_TOO_MANY_ATTEMPTS_2FA);
         }
 
-        String searchHash = org.apache.commons.codec.digest.DigestUtils.sha256Hex(verifyRequest.email().toLowerCase());
+        String searchHash = DigestUtils.sha256Hex(verifyRequest.email()
+            .toLowerCase());
         User user = userRepository.findBySecurityEmailHash(searchHash)
-                .orElseThrow(() -> new IllegalArgumentException("Usuário não encontrado."));
+                .orElseThrow(() -> new IllegalArgumentException(MESSAGE_ERR_USER_NOT_FOUND));
 
-        if (user.getSecurity().getTwoFactorCode() == null || !user.getSecurity().getTwoFactorCode().equals(verifyRequest.code())) {
-            loginAttemptService.loginFailed(ip);
-            loginAttemptService.loginFailed("2FA:" + user.getEmail());
-            log.warn("FALHA 2FA: Código inválido. IP: {} | E-mail: {}", ip, maskEmail(user.getEmail()));
-            throw new IllegalArgumentException("Código 2FA inválido.");
+        if (user.getSecurity().getTwoFactorCode() == null || 
+            !user.getSecurity()
+                .getTwoFactorCode()
+                .equals(verifyRequest.code())) {
+                    loginAttemptService.loginFailed(ip);
+                    loginAttemptService.loginFailed(attemptKey);
+                    log.warn("FALHA 2FA: Código inválido. IP: {} | E-mail: {}", 
+                        ip, 
+                        maskEmail(user.getEmail()));
+                    throw new IllegalArgumentException(ERR_INVALID_2FA);
         }
 
-        if (user.getSecurity().getTwoFactorExpiry().isBefore(LocalDateTime.now())) {
-            user.getSecurity().clearTwoFactorCode();
-            userRepository.save(user);
-            log.warn("FALHA 2FA: Código expirado. IP: {} | E-mail: {}", ip, user.getEmail());
-            throw new IllegalArgumentException("Código 2FA expirado.");
+        if (user.getSecurity()
+            .getTwoFactorExpiry()
+            .isBefore(LocalDateTime.now())) {
+                user.getSecurity().clearTwoFactorCode();
+                userRepository.save(user);
+                log.warn("FALHA 2FA: Código expirado. IP: {} | E-mail: {}", ip, user.getEmail());
+                throw new IllegalArgumentException(ERR_EXPIRED_2FA);
         }
 
         loginAttemptService.loginSucceeded(ip);
+        loginAttemptService.loginSucceeded(attemptKey);
         user.getSecurity().clearTwoFactorCode();
         userRepository.save(user);
 
@@ -124,12 +163,16 @@ public class LoginService {
         return tokenProvider.generateToken(user.getId());
     }
 
-
-
     private String maskEmail(String email) {
         if (email == null || !email.contains("@"))
             return "***";
         String[] parts = email.split("@");
-        return parts[0].substring(0, Math.min(2, parts[0].length())) + "***@" + parts[1];
+        return parts[0]
+            .substring(0, 
+                Math.min(
+                    2, 
+                    parts[0].length()
+                )
+            ) + "***@" + parts[1];
     }
 }

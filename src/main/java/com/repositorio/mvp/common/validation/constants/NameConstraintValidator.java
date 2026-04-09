@@ -6,7 +6,6 @@ import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 
 public class NameConstraintValidator implements ConstraintValidator<ValidName, String> {
-
     private static final String NAME_PATTERN = "^[a-zA-ZÀ-ÿ\\s]+$";
 
     @Override

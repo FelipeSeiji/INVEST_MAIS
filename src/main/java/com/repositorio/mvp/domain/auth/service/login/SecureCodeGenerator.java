@@ -12,6 +12,11 @@ public class SecureCodeGenerator implements CodeGenerator {
 
     @Override
     public String generate(int length) {
-        return String.format("%0" + length + "d", secureRandom.nextInt((int) Math.pow(10, length)));
+        return String.format(
+            "%0" + length + "d", 
+            secureRandom.nextInt(
+                (int) Math.pow(10, length)
+            )
+        );
     }
 }

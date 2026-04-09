@@ -61,8 +61,7 @@ public class SecurityFilter extends OncePerRequestFilter {
      * incidente nos logs.
      * 
      * @param token   String contendo o JWT (sem o prefixo Bearer).
-     * @param request Requisição HTTP usada para capturar o IP do cliente em caso de
-     *                fraude.
+     * @param request Requisição HTTP usada para capturar o IP do cliente em caso de fraude.
      */
     private void authenticateClient(String token, HttpServletRequest request) {
         try {

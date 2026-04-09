@@ -24,8 +24,8 @@ public class EmailTwoFactorService implements TwoFactorNotification{
 
     @Override
     public void sendTwoFactorCode(User user, String code) {
-        
         SimpleMailMessage message = new SimpleMailMessage();
+        
         message.setTo(user.getEmail());
         message.setSubject("Seu código de acesso (2FA) - MVP");
         message.setText("Olá " + user.getName() + ",\n\nSeu código de acesso é: " + code + "\nVálido por 5 minutos.");

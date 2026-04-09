@@ -29,7 +29,10 @@ public class SessionService {
     @Transactional
     public void logout(String token){
         String tokenJWT = token.replace(BEARER_PREFIX,"");
-        InvalidToken invalidToken = new InvalidToken(tokenJWT, tokenProvider.getExpiration(tokenJWT));
+        InvalidToken invalidToken = new InvalidToken(
+            tokenJWT,
+            tokenProvider.getExpiration(tokenJWT)
+        );
         invalidTokenRepository.save(invalidToken);
     }
 }

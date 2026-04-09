@@ -25,7 +25,6 @@ import lombok.ToString;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class UserSecurity {
-
     @NotBlank
     @Column(nullable = false, length = 255)
     @ToString.Exclude

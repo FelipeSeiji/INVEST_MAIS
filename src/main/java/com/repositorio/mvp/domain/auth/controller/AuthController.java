@@ -44,11 +44,14 @@ public class AuthController {
     private final PasswordRecoveryService passwordRecoveryService;
 
     /**
-     * Inicia o processo de login do usuário.
-     * Valida as credenciais e, em caso de sucesso, gera um código 2FA e envia por e-mail.
-     * * @param loginRequest DTO contendo e-mail e senha do usuário.
-     * @param request Objeto HTTP da requisição usado para extrair o IP do cliente (para proteção contra força bruta).
-     * @return Mensagem de sucesso indicando o envio do e-mail.
+     * Inicia o processo de login do usuário (Fase 1).
+     * Valida as credenciais (e-mail e senha) e, se corretas, dispara o envio de um 
+     * código de verificação 2FA para o e-mail do usuário.
+     * 
+     * @param loginRequest DTO contendo e-mail e senha para autenticação base.
+     * @param request Objeto HttpServletRequest para captura do IP do cliente e auditoria.
+     * @return Mensagem confirmando que o código de verificação foi encaminhado.
+     * @throws IllegalArgumentException Caso as credenciais sejam inválidas ou o acesso esteja bloqueado.
      */
     // POST /auth/login
     @PostMapping("/login")
@@ -62,11 +65,13 @@ public class AuthController {
     }
 
     /**
-     * Conclui o processo de login verificando o código de dois fatores (2FA).
-     * Se o código for válido e não estiver expirado, libera o token JWT.
-     * * @param verifyRequest DTO contendo o e-mail e o código numérico recebido.
-     * @param request Objeto HTTP usado para extrair o IP e validar limites de tentativas.
-     * @return Token JWT para autenticação nas rotas protegidas.
+     * Conclui o processo de login (Fase 2) validando o código 2FA.
+     * Emite um token JWT de longa duração caso a validação seja bem-sucedida.
+     * 
+     * @param verifyRequest DTO contendo o código de 6 dígitos e o e-mail do usuário.
+     * @param request Objeto HttpServletRequest para controle de segurança e auditoria.
+     * @return DTO contendo o Token JWT assinado para sessões futuras.
+     * @throws IllegalArgumentException Se o código for inválido ou estiver expirado.
      */
     // POST /auth/verify-2fa
     @PostMapping("/verify-2fa")
@@ -83,9 +88,10 @@ public class AuthController {
     }
 
     /**
-     * Encerra a sessão ativa do usuário invalidando o token JWT atual.
-     * O token é adicionado a uma Blacklist no banco de dados para impedir reuso.
-     * * @param token Token JWT enviado no cabeçalho Authorization.
+     * Realiza o logout do usuário autenticado.
+     * Invalida o token JWT no lado do servidor através da adição em uma Blacklist.
+     * 
+     * @param token O token de autorização extraído do cabeçalho "Authorization".
      */
     // POST /auth/logout
     @PostMapping("/logout")
@@ -97,9 +103,12 @@ public class AuthController {
     }
 
     /**
-     * Solicita o envio de um link de recuperação de senha para o e-mail informado.
-     * * @param request DTO contendo o e-mail do usuário no corpo da requisição.
-     * @return Mensagem genérica de sucesso (evita vazamento de informações sobre quais e-mails existem no sistema).
+     * Inicia o fluxo de recuperação de conta para senhas esquecidas.
+     * Emite um token de redefinição com link seguro via e-mail.
+     * 
+     * @param forgotPasswordRequestDTO DTO contendo o e-mail do usuário alvo.
+     * @param request Objeto HttpServletRequest para auditoria e controle de abuso.
+     * @return Mensagem amigável de sucesso (sem revelar existência da conta).
      */
     // POST /auth/forgot-password
     @PostMapping("/forgot-password")
@@ -125,9 +134,12 @@ public class AuthController {
     }
 
     /**
-     * Efetiva a troca de senha utilizando um token válido gerado no processo de recuperação.
-     * * @param request DTO contendo o token de recuperação e a nova senha desejada.
-     * @return Mensagem confirmando a alteração da senha.
+     * Redefine a senha do usuário utilizando um token de recuperação.
+     * 
+     * @param request DTO com o token bruto e a nova senha desejada.
+     * @param httpRequest Objeto HttpServletRequest para auditoria de origem.
+     * @return Mensagem confirmando a alteração da credencial.
+     * @throws IllegalArgumentException Caso o token seja inválido ou já tenha expirado.
      */
     // POST /auth/reset-password
     @PostMapping("/reset-password")

@@ -17,16 +17,18 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class SessionService {
 
-    private final InvalidTokenRepository invalidTokenRepository;
     private final TokenBlackListService tokenBlackListService;
     private final TokenProvider tokenProvider;
     
     private static final String BEARER_PREFIX = "Bearer ";
 
     /**
-     * Efetua o logout de um usuário adicionando o seu token JWT atual a uma Blacklist.
-     * Como JWTs são stateless e não podem ser apagados remotamente, essa é a técnica segura de invalidação.
-     * @param token String do token JWT bruto (podendo conter o prefixo "Bearer ").
+     * Efetua o logout do usuário invalidando o token JWT atual.
+     * Como tokens JWT são stateless e não podem ser "deletados" do cliente pelo servidor, 
+     * o token é adicionado a uma Blacklist (com base na sua data de expiração) para 
+     * impedir que seja reutilizado em requisições futuras.
+     * 
+     * @param token String do token JWT (pode conter o prefixo "Bearer ").
      */
     @Transactional
     public void logout(String token){

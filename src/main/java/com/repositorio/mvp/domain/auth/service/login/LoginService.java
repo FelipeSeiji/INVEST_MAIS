@@ -46,12 +46,11 @@ public class LoginService {
     /**
      * Processa a primeira etapa do login.
      * Verifica se o IP ou a conta estão bloqueados por excesso de tentativas,
-     * valida a senha e aciona o envio do código de 2FA.
-     * * @param loginRequest Dados de acesso (e-mail e senha).
+     * valida a senha e aciona o envio do código de 2FA para o usuário.
      * 
-     * @param ip Endereço IP do cliente requisitante.
-     * @throws IllegalArgumentException Se as credenciais forem inválidas ou houver
-     *                                  bloqueio de segurança.
+     * @param loginRequest Objeto contendo as credenciais de acesso (e-mail e senha).
+     * @param ip Endereço IP do cliente requisitante para controle de segurança.
+     * @throws IllegalArgumentException Caso as credenciais sejam inválidas ou a tentativa seja bloqueada por segurança.
      */
     @Transactional
     public void initiateLogin(LoginRequestDTO loginRequest, String ip) {
@@ -107,14 +106,13 @@ public class LoginService {
     }
 
     /**
-     * Processa a segunda etapa do login verificando o código 2FA.
-     * * @param verifyRequest Dados contendo o e-mail e o código digitado pelo
-     * usuário.
+     * Processa a segunda etapa do login através da verificação do código 2FA.
+     * Caso o código seja válido e esteja dentro do prazo de expiração, um token JWT é gerado.
      * 
-     * @param ip Endereço IP do cliente requisitante.
-     * @return Uma String contendo o Token JWT assinado para a sessão.
-     * @throws IllegalArgumentException Se o código for inválido, não bater ou
-     *                                  estiver expirado.
+     * @param verifyRequest Objeto contendo o e-mail e o código 2FA informado pelo usuário.
+     * @param ip Endereço IP do cliente requisitante para controle de segurança.
+     * @return String contendo o Token JWT assinado para autenticação nas próximas requisições.
+     * @throws IllegalArgumentException Caso o código seja inválido, expirado ou a conta esteja bloqueada.
      */
     @Transactional
     public String verify2FAAndGenerateToken(Verify2FARequestDTO verifyRequest, String ip) {
@@ -163,6 +161,13 @@ public class LoginService {
         return tokenProvider.generateToken(user.getId());
     }
 
+    /**
+     * Ofusca o endereço de e-mail para exibição segura em logs de auditoria.
+     * Mantém os primeiros caracteres e o domínio, ocultando a parte central.
+     * 
+     * @param email Endereço de e-mail original completo.
+     * @return String contendo o e-mail mascarado (ex: jo***@domain.com).
+     */
     private String maskEmail(String email) {
         if (email == null || !email.contains("@"))
             return "***";

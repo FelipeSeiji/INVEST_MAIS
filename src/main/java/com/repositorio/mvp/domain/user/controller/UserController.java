@@ -40,9 +40,11 @@ public class UserController {
     private final UserQueryService userQueryService;
     
     /**
-     * Endpoint público para registro de um novo usuário na plataforma.
-     * @param userRequestDTO DTO contendo os dados do novo usuário.
-     * @return DTO com os dados salvos do usuário recém-criado.
+     * Endpoint público para o registro de um novo usuário na plataforma.
+     * Realiza a criação da conta base e das credenciais de segurança.
+     * 
+     * @param userRequestDTO DTO contendo os dados mandatórios para criação da conta.
+     * @return DTO contendo os dados públicos do usuário recém-registrado.
      */
     // POST /api/users
     @PostMapping
@@ -54,8 +56,11 @@ public class UserController {
     }
     
     /**
-     * Endpoint para listar todos os usuários da base.
-     * @return Lista contendo os dados públicos de todos os usuários.
+     * Recupera uma lista paginada de todos os usuários do sistema.
+     * Acesso restrito exclusivamente a perfis com a role 'ADMIN'.
+     * 
+     * @param pageable Configurações de paginação (padrão: 20 registros).
+     * @return Página de usuários em formato DTO.
      */
     // GET /api/users
     @GetMapping
@@ -63,15 +68,14 @@ public class UserController {
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Lista os usuarios com paginação", description = "Retorna uma página de usuários do sistema")
     public Page<UserResponseDTO> getAllUsers(@PageableDefault(size = 20) Pageable pageable) {
-        // Você precisará atualizar a interface UserQueryService e a implementação
-        // para usar o findAll(pageable) do UserRepository.
         return userQueryService.listAllUsers(pageable);
     }
 
     /**
-     * Remove um usuário do sistema pelo seu identificador.
-     * Regra de Segurança: Apenas um Administrador pode excluir contas através desta rota.
-     * @param id UUID do usuário que será deletado.
+     * Exclui permanentemente um usuário da base de dados.
+     * Ação irreversível e restrita a Administradores.
+     * 
+     * @param id UUID do usuário alvo da exclusão.
      */
     // DELETE /api/users/{id}
     @DeleteMapping("/{id}")
@@ -84,10 +88,12 @@ public class UserController {
     }
 
     /**
-     * Busca os detalhes de um usuário específico.
-     * Regra de Segurança (Anti-IDOR): O usuário logado só pode buscar os próprios dados, a menos que seja um ADMIN.
-     * @param id UUID do usuário alvo da busca.
-     * @return DTO com as informações do usuário encontrado.
+     * Recupera os detalhes públicos de um perfil de usuário.
+     * Regra de Acesso: O próprio usuário pode visualizar seus dados, ou um ADMIN.
+     * 
+     * @param id UUID do usuário consultado.
+     * @return DTO com as informações do perfil.
+     * @throws EntityNotFoundException Caso o usuário não seja localizado.
      */
     // GET /api/users/{id}
     @GetMapping("/{id}")
@@ -99,11 +105,13 @@ public class UserController {
     }
 
     /**
-     * Atualiza os dados cadastrais de um usuário (ex: Nome, Email).
-     * Regra de Segurança (Anti-IDOR): O usuário logado só pode alterar o próprio perfil, a menos que seja um ADMIN.
-     * @param id UUID do usuário que será alterado.
-     * @param userUpdateRequestDTO DTO contendo os novos dados do perfil.
-     * @return DTO refletindo o estado atualizado do usuário.
+     * Atualiza os dados de perfil (Nome/Email) de um usuário.
+     * Regra de Acesso: Apenas o proprietário da conta ou um ADMIN pode realizar a alteração.
+     * Nota: Alterações críticas exigem a confirmação da senha atual no DTO.
+     * 
+     * @param id UUID do usuário cujos dados serão alterados.
+     * @param userUpdateRequestDTO Novos dados e senha de confirmação.
+     * @return DTO com o perfil atualizado.
      */
     // PUT /api/users/{id}
     @PutMapping("/{id}")

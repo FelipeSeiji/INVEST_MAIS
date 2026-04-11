@@ -24,9 +24,10 @@ public class UserQueryServiceImpl implements UserQueryService {
 
     /**
      * Busca um usuário específico pelo seu identificador único (UUID).
-     * * @param id UUID do usuário.
-     * @return DTO contendo os dados do usuário.
-     * @throws EntityNotFoundException Se o UUID não existir na base de dados.
+     * 
+     * @param id UUID do usuário a ser localizado.
+     * @return DTO contendo os dados públicos do usuário encontrado.
+     * @throws EntityNotFoundException Caso o identificador não corresponda a nenhum usuário no sistema.
      */
     @Override
     @Transactional(readOnly = true)
@@ -37,9 +38,10 @@ public class UserQueryServiceImpl implements UserQueryService {
     }
 
     /**
-     * Lista todos os usuários cadastrados no sistema.
-     * Nota: Idealmente, em produção, este método deve implementar paginação (Pageable).
-     * * @return Lista contendo DTOs de todos os usuários.
+     * Recupera uma lista paginada de todos os usuários cadastrados no sistema.
+     * 
+     * @param pageable Objeto contendo as informações de paginação (página, tamanho, ordenação).
+     * @return Page contendo os DTOs dos usuários dentro dos critérios de paginação.
      */
     @Override
     @Transactional(readOnly = true)

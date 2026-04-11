@@ -41,9 +41,11 @@ public class UserCommandServiceImpl implements UserCommandService {
 
     /**
      * Cria e registra um novo usuário no banco de dados.
-     * Valida duplicação de e-mail e aplica hash seguro na senha.
-     * * @param userRequestDTO DTO com os dados do usuário a ser cadastrado.
-     * @return DTO com os dados do usuário recém-criado, ocultando informações sensíveis.
+     * Realiza validações de negócio, gera o hash seguro da senha e o hash de busca do e-mail.
+     * 
+     * @param userRequestDTO DTO contendo os dados do prospecto (nome, e-mail, senha).
+     * @return DTO com os dados do usuário persistido, ocultando informações de segurança.
+     * @throws ValidationException Caso as regras de negócio de registro sejam violadas.
      */
     @Override
     @Transactional
@@ -63,9 +65,10 @@ public class UserCommandServiceImpl implements UserCommandService {
     }
 
     /**
-     * Remove um usuário permanentemente da base de dados.
-     * * @param id UUID do usuário a ser excluído.
-     * @throws EntityNotFoundException Caso o usuário não seja encontrado.
+     * Remove permanentemente um usuário da base de dados.
+     * 
+     * @param id UUID do usuário que deve ser excluído.
+     * @throws EntityNotFoundException Caso o identificador não seja localizado.
      */
     @Override
     @Transactional
@@ -77,12 +80,14 @@ public class UserCommandServiceImpl implements UserCommandService {
     }
 
     /**
-     * Atualiza o perfil de um usuário existente (ex: nome e e-mail).
-     * Como medida de segurança (Account Takeover), exige a confirmação da senha atual.
-     * * @param id UUID do usuário a ser atualizado.
-     * @param userUpdateRequestDTO Dados novos a serem aplicados, junto com a senha atual para validação.
+     * Atualiza o perfil (nome e e-mail) de um usuário existente.
+     * Medida de segurança: Exige a senha atual para autorizar alterações críticas no perfil.
+     * 
+     * @param id UUID do usuário a ser atualizado.
+     * @param userUpdateRequestDTO Novos dados do perfil e senha de confirmação.
      * @return DTO com o perfil atualizado do usuário.
-     * @throws IllegalArgumentException Se a senha de confirmação estiver incorreta.
+     * @throws IllegalArgumentException Se a senha atual informada estiver incorreta.
+     * @throws EntityNotFoundException Se o usuário não for encontrado.
      */
     @Override
     @Transactional
@@ -106,10 +111,12 @@ public class UserCommandServiceImpl implements UserCommandService {
     }
 
     /**
-     * Carrega os detalhes do usuário para a integração interna do Spring Security.
-     * Usado durante a validação do token JWT no filtro de segurança.
-     * * @param subjectId ID do usuário extraído do token JWT.
-     * @return Instância de UserDetailsImpl populada com os dados e permissões do usuário.
+     * Localiza e carrega os detalhes de segurança do usuário para o Spring Security.
+     * Método central para a autorização stateless via Token JWT.
+     * 
+     * @param subjectId ID do usuário (como String) extraído do assunto do Token.
+     * @return Objeto UserDetailsImpl compatível com o ecossistema de segurança do Spring.
+     * @throws IllegalArgumentException Caso o ID no token não corresponda a um usuário ativo.
      */
     @Transactional(readOnly = true)
     public UserDetails loadUserDetailsById(String subjectId) {

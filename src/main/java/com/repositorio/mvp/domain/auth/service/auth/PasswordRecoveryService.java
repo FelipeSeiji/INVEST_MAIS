@@ -50,8 +50,11 @@ public class PasswordRecoveryService {
 
     /**
      * Cria um token de recuperação seguro e o associa ao e-mail do usuário.
-     * O método é assíncrono (@Async) para mascarar o tempo de resposta da API.
-     * @param email Endereço de e-mail em texto puro que o usuário digitou.
+     * O processo é disparado de forma assíncrona (@Async) para evitar que o tempo de 
+     * processamento (e-mail, hashing) possa ser usado em ataques de tempo para 
+     * validar a existência de contas.
+     * 
+     * @param email Endereço de e-mail fornecido pelo usuário para recuperação.
      */
     @Async
     public void createPasswordResetTokenForUser(String email) {
@@ -94,7 +97,12 @@ public class PasswordRecoveryService {
     }
 
     /**
-     * Valida o token de recuperação fornecido e, se válido, altera a senha do usuário.
+     * Valida o token de recuperação fornecido e redefine a senha do usuário.
+     * O token é invalidado imediatamente após o uso bem-sucedido.
+     * 
+     * @param token String do token bruto enviado por e-mail.
+     * @param newPassword Nova senha em texto puro a ser criptografada e armazenada.
+     * @throws IllegalArgumentException Caso o token seja inválido ou já tenha expirado.
      */
     @Transactional
     public void resetPassword(String token, String newPassword) {
@@ -120,6 +128,14 @@ public class PasswordRecoveryService {
         passwordResetTokenRepository.delete(resetToken);
     }
 
+    /**
+     * Gera um hash determinístico do e-mail para permitir a busca no banco de dados
+     * sem expor o e-mail original em texto puro.
+     * 
+     * @param email E-mail a ser hasheado.
+     * @return Hash SHA-256 do e-mail em formato hexadecimal.
+     * @throws RuntimeException Se houver falha na inicialização do algoritmo SHA-256.
+     */
     private String generateEmailHash(String email) {
         try {
             MessageDigest digest = MessageDigest.getInstance("SHA-256");
@@ -146,7 +162,13 @@ public class PasswordRecoveryService {
     }
 
     /**
-     * Gera o Hash Base64 do Token usando HMAC-SHA256 com a chave secreta do sistema.
+     * Gera uma representação HMAC segura do token para armazenamento e comparação.
+     * Utiliza a chave secreta do sistema para garantir que mesmo que o banco de 
+     * dados seja comprometido, os tokens não possam ser revertidos ou forjados.
+     * 
+     * @param token Token bruto a ser hasheado.
+     * @return Hash HMAC-SHA256 codificado em Base64Url.
+     * @throws RuntimeException Se houver falha na geração do HMAC.
      */
     private String hashToken(String token) {
         try {

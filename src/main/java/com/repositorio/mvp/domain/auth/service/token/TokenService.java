@@ -26,10 +26,11 @@ public class TokenService implements TokenProvider {
 
     /**
      * Gera um novo token JWT assinado usando o algoritmo HMAC256.
+     * Define o emissor (Issuer), o assunto (Subject) como o ID do usuário,
+     * e os instantes de emissão e expiração.
      * 
-     * @param userId Identificador único do usuário a ser embutido no payload
-     *               (Subject).
-     * @return Token JWT serializado em Base64Url.
+     * @param userId Identificador único do usuário a ser embutido no payload.
+     * @return Token JWT serializado em Base64Url pronto para ser enviado ao cliente.
      */
     @Override
     public String generateToken(UUID userId) {
@@ -48,12 +49,11 @@ public class TokenService implements TokenProvider {
     }
 
     /**
-     * Valida a integridade, o emissor e a data de expiração do token.
+     * Valida a integridade, o emissor e a validade temporal do token JWT.
      * 
      * @param token Token JWT recebido nas requisições protegidas.
-     * @return O ID do usuário (Subject) em formato String caso o token seja válido.
-     * @throws IllegalArgumentException Se a assinatura for inválida, o token
-     *                                  estiver adulterado ou expirado.
+     * @return O identificador do usuário (Subject) extraído do token validado.
+     * @throws IllegalArgumentException Se a assinatura for inválida, o emissor estiver incorreto ou o token estiver expirado.
      */
     @Override
     public String validateToken(String token) {
@@ -72,12 +72,12 @@ public class TokenService implements TokenProvider {
     }
 
     /**
-     * Descriptografa o token apenas para extrair o momento exato de sua expiração
-     * (útil para blacklists).
+     * Recupera o instante exato de expiração do token sem a necessidade de 
+     * processar manualmente o payload Base64. Utilizada para gerenciamento de Blacklist.
      * 
      * @param token Token JWT a ser analisado.
-     * @return Data e hora da expiração (Instant).
-     * @throws IllegalArgumentException Se o token estiver malformado ou inválido.
+     * @return Instant contendo a data e hora de expiração.
+     * @throws IllegalArgumentException Se o token estiver malformado ou sua assinatura for inválida.
      */
     @Override
     public Instant getExpiration(String token) {

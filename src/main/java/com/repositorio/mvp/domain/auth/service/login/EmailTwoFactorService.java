@@ -17,11 +17,12 @@ public class EmailTwoFactorService implements TwoFactorNotification{
     private final JavaMailSender mailSender;
 
     /**
-     * Prepara e envia o e-mail contendo o código de segurança para o usuário.
-     * @param user Entidade do usuário que solicitou o login.
-     * @param code Código numérico de 6 dígitos gerado previamente.
+     * Prepara e envia o e-mail contendo o código de segurança 2FA para o usuário.
+     * Utiliza o JavaMailSender para o disparo de mensagens simples de texto.
+     * 
+     * @param user Entidade do usuário que solicitou o acesso.
+     * @param code Código numérico de 6 dígitos gerado para validação.
      */
-
     @Override
     public void sendTwoFactorCode(User user, String code) {
         SimpleMailMessage message = new SimpleMailMessage();

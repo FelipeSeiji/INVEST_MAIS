@@ -99,9 +99,8 @@ public class UserCommandServiceImpl implements UserCommandService {
         }
         
         updateValidators.forEach(v -> v.validate(userUpdateRequestDTO, user));
-
-        user.setName(userUpdateRequestDTO.name());
-        user.setEmail(userUpdateRequestDTO.email());
+        
+        user.updateProfile(userUpdateRequestDTO.name(), userUpdateRequestDTO.email());
 
         return userMapper.toUserResponseDTO(userRepository.save(user));
     }

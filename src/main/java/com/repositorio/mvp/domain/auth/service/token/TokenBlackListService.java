@@ -8,6 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.repositorio.mvp.domain.auth.model.InvalidToken;
 import com.repositorio.mvp.domain.auth.repository.InvalidTokenRepository;
+import org.apache.commons.codec.digest.DigestUtils;
 
 import lombok.RequiredArgsConstructor;
 
@@ -27,7 +28,7 @@ public class TokenBlackListService {
      */
     @Transactional(readOnly = true)
     public boolean isTokenInvalidated(String token) {
-        return invalidTokenRepository.existsById(token);
+        return invalidTokenRepository.existsById(DigestUtils.sha256Hex(token));
     }
 
     /**
@@ -37,7 +38,7 @@ public class TokenBlackListService {
      */
     @Transactional
     public void invalidateToken(String token, Instant expiresAt) {
-        InvalidToken invalidToken = new InvalidToken(token, expiresAt);
+        InvalidToken invalidToken = new InvalidToken(DigestUtils.sha256Hex(token), expiresAt);
         invalidTokenRepository.save(invalidToken);
     }
 
@@ -50,7 +51,7 @@ public class TokenBlackListService {
         if (token == null || token.isBlank()) {
             return false;
         }
-        return invalidTokenRepository.existsById(token);
+        return invalidTokenRepository.existsById(DigestUtils.sha256Hex(token));
     }
 
     /**

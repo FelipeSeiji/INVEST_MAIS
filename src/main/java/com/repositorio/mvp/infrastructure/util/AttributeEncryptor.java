@@ -6,9 +6,13 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.Cipher;
+import javax.crypto.SecretKey;
+import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.GCMParameterSpec;
+import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.SecretKeySpec;
 import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
 import java.security.Key;
 import java.security.SecureRandom;
 import java.util.Base64;
@@ -22,15 +26,38 @@ public class AttributeEncryptor implements AttributeConverter<String, String> {
     private static final int GCM_IV_LENGTH = 12;
     private static final int GCM_TAG_LENGTH = 128;
     
+    private static final int AES_KEY_BITS = 256;
+
     private final Key key;
     private final SecureRandom secureRandom;
 
-    public AttributeEncryptor(@Value("${api.security.db.encryption.key:#{null}}") String secretKey) {
+    public AttributeEncryptor(
+            @Value("${api.security.db.encryption.key:#{null}}") String secretKey,
+            @Value("${security.aes.kdf.salt}") String kdfSalt,
+            @Value("${security.aes.kdf.iterations}") int kdfIterations) {
+
         if (secretKey == null || secretKey.length() < 32) {
             throw new IllegalArgumentException("CRÍTICO: Chave de criptografia inválida ou ausente. O sistema não pode iniciar de forma segura.");
         }
-        
-        this.key = new SecretKeySpec(secretKey.getBytes(), ALGORITHM);
+        if (kdfSalt == null || kdfSalt.isBlank()) {
+            throw new IllegalArgumentException("CRÍTICO: Salt KDF inválido ou ausente.");
+        }
+
+        try {
+            PBEKeySpec spec = new PBEKeySpec(
+                secretKey.toCharArray(),
+                kdfSalt.getBytes(StandardCharsets.UTF_8),
+                kdfIterations,
+                AES_KEY_BITS
+            );
+            SecretKeyFactory factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256");
+            SecretKey derivedKey = factory.generateSecret(spec);
+            spec.clearPassword();
+            this.key = new SecretKeySpec(derivedKey.getEncoded(), ALGORITHM);
+        } catch (Exception e) {
+            throw new IllegalArgumentException("CRÍTICO: Falha ao derivar a chave de criptografia.", e);
+        }
+
         this.secureRandom = new SecureRandom();
     }
 

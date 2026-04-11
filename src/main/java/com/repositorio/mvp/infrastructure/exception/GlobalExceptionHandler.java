@@ -46,16 +46,16 @@ public class GlobalExceptionHandler {
         );
     }
 
-    //409
+    //400
     @ExceptionHandler(IllegalArgumentException.class)
     public ProblemDetail handleIllegalArgumentException(IllegalArgumentException ex) {
         log.warn(
-            "Regra de negócio violada (409): {}", 
+            "Regra de negócio violada (400): {}", 
             ex.getMessage()
         );
         return ProblemDetailBuilder.build(
-            HttpStatus.CONFLICT, 
-            TITLE_CONFLICT, 
+            HttpStatus.BAD_REQUEST, 
+            "Requisição inválida", 
             ex.getMessage()
         );
     }

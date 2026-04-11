@@ -108,18 +108,19 @@ public class AuthController {
     public MessageResponseDTO forgotPassword(@Valid @RequestBody ForgotPasswordRequestDTO forgotPasswordRequestDTO, HttpServletRequest request) {
         String ip = ClientIp.getClientIp(request);
 
-        if(loginAttemptService.isBlocked(ip)) {
-            return new MessageResponseDTO(
-                MESSAGE_TOO_MANY_REQUESTS
+        // MED-03: Se o IP estiver bloqueado, retorna a MESMA mensagem genérica.
+        // Retornar uma mensagem diferente (ex: "Muitas requisições") revelaria ao atacante
+        // que seu IP foi detectado, facilitando a evasão do rate-limit.
+        if (!loginAttemptService.isBlocked(ip)) {
+            passwordRecoveryService.createPasswordResetTokenForUser(
+                forgotPasswordRequestDTO.email()
             );
+        } else {
+            log.warn("RECUPERAÇÃO DE SENHA BLOQUEADA (Rate Limit): IP {} está bloqueado.", ip);
         }
-        
-        passwordRecoveryService.createPasswordResetTokenForUser(
-            forgotPasswordRequestDTO.email()
-        );
-        
+
         log.info("RECUPERAÇÃO DE SENHA: Solicitação iniciada para o e-mail: {} a partir do IP: {}", forgotPasswordRequestDTO.email(), ip);
-        
+
         return new MessageResponseDTO(MESSAGE_FORGOT_PASSWORD_SENT);
     }
 

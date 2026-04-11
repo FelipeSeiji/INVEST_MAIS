@@ -22,7 +22,7 @@ public class TokenService implements TokenProvider {
     private String secret;
 
     private static final String ISSUER = "auth-api";
-    private static final long EXPIRATION_MINUTES = 2800;
+    private static final long EXPIRATION_MINUTES = 60;
 
     /**
      * Gera um novo token JWT assinado usando o algoritmo HMAC256.

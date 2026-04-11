@@ -54,7 +54,8 @@ public class SecurityConfig {
                 .httpStrictTransportSecurity(hsts -> hsts
                     .includeSubDomains(true)
                     .maxAgeInSeconds(31536000)) // Força navegadores a usarem apenas HTTPS por 1 ano
-                .contentTypeOptions(contentType -> contentType.disable()) // Impede ataques MIME-sniffing
+                // MED-02: X-Content-Type-Options: nosniff é habilitado por padrão pelo Spring Security.
+                // Não chamar .disable() aqui — a linha anterior estava ativando a vulnerabilidade de MIME-sniffing.
             )
             .addFilterBefore(rateLimitFilter, UsernamePasswordAuthenticationFilter.class)
             .addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class);

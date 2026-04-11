@@ -28,7 +28,7 @@ import lombok.ToString;
 @Table(name = "TB_USER")
 @Getter
 @Setter
-@ToString
+@ToString(onlyExplicitlyIncluded = true)
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
@@ -36,19 +36,18 @@ public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     @Setter(AccessLevel.NONE)
+    @ToString.Include
     private UUID id;
 
     @NotBlank
     @Column(nullable = false, length = 255)
     @Convert(converter = AttributeEncryptor.class)
-    @ToString.Exclude
     private String name;
 
     @NotBlank
     @Email
     @Column(nullable = false, unique = true, length = 500)
     @Convert(converter = AttributeEncryptor.class)
-    @ToString.Exclude
     private String email;
 
     @Embedded

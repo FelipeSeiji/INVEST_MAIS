@@ -18,6 +18,8 @@ import com.repositorio.mvp.domain.auth.repository.PasswordResetTokenRepository;
 import com.repositorio.mvp.domain.user.model.User;
 import com.repositorio.mvp.domain.user.repository.UserRepository;
 
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.transaction.support.TransactionTemplate;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -40,7 +42,11 @@ public class PasswordRecoveryService {
     private final PasswordResetTokenRepository passwordResetTokenRepository;
     private final PasswordEncoder passwordEncoder;
     private final JavaMailSender mailSender;
+    private final TransactionTemplate transactionTemplate;
     private final SecureRandom secureRandom = new SecureRandom();
+
+    @Value("${api.security.token.secret}")
+    private String tokenSecret;
 
     /**
      * Cria um token de recuperação seguro e o associa ao e-mail do usuário.
@@ -48,7 +54,6 @@ public class PasswordRecoveryService {
      * @param email Endereço de e-mail em texto puro que o usuário digitou.
      */
     @Async
-    @Transactional
     public void createPasswordResetTokenForUser(String email) {
         String emailHash = generateEmailHash(email);
 
@@ -57,37 +62,35 @@ public class PasswordRecoveryService {
                 byte[] tokenBytes = new byte[32];
                 secureRandom.nextBytes(tokenBytes);
                 String token = Base64
-                .getUrlEncoder()
-                .withoutPadding()
-                .encodeToString(tokenBytes);
-                PasswordResetToken myToken = new PasswordResetToken(
-                    hashToken(token), 
-                    user
-                );
+                    .getUrlEncoder()
+                    .withoutPadding()
+                    .encodeToString(tokenBytes);
+                
+                String hashedToken = hashToken(token);
+                
+                // Persistência em transação isolada
+                transactionTemplate.execute(status -> {
+                    PasswordResetToken myToken = new PasswordResetToken(hashedToken, "hmac-v1", user);
+                    return passwordResetTokenRepository.save(myToken);
+                });
 
-                passwordResetTokenRepository.save(myToken);
-
-            try {
-                SimpleMailMessage message = new SimpleMailMessage();
-                message.setTo(email); 
-                message.setSubject(MESSAGE_EMAIL_SUBJECT);
-                message.setText(
-                    String.format(
-                        MESSAGE_EMAIL_BODY_TEMPLATE, 
-                        user.getName(), 
-                        token
-                    )
-                );
-                mailSender.send(message);
-                log.info("E-mail de recuperação enviado para {}", 
-                email
-                );
-            } catch (Exception e) {
-                log.error("Erro ao enviar e-mail de recuperação", 
-                e
-                );
-            }
-        });
+                try {
+                    SimpleMailMessage message = new SimpleMailMessage();
+                    message.setTo(email); 
+                    message.setSubject(MESSAGE_EMAIL_SUBJECT);
+                    message.setText(
+                        String.format(
+                            MESSAGE_EMAIL_BODY_TEMPLATE, 
+                            user.getName(), 
+                            token
+                        )
+                    );
+                    mailSender.send(message);
+                    log.info("E-mail de recuperação enviado para {}", email);
+                } catch (Exception e) {
+                    log.error("Erro ao enviar e-mail de recuperação", e);
+                }
+            });
     }
 
     /**
@@ -143,22 +146,23 @@ public class PasswordRecoveryService {
     }
 
     /**
-     * Gera o Hash Base64 do Token (usado internamente pela classe).
+     * Gera o Hash Base64 do Token usando HMAC-SHA256 com a chave secreta do sistema.
      */
     private String hashToken(String token) {
         try {
-            MessageDigest digest = MessageDigest.getInstance("SHA-256");
-            byte[] hash = digest.digest(
-                token.getBytes(StandardCharsets.UTF_8)
+            javax.crypto.Mac sha256_HMAC = javax.crypto.Mac.getInstance("HmacSHA256");
+            javax.crypto.spec.SecretKeySpec secret_key = new javax.crypto.spec.SecretKeySpec(
+                tokenSecret.getBytes(StandardCharsets.UTF_8), 
+                "HmacSHA256"
             );
+            sha256_HMAC.init(secret_key);
+
+            byte[] hash = sha256_HMAC.doFinal(token.getBytes(StandardCharsets.UTF_8));
             return Base64.getUrlEncoder()
                 .withoutPadding()
                 .encodeToString(hash);
         } catch (Exception e) {
-            throw new RuntimeException(
-                MESSAGE_ERR_HASH_TOKEN,
-                e
-            );
+            throw new RuntimeException(MESSAGE_ERR_HASH_TOKEN, e);
         }
     }
 }

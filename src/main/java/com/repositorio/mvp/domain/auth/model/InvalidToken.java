@@ -19,8 +19,8 @@ import lombok.Getter;
 @Setter
 public class InvalidToken {
     @Id
-    @Column(length = 1000)
-    private String token;
+    @Column(length = 64) // SHA-256 hex hash tem 64 caracteres
+    private String token; // Armazena o SHA-256 hash do token JWT
 
     private Instant expiresAt;
 }

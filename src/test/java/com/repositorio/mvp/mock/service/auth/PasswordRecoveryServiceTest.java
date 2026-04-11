@@ -80,7 +80,7 @@ public class PasswordRecoveryServiceTest {
         String newPassword = "newPassword@123";
         String encodedPassword = "encodedPassword";
 
-        PasswordResetToken passwordResetToken = new PasswordResetToken(tokenInput, mockUser);
+        PasswordResetToken passwordResetToken = new PasswordResetToken(tokenInput, "hmac-v1", mockUser);
         passwordResetToken.setExpiryDate(LocalDateTime.now().plusMinutes(10));
 
         when(passwordResetTokenRepository.findByToken(anyString()))
@@ -115,7 +115,7 @@ public class PasswordRecoveryServiceTest {
     public void resetPassword_WithExpiredToken_ThrowsExceptionAndDeletesToken() {
         String token = "token_expirado";
         String newPassword = "newPassword@123";   
-        PasswordResetToken expiredToken = new PasswordResetToken(token, mockUser);
+        PasswordResetToken expiredToken = new PasswordResetToken(token, "hmac-v1", mockUser);
 
         expiredToken.setExpiryDate(LocalDateTime.now().minusMinutes(5));
 

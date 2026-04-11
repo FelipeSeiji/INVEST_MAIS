@@ -31,6 +31,9 @@ public class PasswordResetToken {
     @Column(nullable = false, unique = true)
     private String token;
 
+    @Column(nullable = false)
+    private String salt;
+
     @OneToOne(targetEntity = User.class, fetch = FetchType.EAGER)
     @JoinColumn(nullable = false, name = "user_id")
     private User user;
@@ -38,8 +41,9 @@ public class PasswordResetToken {
     @Column(nullable = false)
     private LocalDateTime expiryDate;
 
-    public PasswordResetToken(String token, User user){
+    public PasswordResetToken(String token, String salt, User user){
         this.token = token;
+        this.salt = salt;
         this.user = user;
         this.expiryDate = LocalDateTime.now().plusMinutes(15);
     }

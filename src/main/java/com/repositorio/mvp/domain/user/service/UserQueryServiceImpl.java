@@ -14,6 +14,7 @@ import com.repositorio.mvp.domain.user.repository.UserRepository;
 import com.repositorio.mvp.domain.user.service.interfaces.UserQueryService;
 
 import jakarta.persistence.EntityNotFoundException;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -31,7 +32,7 @@ public class UserQueryServiceImpl implements UserQueryService {
      */
     @Override
     @Transactional(readOnly = true)
-    public UserResponseDTO findUserById(UUID id) {
+    public UserResponseDTO findUserById(@NonNull UUID id) {
         return userRepository.findById(id)
             .map(userMapper::toUserResponseDTO)
             .orElseThrow(() -> new EntityNotFoundException("Usuário não encontrado"));
@@ -45,7 +46,7 @@ public class UserQueryServiceImpl implements UserQueryService {
      */
     @Override
     @Transactional(readOnly = true)
-    public Page<UserResponseDTO> listAllUsers(Pageable pageable) {
+    public Page<UserResponseDTO> listAllUsers(@NonNull Pageable pageable) {
         return userRepository.findAll(pageable)
             .map(userMapper::toUserResponseDTO);
     }

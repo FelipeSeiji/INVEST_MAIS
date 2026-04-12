@@ -7,6 +7,7 @@ import com.repositorio.mvp.domain.user.DTO.UserUpdateRequestDTO;
 import com.repositorio.mvp.domain.user.model.User;
 import com.repositorio.mvp.domain.user.repository.UserRepository;
 import com.repositorio.mvp.domain.user.validation.interfaces.UserUpdateValidator;
+import lombok.NonNull;
 
 @Component
 public class UserUpdateValidatorImpl implements UserUpdateValidator {
@@ -18,7 +19,7 @@ public class UserUpdateValidatorImpl implements UserUpdateValidator {
     }
 
     @Override
-    public void validate(UserUpdateRequestDTO request, User user) {
+    public void validate(@NonNull UserUpdateRequestDTO request, @NonNull User user) {
         // Se o usuário estiver enviando o próprio e-mail atual, não faz nada
         if (request.email().equalsIgnoreCase(user.getEmail())) {
             return;

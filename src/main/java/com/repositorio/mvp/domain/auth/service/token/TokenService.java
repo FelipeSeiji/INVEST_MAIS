@@ -6,6 +6,7 @@ import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import lombok.NonNull;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
@@ -33,7 +34,7 @@ public class TokenService implements TokenProvider {
      * @return Token JWT serializado em Base64Url pronto para ser enviado ao cliente.
      */
     @Override
-    public String generateToken(UUID userId) {
+    public String generateToken(@NonNull UUID userId) {
         Algorithm algorithm = Algorithm.HMAC256(secret);
         Instant now = Instant.now();
 
@@ -56,7 +57,7 @@ public class TokenService implements TokenProvider {
      * @throws IllegalArgumentException Se a assinatura for inválida, o emissor estiver incorreto ou o token estiver expirado.
      */
     @Override
-    public String validateToken(String token) {
+    public String validateToken(@NonNull String token) {
         try {
             Algorithm algorithm = Algorithm.HMAC256(secret);
 
@@ -80,7 +81,7 @@ public class TokenService implements TokenProvider {
      * @throws IllegalArgumentException Se o token estiver malformado ou sua assinatura for inválida.
      */
     @Override
-    public Instant getExpiration(String token) {
+    public Instant getExpiration(@NonNull String token) {
         try {
             Algorithm algorithm = Algorithm.HMAC256(secret);
 

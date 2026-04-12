@@ -20,6 +20,7 @@ import com.repositorio.mvp.domain.user.repository.UserRepository;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.transaction.support.TransactionTemplate;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -57,7 +58,7 @@ public class PasswordRecoveryService {
      * @param email Endereço de e-mail fornecido pelo usuário para recuperação.
      */
     @Async
-    public void createPasswordResetTokenForUser(String email) {
+    public void createPasswordResetTokenForUser(@NonNull String email) {
         String emailHash = generateEmailHash(email);
 
         userRepository.findBySecurityEmailHash(emailHash)
@@ -105,7 +106,7 @@ public class PasswordRecoveryService {
      * @throws IllegalArgumentException Caso o token seja inválido ou já tenha expirado.
      */
     @Transactional
-    public void resetPassword(String token, String newPassword) {
+    public void resetPassword(@NonNull String token, @NonNull String newPassword) {
         PasswordResetToken resetToken = passwordResetTokenRepository
             .findByToken(hashToken(token))
             .orElseThrow(() -> new IllegalArgumentException(

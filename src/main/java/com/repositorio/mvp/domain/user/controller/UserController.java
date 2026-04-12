@@ -26,6 +26,7 @@ import com.repositorio.mvp.domain.user.service.interfaces.UserQueryService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.validation.Valid;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
 /**
@@ -53,7 +54,7 @@ public class UserController {
     @ResponseStatus(HttpStatus.CREATED)
     @Operation(summary = "Cria um novo usuario", description = "Cria um novo usuario e insere no banco de dados")
     @ApiResponse(responseCode = "201", description = "Usuario criado com sucesso")
-    public UserResponseDTO createUser(@Valid @RequestBody UserRequestDTO userRequestDTO) {
+    public UserResponseDTO createUser(@Valid @RequestBody @NonNull UserRequestDTO userRequestDTO) {
         return userCommandService.createUser(userRequestDTO);
     }
 
@@ -69,7 +70,7 @@ public class UserController {
     @ResponseStatus(HttpStatus.OK)
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Lista os usuarios com paginação", description = "Retorna uma página de usuários do sistema")
-    public Page<UserResponseDTO> getAllUsers(@PageableDefault(size = 20) Pageable pageable) {
+    public Page<UserResponseDTO> getAllUsers(@PageableDefault(size = 20) @NonNull Pageable pageable) {
         return userQueryService.listAllUsers(pageable);
     }
 
@@ -85,7 +86,7 @@ public class UserController {
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Deleta um usuario", description = "Deleta um usuario do banco de dados pelo id")
     @ApiResponse(responseCode = "204", description = "Usuario deletado com sucesso")
-    public void deleteUser(@PathVariable UUID id) {
+    public void deleteUser(@PathVariable @NonNull UUID id) {
         userCommandService.deleteUserById(id);
     }
 
@@ -102,7 +103,7 @@ public class UserController {
     @ResponseStatus(HttpStatus.OK)
     @PreAuthorize("hasRole('ADMIN') or #id.toString() == authentication.principal.user.id.toString()")
     @Operation(summary = "Busca um usuario pelo id", description = "Busca um usuario do banco de dados pelo id")
-    public UserResponseDTO findUserByID(@PathVariable UUID id) {
+    public UserResponseDTO findUserByID(@PathVariable @NonNull UUID id) {
         return userQueryService.findUserById(id);
     }
 
@@ -121,8 +122,8 @@ public class UserController {
     @PreAuthorize("hasRole('ADMIN') or #id.toString() == authentication.principal.user.id.toString()")
     @ResponseStatus(HttpStatus.OK)
     @Operation(summary = "Atualiza um usuario", description = "Atualiza um usuario do banco de dados pelo id")
-    public UserResponseDTO updateUser(@PathVariable UUID id,
-            @Valid @RequestBody UserUpdateRequestDTO userUpdateRequestDTO) {
+    public UserResponseDTO updateUser(@PathVariable @NonNull UUID id,
+            @Valid @RequestBody @NonNull UserUpdateRequestDTO userUpdateRequestDTO) {
         return userCommandService.updateUserById(id, userUpdateRequestDTO);
     }
 }

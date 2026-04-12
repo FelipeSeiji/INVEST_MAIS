@@ -3,6 +3,7 @@ package com.repositorio.mvp.domain.auth.service.login;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import org.springframework.stereotype.Service;
+import lombok.NonNull;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -23,7 +24,7 @@ public class LoginAttemptService {
      * 
      * @param key Identificador da tentativa (ex: IP ou e-mail).
      */
-    public void loginSucceeded(String key) {
+    public void loginSucceeded(@NonNull String key) {
         attemptsCache.invalidate(key);
     }
 
@@ -32,7 +33,7 @@ public class LoginAttemptService {
      * 
      * @param key Identificador da tentativa (ex: IP ou e-mail).
      */
-    public void loginFailed(String key) {
+    public void loginFailed(@NonNull String key) {
         int attempts = attemptsCache.get(key, k -> 0) + 1;
         attemptsCache.put(key, attempts);
     }
@@ -43,7 +44,7 @@ public class LoginAttemptService {
      * @param key Identificador da tentativa (ex: IP ou e-mail).
      * @return true se a chave estiver bloqueada (>= 5 tentativas), false caso contrário.
      */
-    public boolean isBlocked(String key) {
+    public boolean isBlocked(@NonNull String key) {
         return attemptsCache.get(key, k -> 0) >= MAX_ATTEMPTS;
     }
 
@@ -53,7 +54,7 @@ public class LoginAttemptService {
      * @param key Identificador da tentativa.
      * @return O contador de falhas atual.
      */
-    public int getAttempts(String key) {
+    public int getAttempts(@NonNull String key) {
         Integer attempts = attemptsCache.getIfPresent(key);
         return attempts != null ? attempts : 0;
     }

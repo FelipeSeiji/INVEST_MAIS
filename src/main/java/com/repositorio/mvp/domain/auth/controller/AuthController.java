@@ -19,6 +19,7 @@ import com.repositorio.mvp.domain.auth.service.auth.SessionService;
 
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import jakarta.servlet.http.HttpServletRequest;
@@ -36,7 +37,6 @@ import jakarta.servlet.http.HttpServletRequest;
 @RequiredArgsConstructor
 public class AuthController {
     private static final String MESSAGE_LOGIN_2FA_SENT = "Código de verificação enviado para o seu e-mail.";
-    private static final String MESSAGE_TOO_MANY_REQUESTS = "Muitas requisições. Tente novamente mais tarde.";
     private static final String MESSAGE_FORGOT_PASSWORD_SENT = "Se o e-mail existir, um link de recuperação foi enviado.";
     private static final String MESSAGE_PASSWORD_RESET_SUCCESS = "Senha redefinida com sucesso.";
 
@@ -61,7 +61,7 @@ public class AuthController {
     @PostMapping("/login")
     @ResponseStatus(HttpStatus.OK)
     @Operation(summary = "Inicia o login e envia código 2FA", description = "Valida e-mail e senha. Se corretos, envia um e-mail com o código de 6 dígitos para o usuário.")
-    public MessageResponseDTO login(@Valid @RequestBody LoginRequestDTO loginRequest, HttpServletRequest request) {
+    public MessageResponseDTO login(@Valid @RequestBody @NonNull LoginRequestDTO loginRequest, @NonNull HttpServletRequest request) {
         String ip = ClientIp.getClientIp(request);
         loginService.initiateLogin(loginRequest, ip);
 
@@ -84,8 +84,8 @@ public class AuthController {
     @PostMapping("/verify-2fa")
     @ResponseStatus(HttpStatus.OK)
     @Operation(summary = "Valida o código 2FA e retorna o JWT", description = "Valida o código recebido por e-mail. Se correto e no prazo, devolve o token de acesso (JWT).")
-    public TokenResponseDTO verify2FA(@Valid @RequestBody Verify2FARequestDTO verifyRequest,
-            HttpServletRequest request) {
+    public TokenResponseDTO verify2FA(@Valid @RequestBody @NonNull Verify2FARequestDTO verifyRequest,
+            @NonNull HttpServletRequest request) {
         String ip = ClientIp.getClientIp(request);
         String token = loginService.verify2FAAndGenerateToken(
                 verifyRequest,
@@ -104,7 +104,7 @@ public class AuthController {
     @PostMapping("/logout")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Operation(summary = "Realiza o logout do usuário", description = "Invalida o token JWT fornecido no cabeçalho de autorização, encerrando a sessão ativa.")
-    public void logout(@RequestHeader("Authorization") String token) {
+    public void logout(@RequestHeader("Authorization") @NonNull String token) {
         SecurityContextHolder.clearContext();
         sessionService.logout(token);
     }
@@ -122,8 +122,8 @@ public class AuthController {
     @PostMapping("/forgot-password")
     @ResponseStatus(HttpStatus.OK)
     @Operation(summary = "Solicita a recuperação de senha", description = "Gera um token de redefinição e envia um link para o e-mail informado.")
-    public MessageResponseDTO forgotPassword(@Valid @RequestBody ForgotPasswordRequestDTO forgotPasswordRequestDTO,
-            HttpServletRequest request) {
+    public MessageResponseDTO forgotPassword(@Valid @RequestBody @NonNull ForgotPasswordRequestDTO forgotPasswordRequestDTO,
+            @NonNull HttpServletRequest request) {
         String ip = ClientIp.getClientIp(request);
 
         if (!loginAttemptService.isBlocked(ip)) {
@@ -151,8 +151,8 @@ public class AuthController {
     @PostMapping("/reset-password")
     @ResponseStatus(HttpStatus.OK)
     @Operation(summary = "Redefine a senha do usuário", description = "Recebe o token de recuperação e a nova senha para atualizar as credenciais.")
-    public MessageResponseDTO resetPassword(@Valid @RequestBody ResetPasswordRequestDTO request,
-            HttpServletRequest httpRequest) {
+    public MessageResponseDTO resetPassword(@Valid @RequestBody @NonNull ResetPasswordRequestDTO request,
+            @NonNull HttpServletRequest httpRequest) {
         String ip = ClientIp.getClientIp(httpRequest);
 
         passwordRecoveryService.resetPassword(

@@ -23,6 +23,7 @@ import com.repositorio.mvp.domain.user.validation.interfaces.UserUpdateValidator
 import com.repositorio.mvp.infrastructure.security.UserDetailsImpl;
 
 import jakarta.persistence.EntityNotFoundException;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -49,7 +50,7 @@ public class UserCommandServiceImpl implements UserCommandService {
      */
     @Override
     @Transactional
-    public UserResponseDTO createUser(UserRequestDTO userRequestDTO) {
+    public UserResponseDTO createUser(@NonNull UserRequestDTO userRequestDTO) {
         registerValidators.forEach(v -> v.validate(userRequestDTO));
 
         User user = userMapper.toUser(userRequestDTO);
@@ -72,7 +73,7 @@ public class UserCommandServiceImpl implements UserCommandService {
      */
     @Override
     @Transactional
-    public void deleteUserById(UUID id) {
+    public void deleteUserById(@NonNull UUID id) {
         if (!userRepository.existsById(id)) {
             throw new EntityNotFoundException(MESSAGE_USER_NOT_FOUND + id);
         }
@@ -91,7 +92,7 @@ public class UserCommandServiceImpl implements UserCommandService {
      */
     @Override
     @Transactional
-    public UserResponseDTO updateUserById(UUID id, UserUpdateRequestDTO userUpdateRequestDTO) {
+    public UserResponseDTO updateUserById(@NonNull UUID id, @NonNull UserUpdateRequestDTO userUpdateRequestDTO) {
         User user = userRepository.findById(id)
             .orElseThrow(() -> new EntityNotFoundException(
                 MESSAGE_USER_NOT_FOUND_FOR_UPDATE
@@ -119,7 +120,7 @@ public class UserCommandServiceImpl implements UserCommandService {
      * @throws IllegalArgumentException Caso o ID no token não corresponda a um usuário ativo.
      */
     @Transactional(readOnly = true)
-    public UserDetails loadUserDetailsById(String subjectId) {
+    public UserDetails loadUserDetailsById(@NonNull String subjectId) {
         User user = userRepository.findById(UUID.fromString(subjectId))
             .orElseThrow(() -> new IllegalArgumentException(
                 MESSAGE_USER_NOT_FOUND_FOR_TOKEN

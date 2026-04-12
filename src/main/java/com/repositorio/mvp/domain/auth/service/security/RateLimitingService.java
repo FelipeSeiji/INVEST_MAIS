@@ -6,6 +6,7 @@ import io.github.bucket4j.Bandwidth;
 import io.github.bucket4j.Bucket;
 import io.github.bucket4j.Refill;
 import org.springframework.stereotype.Service;
+import lombok.NonNull;
 
 import java.time.Duration;
 import java.util.concurrent.TimeUnit;
@@ -27,7 +28,7 @@ public class RateLimitingService {
      * @param ip Endereço IP do cliente requisitante.
      * @return O Bucket associado ao IP para conferência de permissão.
      */
-    public Bucket resolveBucket(String ip) {
+    public Bucket resolveBucket(@NonNull String ip) {
         return cache.get(ip, this::newBucket);
     }
 

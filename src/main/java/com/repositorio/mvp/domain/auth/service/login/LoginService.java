@@ -14,6 +14,7 @@ import com.repositorio.mvp.domain.user.repository.UserRepository;
 import com.repositorio.mvp.domain.auth.service.interfaces.TwoFactorNotification;
 import com.repositorio.mvp.domain.auth.service.token.TokenProvider;
 
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -53,7 +54,7 @@ public class LoginService {
      * @throws IllegalArgumentException Caso as credenciais sejam inválidas ou a tentativa seja bloqueada por segurança.
      */
     @Transactional
-    public void initiateLogin(LoginRequestDTO loginRequest, String ip) {
+    public void initiateLogin(@NonNull LoginRequestDTO loginRequest, @NonNull String ip) {
         if (loginAttemptService.isBlocked(ip) || loginAttemptService.isBlocked(loginRequest.email())) {
             log.warn("ALERTA: Tentativa de login bloqueada (Força Bruta). IP: {} | Conta alvo: {}", 
                 ip, 
@@ -115,7 +116,7 @@ public class LoginService {
      * @throws IllegalArgumentException Caso o código seja inválido, expirado ou a conta esteja bloqueada.
      */
     @Transactional
-    public String verify2FAAndGenerateToken(Verify2FARequestDTO verifyRequest, String ip) {
+    public String verify2FAAndGenerateToken(@NonNull Verify2FARequestDTO verifyRequest, @NonNull String ip) {
         String attemptKey = MESSAGE_PREFIX_2FA_ATTEMPT + verifyRequest.email();
 
         if (loginAttemptService.isBlocked(ip) || loginAttemptService.isBlocked(attemptKey)) {

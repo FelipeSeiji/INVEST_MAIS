@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import com.repositorio.mvp.domain.auth.service.interfaces.CodeGenerator;
 import com.repositorio.mvp.domain.user.model.User;
 
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -20,7 +21,7 @@ public class TwoFactorService {
      * 
      * @param user Objeto do usuário que está tentando se autenticar.
      */
-    public void prepareTwoFactor(User user) {
+    public void prepareTwoFactor(@NonNull User user) {
         String code = codeGenerator.generate(6);
         user.getSecurity().generateTwoFactorCode(
             code, 

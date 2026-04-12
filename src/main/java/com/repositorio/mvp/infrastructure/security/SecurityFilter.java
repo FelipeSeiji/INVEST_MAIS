@@ -17,6 +17,7 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -44,7 +45,7 @@ public class SecurityFilter extends OncePerRequestFilter {
      * @param filterChain Cadeia de filtros de segurança do Spring.
      */
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
+    protected void doFilterInternal(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response, @NonNull FilterChain filterChain)
             throws ServletException, IOException {
         String token = this.recoverToken(request);
 
@@ -63,7 +64,7 @@ public class SecurityFilter extends OncePerRequestFilter {
      * @param token   String contendo o JWT (sem o prefixo Bearer).
      * @param request Requisição HTTP usada para capturar o IP do cliente em caso de fraude.
      */
-    private void authenticateClient(String token, HttpServletRequest request) {
+    private void authenticateClient(@NonNull String token, @NonNull HttpServletRequest request) {
         try {
             String subjectId = tokenService.validateToken(token);
 
@@ -90,7 +91,7 @@ public class SecurityFilter extends OncePerRequestFilter {
      * @param request Requisição HTTP contendo os cabeçalhos.
      * @return O token limpo (se presente) ou null caso o formato seja incorreto.
      */
-    private String recoverToken(HttpServletRequest request) {
+    private String recoverToken(@NonNull HttpServletRequest request) {
         var authHeader = request.getHeader("Authorization");
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             return null;

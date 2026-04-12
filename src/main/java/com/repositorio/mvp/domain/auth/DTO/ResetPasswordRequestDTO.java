@@ -7,6 +7,7 @@ import jakarta.validation.constraints.Size;
 
 public record ResetPasswordRequestDTO (
 
+    @Schema(description = "Token de recuperação", example = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...")
     @NotBlank(message = "O token de recuperação é obrigatório.")
     String token,
 

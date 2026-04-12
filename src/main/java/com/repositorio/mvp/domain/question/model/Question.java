@@ -3,7 +3,6 @@ package com.repositorio.mvp.domain.question.model;
 import java.util.UUID;
 
 import com.repositorio.mvp.domain.asset.model.Asset;
-import com.repositorio.mvp.domain.asset.model.enums.AssetCategory;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -59,11 +58,6 @@ public class Question {
     @NotBlank
     @Column(nullable = false, length = 50)
     private String idQuestion;
-
-    @NotNull
-    @Column(nullable = false)
-    @Enumerated(EnumType.STRING)
-    private AssetCategory assetCategory;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "active_id", nullable = false)

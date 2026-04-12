@@ -7,7 +7,6 @@ import java.util.UUID;
 
 import org.hibernate.annotations.Formula;
 
-import com.repositorio.mvp.domain.asset.model.enums.AssetCategory;
 import com.repositorio.mvp.domain.question.model.Question;
 import com.repositorio.mvp.domain.user.model.User;
 
@@ -79,11 +78,6 @@ public class Asset {
     @Column(nullable = false, precision = 10, scale = 2)
     @PositiveOrZero
     private BigDecimal percentage;
-    
-    @NotNull
-    @Column(nullable = false)
-    @Enumerated(EnumType.STRING)
-    private AssetCategory categoryActive;
 
     @Formula("amount * price")
     private BigDecimal totalValue;

@@ -30,7 +30,8 @@ import lombok.RequiredArgsConstructor;
 
 /**
  * Controlador REST responsável pelo gerenciamento (CRUD) de usuários.
- * Implementa controles de acesso baseados em roles e ID do proprietário para evitar IDOR (Insecure Direct Object Reference).
+ * Implementa controles de acesso baseados em roles e ID do proprietário para
+ * evitar IDOR (Insecure Direct Object Reference).
  */
 @RestController
 @RequestMapping("/api/users")
@@ -38,12 +39,13 @@ import lombok.RequiredArgsConstructor;
 public class UserController {
     private final UserCommandService userCommandService;
     private final UserQueryService userQueryService;
-    
+
     /**
      * Endpoint público para o registro de um novo usuário na plataforma.
      * Realiza a criação da conta base e das credenciais de segurança.
      * 
-     * @param userRequestDTO DTO contendo os dados mandatórios para criação da conta.
+     * @param userRequestDTO DTO contendo os dados mandatórios para criação da
+     *                       conta.
      * @return DTO contendo os dados públicos do usuário recém-registrado.
      */
     // POST /api/users
@@ -51,10 +53,10 @@ public class UserController {
     @ResponseStatus(HttpStatus.CREATED)
     @Operation(summary = "Cria um novo usuario", description = "Cria um novo usuario e insere no banco de dados")
     @ApiResponse(responseCode = "201", description = "Usuario criado com sucesso")
-    public UserResponseDTO createUser(@Valid @RequestBody UserRequestDTO userRequestDTO) { 
+    public UserResponseDTO createUser(@Valid @RequestBody UserRequestDTO userRequestDTO) {
         return userCommandService.createUser(userRequestDTO);
     }
-    
+
     /**
      * Recupera uma lista paginada de todos os usuários do sistema.
      * Acesso restrito exclusivamente a perfis com a role 'ADMIN'.
@@ -106,10 +108,11 @@ public class UserController {
 
     /**
      * Atualiza os dados de perfil (Nome/Email) de um usuário.
-     * Regra de Acesso: Apenas o proprietário da conta ou um ADMIN pode realizar a alteração.
+     * Regra de Acesso: Apenas o proprietário da conta ou um ADMIN pode realizar a
+     * alteração.
      * Nota: Alterações críticas exigem a confirmação da senha atual no DTO.
      * 
-     * @param id UUID do usuário cujos dados serão alterados.
+     * @param id                   UUID do usuário cujos dados serão alterados.
      * @param userUpdateRequestDTO Novos dados e senha de confirmação.
      * @return DTO com o perfil atualizado.
      */
@@ -118,7 +121,8 @@ public class UserController {
     @PreAuthorize("hasRole('ADMIN') or #id.toString() == authentication.principal.user.id.toString()")
     @ResponseStatus(HttpStatus.OK)
     @Operation(summary = "Atualiza um usuario", description = "Atualiza um usuario do banco de dados pelo id")
-    public UserResponseDTO updateUser(@PathVariable UUID id, @Valid @RequestBody UserUpdateRequestDTO userUpdateRequestDTO) {
+    public UserResponseDTO updateUser(@PathVariable UUID id,
+            @Valid @RequestBody UserUpdateRequestDTO userUpdateRequestDTO) {
         return userCommandService.updateUserById(id, userUpdateRequestDTO);
     }
 }

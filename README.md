@@ -2,120 +2,120 @@
 
 [![Java Version](https://img.shields.io/badge/Java-21-orange?style=for-the-badge&logo=openjdk)](https://openjdk.org/)
 [![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.5-brightgreen?style=for-the-badge&logo=springboot)](https://spring.io/projects/spring-boot)
-[![Security](https://img.shields.io/badge/Security-Hardened-red?style=for-the-badge&logo=springsecurity)](https://spring.io/projects/spring-security)
-[![License](https://img.shields.io/badge/License-MIT-blue?style=for-the-badge)](LICENSE)
+[![Security](https://img.shields.io/badge/Seguran%C3%A7a-Refor%C3%A7ada-red?style=for-the-badge&logo=springsecurity)](https://spring.io/projects/spring-security)
+[![License](https://img.shields.io/badge/Licen%C3%A7a-MIT-blue?style=for-the-badge)](LICENSE)
 
-**INVESTE-** is a robust, high-performance investment management backend built with **Spring Boot 3.5** and **Java 21**. Designed with a security-first mindset, it implements advanced authentication patterns, defensive infrastructure filters, and follows strict **SOLID** and **Domain-Driven Design (DDD)** principles to ensure scalability and maintainability.
+O **INVESTE-** é um backend robusto e de alta performance para gestão de investimentos, construído com **Spring Boot 3.5** e **Java 21**. Desenvolvido com mentalidade *security-first*, o projeto implementa padrões avançados de autenticação, filtros de infraestrutura defensivos e segue rigorosamente os princípios **SOLID** e **Domain-Driven Design (DDD)** para garantir escalabilidade e manutenibilidade.
 
 ---
 
-## 🛠 Tech Stack
+## 🛠 Tecnologias
 
 - **Core**: Java 21 LTS & Spring Boot 3.5.x
-- **Persistence**: PostgreSQL (Production) / H2 (Development & Testing)
-- **Security**: 
-  - Spring Security with JWT (java-jwt)
-  - OAuth2 Client integration
-  - Argon2 Password Hashing
-  - AES-256 DB Encryption for sensitive fields
-- **Infrastructure**:
-  - **Rate Limiting**: Implementation using Bucket4j & Caffeine
-  - **Validation**: Bean Validation (Hibernate Validator)
-  - **Mappers**: MapStruct for clean entity/DTO conversion
-- **Documentation**: OpenAPI 3 / Swagger (SpringDoc UI)
-- **Utilities**: Lombok, dotenv-java, BouncyCastle
+- **Persistência**: PostgreSQL (Produção) / H2 (Desenvolvimento & Testes)
+- **Segurança**: 
+  - Spring Security com JWT (java-jwt)
+  - Integração OAuth2 Client
+  - Hashing de senhas com Argon2
+  - Criptografia AES-256 no Banco de Dados para campos sensíveis
+- **Infraestrutura**:
+  - **Rate Limiting**: Implementação usando Bucket4j & Caffeine
+  - **Validação**: Bean Validation (Hibernate Validator)
+  - **Mapeadores**: MapStruct para conversão limpa entre Entidades e DTOs
+- **Documentação**: OpenAPI 3 / Swagger (SpringDoc UI)
+- **Utilitários**: Lombok, dotenv-java, BouncyCastle
 
 ---
 
-## 🏗 Architecture & Principles
+## 🏗 Arquitetura e Princípios
 
-This project is built to transcend simple MVP standards, adhering to modern software engineering best practices:
+Este projeto foi construído para transcender os padrões básicos de um MVP, adotando as melhores práticas de engenharia de software moderna:
 
-- **Domain-Driven Design (DDD)**: Logic organized by domain boundaries (`auth`, `user`, `asset`, `admin`).
-- **SOLID Principles**: Focused on decoupling, single responsibility, and interface-based design.
-- **Defensive Programming**: Extensive input validation and standardized error handling.
-- **Security Hardening**:
-  - Custom filters to detect and block automated tools (Nmap/Gobuster).
-  - Short-lived JWT tokens with server-side blacklisting (hashed).
-  - Multi-layer 2FA (Two-Factor Authentication) implementation.
-
----
-
-## ✨ Key Features
-
-### 🔐 Secure Authentication
-- **JWT flow**: Stateless authentication with automatic token validation.
-- **2FA**: Two-factor authentication via e-mail for critical actions and login.
-- **OAuth2**: Supports login via external providers.
-- **Logout**: Secure token termination using a server-side blacklist.
-
-### 🛡 Infrastructure Resilience
-- **Rate Limiting**: DDoS and Brute-force protection implemented at the filter level.
-- **Request Anomaly Detection**: Identification of common scanning patterns.
-- **HTTPS/SSL**: Self-signed certificate support out-of-the-box for local dev.
-
-### 📈 Investment Management
-- **Asset Control**: Manage diverse investment portfolios across different domains.
-- **Admin Dashboard**: Specialized endpoints for platform control and audits.
+- **Domain-Driven Design (DDD)**: Lógica organizada por limites de domínio (`auth`, `user`, `asset`, `admin`).
+- **Princípios SOLID**: Foco no desacoplamento, responsabilidade única e design orientado a interfaces.
+- **Programação Defensiva**: Validação extensiva de entradas e tratamento padronizado de erros.
+- **Endurecimento de Segurança (Hardening)**:
+  - Filtros customizados para detectar e bloquear ferramentas automatizadas (Nmap/Gobuster).
+  - Tokens JWT de curta duração com lista de bloqueio (*blacklist*) no servidor (hasheada).
+  - Implementação de 2FA (Autenticação de Dois Fatores) em múltiplas camadas.
 
 ---
 
-## 🚀 Getting Started
+## ✨ Funcionalidades Principais
 
-### Prerequisites
+### 🔐 Autenticação Segura
+- **Fluxo JWT**: Autenticação stateless com validação automática de tokens.
+- **2FA**: Autenticação de dois fatores via e-mail para logins e ações críticas.
+- **OAuth2**: Suporte para login via provedores externos.
+- **Logout**: Encerramento seguro de sessões usando uma blacklist no servidor.
+
+### 🛡 Resiliência de Infraestrutura
+- **Rate Limiting**: Proteção contra DDoS e ataques de força bruta implementada em nível de filtro.
+- **Detecção de Anomalias**: Identificação de padrões comuns de varredura (scanning).
+- **HTTPS/SSL**: Suporte nativo a certificados autoassinados para desenvolvimento local.
+
+### 📈 Gestão de Investimentos
+- **Controle de Ativos**: Gestão de portfólios de investimentos diversos.
+- **Painel Administrativo**: Endpoints especializados para controle da plataforma e auditorias.
+
+---
+
+## 🚀 Como Começar
+
+### Pré-requisitos
 - JDK 21
 - Maven 3.x
-- PostgreSQL (Optional, H2 used by default in dev)
+- PostgreSQL (Opcional, H2 é usado por padrão em dev)
 
-### Configuration
-1. Clone the repository.
-2. Create a `.env` file in the root directory based on the following template:
+### Configuração
+1. Clone o repositório.
+2. Crie um arquivo `.env` na raiz do projeto baseado no seguinte modelo:
 
 ```env
-# Mail Credentials (2FA)
+# Credenciais de E-mail (2FA)
 MAIL_HOST=smtp.gmail.com
 MAIL_PORT=587
-MAIL_USERNAME=your-email@gmail.com
-MAIL_PASSWORD=your-app-password
+MAIL_USERNAME=seu-email@gmail.com
+MAIL_PASSWORD=sua-senha-de-aplicativo
 
-# Security
-JWT_KEY=your-super-secret-key-32-chars
-DB_ENCRYPTION_KEY=your-aes-key-32-chars
+# Segurança
+JWT_KEY=sua-chave-secreta-de-32-caracteres
+DB_ENCRYPTION_KEY=sua-chave-aes-de-32-caracteres
 
-# Database
+# Banco de Dados
 DB_URL=jdbc:h2:mem:testdb
 DB_USERNAME=sa
 DB_PASSWORD=
 ```
 
-### Running the Application
+### Executando a Aplicação
 ```bash
 ./mvnw spring-boot:run
 ```
 
-The application will be available at `https://localhost:8443` (Default HTTPS port).
+A aplicação estará disponível em `https://localhost:8443` (Porta HTTPS padrão).
 
 ---
 
-## 📖 API Documentation
+## 📖 Documentação da API
 
-The interactive API documentation is automatically generated and can be accessed via:
+A documentação interativa da API é gerada automaticamente e pode ser acessada em:
 
 - **Swagger UI**: `https://localhost:8443/swagger-ui.html`
 - **OpenAPI Spec**: `https://localhost:8443/v3/api-docs`
 
 ---
 
-## 🤝 Contributing
+## 🤝 Contribuição
 
-1. Fork the project.
-2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`).
-3. Commit your changes (`git commit -m 'Add some AmazingFeature'`).
-4. Push to the Branch (`git push origin feature/AmazingFeature`).
-5. Open a Pull Request.
+1. Faça um fork do projeto.
+2. Crie uma Branch para sua Feature (`git checkout -b feature/MinhaFeatureIncrivel`).
+3. Adicione suas mudanças (`git commit -m 'Adiciona funcionalidade incrível'`).
+4. Envie para a Branch (`git push origin feature/MinhaFeatureIncrivel`).
+5. Abra um Pull Request.
 
 ---
 
-## 📄 License
+## 📄 Licença
 
-Distributed under the MIT License. See `LICENSE` for more information.
+Distribuído sob a Licença MIT. Veja `LICENSE` para mais informações.

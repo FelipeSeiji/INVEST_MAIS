@@ -39,6 +39,52 @@ Este projeto foi construído para transcender os padrões básicos de um MVP, ad
 
 ---
 
+## 🗺 Mapa de Contexto (DDD)
+
+Abaixo está a representação visual dos **Contextos Delimitados** (Bounded Contexts) do projeto e como eles se relacionam, baseada no design de "post-its":
+
+```mermaid
+graph TD
+    %% Estilos de Post-its
+    classDef yellow fill:#fff4a3,stroke:#d4c44a,stroke-width:2px,color:#000;
+    classDef blue fill:#a3e4ff,stroke:#4a9ed4,stroke-width:2px,color:#000;
+    classDef green fill:#a3ffa3,stroke:#4ad44a,stroke-width:2px,color:#000;
+    classDef pink fill:#ffa3e0,stroke:#d44a9e,stroke-width:2px,color:#000;
+    classDef orange fill:#ffd2a3,stroke:#d48a4a,stroke-width:2px,color:#000;
+    classDef acl fill:#00a884,stroke:#007a60,stroke-width:1px,color:#fff,shape:parallelogram;
+
+    %% Contextos
+    Auth["Autenticação\n(JWT, 2FA, OAuth2)"]:::yellow
+    User["Perfil do\nUsuário"]:::blue
+    Asset["Gestão de Ativos\n(Core Domain)"]:::yellow
+    Question["Questionário\n(Suitability)"]:::orange
+    Admin["Painel\nAdministrativo"]:::green
+    
+    %% Sistemas Externos
+    EmailAPI["API de E-mail\n(SMTP/Gmail)"]:::pink
+    DB["Banco de Dados\n(PostgreSQL/H2)"]:::blue
+
+    %% Relacionamentos
+    Auth -- "Projetado para" --> User
+    User -- "Responde" --> Question
+    Question -- "Informa limite de" --> Asset
+    Admin -- "Monitora" --> User
+    Admin -- "Gere" --> Asset
+    
+    %% ACLs e Integrações
+    Auth -- "requisita" --> ACL1["Camada de\nAnticorrupção"]:::acl
+    ACL1 -- "envia código via" --> EmailAPI
+
+    subgraph Infraestrutura
+        DB
+    end
+
+    %% Posicionamento
+    direction TB
+```
+
+---
+
 ## ✨ Funcionalidades Principais
 
 ### 🔐 Autenticação Segura

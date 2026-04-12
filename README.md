@@ -3,7 +3,6 @@
 [![Java Version](https://img.shields.io/badge/Java-21-orange?style=for-the-badge&logo=openjdk)](https://openjdk.org/)
 [![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.5-brightgreen?style=for-the-badge&logo=springboot)](https://spring.io/projects/spring-boot)
 [![Security](https://img.shields.io/badge/Seguran%C3%A7a-Refor%C3%A7ada-red?style=for-the-badge&logo=springsecurity)](https://spring.io/projects/spring-security)
-[![License](https://img.shields.io/badge/Licen%C3%A7a-MIT-blue?style=for-the-badge)](LICENSE)
 
 O **INVESTE-** é um backend robusto e de alta performance para gestão de investimentos, construído com **Spring Boot 3.5** e **Java 21**. Desenvolvido com mentalidade *security-first*, o projeto implementa padrões avançados de autenticação, filtros de infraestrutura defensivos e segue rigorosamente os princípios **SOLID** e **Domain-Driven Design (DDD)** para garantir escalabilidade e manutenibilidade.
 

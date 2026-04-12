@@ -4,7 +4,7 @@
 [![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.5-brightgreen?style=for-the-badge&logo=springboot)](https://spring.io/projects/spring-boot)
 [![Security](https://img.shields.io/badge/Seguran%C3%A7a-Refor%C3%A7ada-red?style=for-the-badge&logo=springsecurity)](https://spring.io/projects/spring-security)
 
-O **INVESTE-** é um backend robusto e de alta performance para gestão de investimentos, construído com **Spring Boot 3.5** e **Java 21**. Desenvolvido com mentalidade *security-first*, o projeto implementa padrões avançados de autenticação, filtros de infraestrutura defensivos e segue rigorosamente os princípios **SOLID** e **Domain-Driven Design (DDD)** para garantir escalabilidade e manutenibilidade.
+O **INVESTE+** é um backend robusto e de alta performance para gestão de investimentos, construído com **Spring Boot 3.5** e **Java 21**. Desenvolvido com mentalidade *security-first*, o projeto implementa padrões avançados de autenticação, filtros de infraestrutura defensivos e segue rigorosamente os princípios **SOLID** e **Domain-Driven Design (DDD)** para garantir escalabilidade e manutenibilidade.
 
 ---
 
@@ -34,7 +34,6 @@ Este projeto foi construído para transcender os padrões básicos de um MVP, ad
 - **Princípios SOLID**: Foco no desacoplamento, responsabilidade única e design orientado a interfaces.
 - **Programação Defensiva**: Validação extensiva de entradas e tratamento padronizado de erros.
 - **Endurecimento de Segurança (Hardening)**:
-  - Filtros customizados para detectar e bloquear ferramentas automatizadas (Nmap/Gobuster).
   - Tokens JWT de curta duração com lista de bloqueio (*blacklist*) no servidor (hasheada).
   - Implementação de 2FA (Autenticação de Dois Fatores) em múltiplas camadas.
 
@@ -64,7 +63,7 @@ Este projeto foi construído para transcender os padrões básicos de um MVP, ad
 ### Pré-requisitos
 - JDK 21
 - Maven 3.x
-- H2
+- H2 / PostgreSQL
 
 ### Configuração
 1. Clone o repositório.

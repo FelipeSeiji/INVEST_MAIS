@@ -64,7 +64,7 @@ Este projeto foi construído para transcender os padrões básicos de um MVP, ad
 ### Pré-requisitos
 - JDK 21
 - Maven 3.x
-- PostgreSQL (Opcional, H2 é usado por padrão em dev)
+- H2
 
 ### Configuração
 1. Clone o repositório.
@@ -102,19 +102,3 @@ A documentação interativa da API é gerada automaticamente e pode ser acessada
 
 - **Swagger UI**: `https://localhost:8443/swagger-ui.html`
 - **OpenAPI Spec**: `https://localhost:8443/v3/api-docs`
-
----
-
-## 🤝 Contribuição
-
-1. Faça um fork do projeto.
-2. Crie uma Branch para sua Feature (`git checkout -b feature/MinhaFeatureIncrivel`).
-3. Adicione suas mudanças (`git commit -m 'Adiciona funcionalidade incrível'`).
-4. Envie para a Branch (`git push origin feature/MinhaFeatureIncrivel`).
-5. Abra um Pull Request.
-
----
-
-## 📄 Licença
-
-Distribuído sob a Licença MIT. Veja `LICENSE` para mais informações.

@@ -55,7 +55,14 @@ async function handleRegister() {
     const name = document.getElementById('regName').value;
     const email = document.getElementById('regEmail').value;
     const password = document.getElementById('regPassword').value;
+    const confirmPassword = document.getElementById('confirmPassword').value;
     const msgDiv = document.getElementById('regMsg');
+
+    if (password !== confirmPassword) {
+        msgDiv.style.color = "red";
+        msgDiv.innerText = "As senhas não coincidem.";
+        return;
+    }
 
     try {
         const response = await fetch(`${API_BASE}/api/users`, {

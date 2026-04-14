@@ -4,15 +4,19 @@ import java.util.UUID;
 
 import org.apache.commons.codec.digest.DigestUtils;
 
+import com.repositorio.mvp.domain.portfolio.model.Portfolio;
 import com.repositorio.mvp.infrastructure.util.AttributeEncryptor;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -49,6 +53,9 @@ public class User {
     @Column(nullable = false, unique = true, length = 500)
     @Convert(converter = AttributeEncryptor.class)
     private String email;
+
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private Portfolio portfolio;
 
     @Embedded
     private UserSecurity security;

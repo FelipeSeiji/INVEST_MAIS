@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.apache.commons.codec.digest.DigestUtils;
 
+import com.repositorio.mvp.common.constants.MessageConstants;
 import com.repositorio.mvp.domain.user.DTO.UserRequestDTO;
 import com.repositorio.mvp.domain.user.DTO.UserResponseDTO;
 import com.repositorio.mvp.domain.user.DTO.UserUpdateRequestDTO;
@@ -29,10 +30,6 @@ import lombok.RequiredArgsConstructor;
 @Service
 @RequiredArgsConstructor
 public class UserCommandServiceImpl implements UserCommandService {
-    private static final String MESSAGE_USER_NOT_FOUND = "Usuário não encontrado com o ID: ";
-    private static final String MESSAGE_INVALID_PASSWORD = "A senha atual informada está incorreta.";
-    private static final String MESSAGE_USER_NOT_FOUND_FOR_TOKEN = "Usuário não encontrado para o token fornecido.";
-    private static final String MESSAGE_USER_NOT_FOUND_FOR_UPDATE = "Usuário não encontrado.";
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
@@ -75,7 +72,7 @@ public class UserCommandServiceImpl implements UserCommandService {
     @Transactional
     public void deleteUserById(@NonNull UUID id) {
         if (!userRepository.existsById(id)) {
-            throw new EntityNotFoundException(MESSAGE_USER_NOT_FOUND + id);
+            throw new EntityNotFoundException(MessageConstants.User.NOT_FOUND_WITH_ID + id);
         }
         userRepository.deleteById(id);
     }
@@ -95,12 +92,12 @@ public class UserCommandServiceImpl implements UserCommandService {
     public UserResponseDTO updateUserById(@NonNull UUID id, @NonNull UserUpdateRequestDTO userUpdateRequestDTO) {
         User user = userRepository.findById(id)
             .orElseThrow(() -> new EntityNotFoundException(
-                MESSAGE_USER_NOT_FOUND_FOR_UPDATE
+                MessageConstants.User.NOT_FOUND_FOR_UPDATE
             ));
         
         if (!passwordEncoder.matches(userUpdateRequestDTO.currentPassword(), user.getSecurity().getPassword())) {
             throw new IllegalArgumentException(
-                MESSAGE_INVALID_PASSWORD
+                MessageConstants.User.INVALID_PASSWORD
             );
         }
         
@@ -123,7 +120,7 @@ public class UserCommandServiceImpl implements UserCommandService {
     public UserDetails loadUserDetailsById(@NonNull String subjectId) {
         User user = userRepository.findById(UUID.fromString(subjectId))
             .orElseThrow(() -> new IllegalArgumentException(
-                MESSAGE_USER_NOT_FOUND_FOR_TOKEN
+                MessageConstants.User.NOT_FOUND_FOR_TOKEN
             ));
         return new UserDetailsImpl(user);
     }

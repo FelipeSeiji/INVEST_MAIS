@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.repositorio.mvp.common.DTO.MessageResponseDTO;
+import com.repositorio.mvp.common.constants.MessageConstants;
 import com.repositorio.mvp.domain.auth.service.token.TokenBlackListService;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -36,6 +37,6 @@ public class SystemAdminController {
     public MessageResponseDTO forceRemoveExpiredTokens() {
         tokenBlackListService.removeExpiredTokens();
         
-        return new MessageResponseDTO("Rotina de limpeza de tokens executada com sucesso.");
+        return new MessageResponseDTO(MessageConstants.Admin.TOKEN_CLEANUP_SUCCESS);
     }
 }

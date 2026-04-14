@@ -7,6 +7,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.repositorio.mvp.common.constants.MessageConstants;
 import com.repositorio.mvp.domain.auth.DTO.LoginRequestDTO;
 import com.repositorio.mvp.domain.auth.DTO.Verify2FARequestDTO;
 import com.repositorio.mvp.domain.user.model.User;
@@ -28,14 +29,7 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 @RequiredArgsConstructor
 public class LoginService {
-    private static final String MESSAGE_PREFIX_2FA_ATTEMPT = "2FA:";    
-
-    private static final String MESSAGE_ERR_TOO_MANY_ATTEMPTS = "Muitas tentativas falhas.";
-    private static final String MESSAGE_ERR_TOO_MANY_ATTEMPTS_2FA = "Muitas tentativas falhas. Tente novamente mais tarde.";
-    private static final String MESSAGE_ERR_INVALID_CREDENTIALS = "Credenciais inválidas.";
-    private static final String MESSAGE_ERR_USER_NOT_FOUND = "Usuário não encontrado.";
-    private static final String ERR_INVALID_2FA = "Código 2FA inválido.";
-    private static final String ERR_EXPIRED_2FA = "Código 2FA expirado.";
+    private static final String MESSAGE_PREFIX_2FA_ATTEMPT = "2FA:";
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
@@ -59,7 +53,7 @@ public class LoginService {
             log.warn("ALERTA: Tentativa de login bloqueada (Força Bruta). IP: {} | Conta alvo: {}", 
                 ip, 
                 loginRequest.email());
-            throw new IllegalArgumentException(MESSAGE_ERR_TOO_MANY_ATTEMPTS);
+            throw new IllegalArgumentException(MessageConstants.Auth.ERR_TOO_MANY_ATTEMPTS);
         }
 
         String searchHash = DigestUtils
@@ -74,7 +68,7 @@ public class LoginService {
                         ip, 
                         maskEmail(loginRequest.email())
                     );
-                    return new IllegalArgumentException(MESSAGE_ERR_INVALID_CREDENTIALS);
+                    return new IllegalArgumentException(MessageConstants.Auth.ERR_INVALID_CREDENTIALS);
                 });
 
         if (!passwordEncoder.matches(loginRequest.password(), 
@@ -85,7 +79,7 @@ public class LoginService {
                 log.warn("FALHA DE LOGIN: Senha incorreta. IP: {} | E-mail: {}", 
                     ip, 
                     maskEmail(user.getEmail()));
-                throw new IllegalArgumentException(MESSAGE_ERR_INVALID_CREDENTIALS);
+                throw new IllegalArgumentException(MessageConstants.Auth.ERR_INVALID_CREDENTIALS);
         }
 
         loginAttemptService.loginSucceeded(ip);
@@ -123,13 +117,13 @@ public class LoginService {
             log.warn("ALERTA: Tentativa de 2FA bloqueada (Força Bruta). IP: {} | Conta alvo: {}", 
                 ip, 
                 verifyRequest.email());
-            throw new IllegalArgumentException(MESSAGE_ERR_TOO_MANY_ATTEMPTS_2FA);
+            throw new IllegalArgumentException(MessageConstants.Auth.ERR_TOO_MANY_ATTEMPTS_2FA);
         }
 
         String searchHash = DigestUtils.sha256Hex(verifyRequest.email()
             .toLowerCase());
         User user = userRepository.findBySecurityEmailHash(searchHash)
-                .orElseThrow(() -> new IllegalArgumentException(MESSAGE_ERR_USER_NOT_FOUND));
+                .orElseThrow(() -> new IllegalArgumentException(MessageConstants.User.NOT_FOUND));
 
         if (user.getSecurity().getTwoFactorCode() == null || 
             !user.getSecurity()
@@ -140,7 +134,7 @@ public class LoginService {
                     log.warn("FALHA 2FA: Código inválido. IP: {} | E-mail: {}", 
                         ip, 
                         maskEmail(user.getEmail()));
-                    throw new IllegalArgumentException(ERR_INVALID_2FA);
+                    throw new IllegalArgumentException(MessageConstants.Auth.ERR_INVALID_2FA);
         }
 
         if (user.getSecurity()
@@ -149,7 +143,7 @@ public class LoginService {
                 user.getSecurity().clearTwoFactorCode();
                 userRepository.save(user);
                 log.warn("FALHA 2FA: Código expirado. IP: {} | E-mail: {}", ip, user.getEmail());
-                throw new IllegalArgumentException(ERR_EXPIRED_2FA);
+                throw new IllegalArgumentException(MessageConstants.Auth.ERR_EXPIRED_2FA);
         }
 
         loginAttemptService.loginSucceeded(ip);

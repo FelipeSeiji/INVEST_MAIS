@@ -7,6 +7,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import com.repositorio.mvp.common.constants.MessageConstants;
 import com.repositorio.mvp.infrastructure.exception.util.ProblemDetailBuilder;
 
 import jakarta.persistence.EntityNotFoundException;
@@ -15,12 +16,6 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
-    private static final String TITLE_NOT_FOUND = "Recurso não encontrado";
-    private static final String TITLE_CONFLICT = "Conflito de dados";
-    private static final String TITLE_INTERNAL_ERROR = "Erro interno do servidor";
-    
-    private static final String DETAIL_DATA_INTEGRITY = "A operação não pôde ser concluída pois o registro já existe.";
-    private static final String DETAIL_INTERNAL_ERROR = "Ocorreu um erro inesperado. Nossa equipe já foi notificada.";
     
     //400
     @ExceptionHandler(MethodArgumentNotValidException.class)
@@ -41,7 +36,7 @@ public class GlobalExceptionHandler {
         );
         return ProblemDetailBuilder.build(
             HttpStatus.NOT_FOUND, 
-            TITLE_NOT_FOUND, 
+            MessageConstants.Exception.TITLE_NOT_FOUND, 
             ex.getMessage()
         );
     }
@@ -55,7 +50,7 @@ public class GlobalExceptionHandler {
         );
         return ProblemDetailBuilder.build(
             HttpStatus.BAD_REQUEST, 
-            "Requisição inválida", 
+            MessageConstants.Exception.TITLE_BAD_REQUEST, 
             ex.getMessage()
         );
     }
@@ -68,8 +63,8 @@ public class GlobalExceptionHandler {
             ex.getMostSpecificCause().getMessage());
         return ProblemDetailBuilder.build(
             HttpStatus.CONFLICT, 
-            TITLE_CONFLICT, 
-            DETAIL_DATA_INTEGRITY
+            MessageConstants.Exception.TITLE_CONFLICT, 
+            MessageConstants.Exception.DETAIL_DATA_INTEGRITY
         );
     }
 
@@ -83,8 +78,8 @@ public class GlobalExceptionHandler {
         
         return ProblemDetailBuilder.build(
             HttpStatus.INTERNAL_SERVER_ERROR, 
-            TITLE_INTERNAL_ERROR, 
-            DETAIL_INTERNAL_ERROR
+            MessageConstants.Exception.TITLE_INTERNAL_ERROR, 
+            MessageConstants.Exception.DETAIL_INTERNAL_ERROR
         );
     }
 }

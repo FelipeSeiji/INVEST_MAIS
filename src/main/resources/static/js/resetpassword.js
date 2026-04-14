@@ -19,7 +19,6 @@ async function handleForgotPassword() {
         });
 
         if (response.ok) {
-            // Transição visual para o Passo 2
             step1.classList.add('hidden');
             step2.classList.remove('hidden');
         } else {

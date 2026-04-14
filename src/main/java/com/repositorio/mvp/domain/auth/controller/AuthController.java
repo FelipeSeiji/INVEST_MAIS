@@ -1,28 +1,27 @@
 package com.repositorio.mvp.domain.auth.controller;
 
-import com.repositorio.mvp.domain.auth.service.login.LoginAttemptService;
-import com.repositorio.mvp.domain.auth.service.login.LoginService;
-
-import org.springframework.http.HttpStatus;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.*;
-
-import com.repositorio.mvp.common.DTO.MessageResponseDTO;
+import com.repositorio.mvp.common.constants.MessageConstants;
 import com.repositorio.mvp.domain.auth.DTO.ForgotPasswordRequestDTO;
 import com.repositorio.mvp.domain.auth.DTO.LoginRequestDTO;
 import com.repositorio.mvp.domain.auth.DTO.ResetPasswordRequestDTO;
 import com.repositorio.mvp.domain.auth.DTO.TokenResponseDTO;
 import com.repositorio.mvp.domain.auth.DTO.Verify2FARequestDTO;
-import com.repositorio.mvp.infrastructure.security.util.ClientIp;
 import com.repositorio.mvp.domain.auth.service.auth.PasswordRecoveryService;
 import com.repositorio.mvp.domain.auth.service.auth.SessionService;
+import com.repositorio.mvp.domain.auth.service.login.LoginAttemptService;
+import com.repositorio.mvp.domain.auth.service.login.LoginService;
+import com.repositorio.mvp.infrastructure.security.util.ClientIp;
+import com.repositorio.mvp.common.DTO.MessageResponseDTO;
 
 import io.swagger.v3.oas.annotations.Operation;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * Controlador responsável por gerenciar todo o fluxo de autenticação pública da
@@ -36,9 +35,6 @@ import jakarta.servlet.http.HttpServletRequest;
 @RequestMapping("/auth")
 @RequiredArgsConstructor
 public class AuthController {
-    private static final String MESSAGE_LOGIN_2FA_SENT = "Código de verificação enviado para o seu e-mail.";
-    private static final String MESSAGE_FORGOT_PASSWORD_SENT = "Se o e-mail existir, um link de recuperação foi enviado.";
-    private static final String MESSAGE_PASSWORD_RESET_SUCCESS = "Senha redefinida com sucesso.";
 
     private final LoginAttemptService loginAttemptService;
     private final LoginService loginService;
@@ -65,7 +61,7 @@ public class AuthController {
         String ip = ClientIp.getClientIp(request);
         loginService.initiateLogin(loginRequest, ip);
 
-        return new MessageResponseDTO(MESSAGE_LOGIN_2FA_SENT);
+        return new MessageResponseDTO(MessageConstants.Auth.LOGIN_2FA_SENT);
     }
 
     /**
@@ -135,7 +131,7 @@ public class AuthController {
         log.info("RECUPERAÇÃO DE SENHA: Solicitação iniciada para o e-mail: {} a partir do IP: {}",
                 forgotPasswordRequestDTO.email(), ip);
 
-        return new MessageResponseDTO(MESSAGE_FORGOT_PASSWORD_SENT);
+        return new MessageResponseDTO(MessageConstants.Auth.FORGOT_PASSWORD_SENT);
     }
 
     /**
@@ -161,6 +157,6 @@ public class AuthController {
 
         log.info("ALERTA DE SEGURANÇA: Senha redefinida com sucesso via token. IP de origem: {}", ip);
 
-        return new MessageResponseDTO(MESSAGE_PASSWORD_RESET_SUCCESS);
+        return new MessageResponseDTO(MessageConstants.Auth.PASSWORD_RESET_SUCCESS);
     }
 }

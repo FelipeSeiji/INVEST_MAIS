@@ -5,6 +5,8 @@ import jakarta.persistence.Converter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import com.repositorio.mvp.common.constants.MessageConstants;
+
 import javax.crypto.Cipher;
 import javax.crypto.SecretKey;
 import javax.crypto.SecretKeyFactory;
@@ -37,10 +39,10 @@ public class AttributeEncryptor implements AttributeConverter<String, String> {
             @Value("${security.aes.kdf.iterations}") int kdfIterations) {
 
         if (secretKey == null || secretKey.length() < 32) {
-            throw new IllegalArgumentException("CRÍTICO: Chave de criptografia inválida ou ausente. O sistema não pode iniciar de forma segura.");
+            throw new IllegalArgumentException(MessageConstants.Infrastructure.ERR_ENCRYPTION_KEY_INVALID);
         }
         if (kdfSalt == null || kdfSalt.isBlank()) {
-            throw new IllegalArgumentException("CRÍTICO: Salt KDF inválido ou ausente.");
+            throw new IllegalArgumentException(MessageConstants.Infrastructure.ERR_KDF_SALT_INVALID);
         }
 
         try {
@@ -55,7 +57,7 @@ public class AttributeEncryptor implements AttributeConverter<String, String> {
             spec.clearPassword();
             this.key = new SecretKeySpec(derivedKey.getEncoded(), ALGORITHM);
         } catch (Exception e) {
-            throw new IllegalArgumentException("CRÍTICO: Falha ao derivar a chave de criptografia.", e);
+            throw new IllegalArgumentException(MessageConstants.Infrastructure.ERR_KDF_DERIVATION_FAILED, e);
         }
 
         this.secureRandom = new SecureRandom();
@@ -80,7 +82,7 @@ public class AttributeEncryptor implements AttributeConverter<String, String> {
             
             return Base64.getEncoder().encodeToString(byteBuffer.array());
         } catch (Exception e) {
-            throw new IllegalStateException("Erro ao criptografar o dado para o banco.", e);
+            throw new IllegalStateException(MessageConstants.Infrastructure.ERR_ENCRYPT_FAILED, e);
         }
     }
 
@@ -102,7 +104,7 @@ public class AttributeEncryptor implements AttributeConverter<String, String> {
             
             return new String(cipher.doFinal(cipherText));
         } catch (Exception e) {
-            throw new IllegalStateException("Erro ao descriptografar o dado do banco.", e);
+            throw new IllegalStateException(MessageConstants.Infrastructure.ERR_DECRYPT_FAILED, e);
         }
     }
 }

@@ -2,6 +2,8 @@ package com.repositorio.mvp.domain.asset.model;
 
 import java.util.UUID;
 
+import com.repositorio.mvp.domain.question.model.Question;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -18,21 +20,25 @@ import lombok.Setter;
 import lombok.ToString;
 
 @Entity
-@Table(name = "TB_ASSET")
+@Table(name = "TB_ASSET_EVALUATION")
 @Getter
 @Setter
 @ToString(onlyExplicitlyIncluded = true)
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-public class Asset {
+public class AssetEvaluation {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    @Setter(AccessLevel.NONE)
-    @ToString.Include
     private UUID id;
 
     @NotBlank
-    @Column(nullable = false)
-    private String ticket;
+    @Column(name = "is_positive", nullable = false)
+    private boolean isPositive;
+
+    
+    private Asset asset;
+
+    private Question question;
+
 }

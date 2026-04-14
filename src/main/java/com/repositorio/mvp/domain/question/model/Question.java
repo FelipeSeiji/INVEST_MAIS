@@ -2,7 +2,7 @@ package com.repositorio.mvp.domain.question.model;
 
 import java.util.UUID;
 
-import com.repositorio.mvp.domain.asset.model.Asset;
+import com.repositorio.mvp.domain.asset.model.AssetCategory;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -13,52 +13,33 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
-@Table(name = "TB_QUESTION")
 @Entity
+@Table(name = "TB_QUESTION")
 @Getter
 @Setter
-@ToString
-@RequiredArgsConstructor
+@ToString(onlyExplicitlyIncluded = true)
 @Builder
-@AllArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class Question {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     @Setter(AccessLevel.NONE)
+    @ToString.Include
     private UUID id;
 
-    @NotBlank
-    @Column(nullable = false, length = 100)
-    private String question;
-
-    @NotBlank
-    @Column(nullable = false, length = 100)
-    private String criterion;
-
-    @NotNull
     @Column(nullable = false)
-    private Integer quantity;
-
-    @NotNull
-    @Column(nullable = false)
-    private Boolean response;
-    
-    @NotBlank
-    @Column(nullable = false, length = 50)
-    private String idQuestion;
+    private String text;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "active_id", nullable = false)
-    @ToString.Exclude
-    private Asset active;
+    @JoinColumn(name = "asset_category_id", nullable = false)
+    private AssetCategory assetCategory;
 }

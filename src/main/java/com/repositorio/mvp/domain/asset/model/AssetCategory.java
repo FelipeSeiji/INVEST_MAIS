@@ -1,5 +1,6 @@
 package com.repositorio.mvp.domain.asset.model;
 
+import java.math.BigDecimal;
 import java.util.UUID;
 
 import jakarta.persistence.Column;
@@ -9,30 +10,33 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.PositiveOrZero;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
 @Entity
-@Table(name = "TB_ASSET")
+@Table(name = "TB_ASSET_CATEGORY")
 @Getter
-@Setter
-@ToString(onlyExplicitlyIncluded = true)
+@ToString
+@RequiredArgsConstructor
 @Builder
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
-public class Asset {
+@AllArgsConstructor
+public class AssetCategory {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     @Setter(AccessLevel.NONE)
-    @ToString.Include
     private UUID id;
 
     @NotBlank
+    @Column(nullable = false, unique = true)
+    private String name;
+
     @Column(nullable = false)
-    private String ticket;
+    @PositiveOrZero
+    private BigDecimal targetPercentage;
 }

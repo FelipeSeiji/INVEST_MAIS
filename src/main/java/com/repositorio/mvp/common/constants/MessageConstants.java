@@ -35,6 +35,22 @@ public final class MessageConstants {
         public static final String TOKEN_CLEANUP_SUCCESS = "Rotina de limpeza de tokens executada com sucesso.";
     }
 
+    public static final class Asset {
+        public static final String NOT_FOUND = "Ativo não encontrado.";
+        public static final String CATEGORY_NOT_FOUND = "Categoria não encontrada.";
+        public static final String CATEGORY_TARGET_EXCEEDED = "A soma das porcentagens alvo excede 100%.";
+    }
+
+    public static final class Question {
+        public static final String NOT_FOUND = "Pergunta não encontrada.";
+        public static final String EVALUATION_SAVED = "Avaliação do ativo salva com sucesso.";
+    }
+
+    public static final class Portfolio {
+        public static final String NOT_FOUND = "Carteira não encontrada.";
+        public static final String REBALANCE_CALC_SUCCESS = "Cálculo de rebalanceamento concluído.";
+    }
+
     public static final class Exception {
         public static final String TITLE_NOT_FOUND = "Recurso não encontrado";
         public static final String TITLE_CONFLICT = "Conflito de dados";

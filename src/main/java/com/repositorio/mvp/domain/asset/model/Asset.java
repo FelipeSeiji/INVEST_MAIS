@@ -42,6 +42,16 @@ public class Asset {
     @Column(nullable = false)
     private String ticker;
 
+    @Column(nullable = false)
+    @Builder.Default
+    private java.math.BigDecimal currentPositionValue = java.math.BigDecimal.ZERO;
+
+    @Column(precision = 19, scale = 4)
+    private java.math.BigDecimal quantity;
+
+    @Column(precision = 19, scale = 2)
+    private java.math.BigDecimal averagePrice;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id", nullable = false)
     private AssetCategory category;

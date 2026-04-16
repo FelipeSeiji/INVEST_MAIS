@@ -31,6 +31,7 @@ import lombok.ToString;
 @Entity
 @Table(name = "TB_ASSET_CATEGORY")
 @Getter
+@Setter
 @ToString
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)

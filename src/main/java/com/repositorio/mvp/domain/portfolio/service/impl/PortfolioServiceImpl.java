@@ -93,7 +93,10 @@ public class PortfolioServiceImpl implements PortfolioService {
                                 .map(AssetCategory::getTargetPercentage)
                                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-                List<RebalanceResponse.CategoryRebalanceDTO> categoryDTOs = new ArrayList<>();
+                // PASSO 1: Calcular os GAPs brutos (necessidade) de todos os ativos e somá-los
+                BigDecimal totalPositiveGap = BigDecimal.ZERO;
+                java.util.Map<UUID, BigDecimal> rawGaps = new java.util.HashMap<>();
+                java.util.Map<UUID, BigDecimal> redistributedTargets = new java.util.HashMap<>();
 
                 for (AssetCategory category : portfolio.getCategories()) {
                         boolean isActive = activeCategories.contains(category);
@@ -105,22 +108,12 @@ public class PortfolioServiceImpl implements PortfolioService {
                                                 .multiply(new BigDecimal("100"))
                                                 .divide(sumActiveOriginalTargets, 2, RoundingMode.HALF_UP);
                         }
+                        redistributedTargets.put(category.getId(), redistributedTargetPercentage);
 
+                        // Define o target financeiro da categoria nesta simulação
                         BigDecimal categoryTargetValue = newTotalValue.multiply(redistributedTargetPercentage)
                                         .divide(new BigDecimal("100"), 2, RoundingMode.HALF_UP);
 
-                        BigDecimal currentCategoryValue = category.getAssets().stream()
-                                        .map(Asset::getCurrentPositionValue)
-                                        .reduce(BigDecimal.ZERO, BigDecimal::add);
-
-                        BigDecimal categoryCurrentPercentage = totalCurrentValue.compareTo(BigDecimal.ZERO) > 0
-                                        ? currentCategoryValue.multiply(new BigDecimal("100")).divide(totalCurrentValue,
-                                                        2, RoundingMode.HALF_UP)
-                                        : BigDecimal.ZERO;
-
-                        List<RebalanceResponse.AssetRebalanceDTO> assetDTOs = new ArrayList<>();
-
-                        // 4. Cálculo da soma das notas dos ativos aprovados na categoria
                         int totalCategoryScore = category.getAssets().stream()
                                         .map(this::calculateAssetScore)
                                         .filter(score -> score > 0)
@@ -130,21 +123,51 @@ public class PortfolioServiceImpl implements PortfolioService {
                         for (Asset asset : category.getAssets()) {
                                 int score = calculateAssetScore(asset);
 
-                                // 5. Linha de Corte: Ativos com score <= 0 recebem peso zero (bloqueio de aporte)
+                                // Linha de Corte: Ativos com score <= 0 recebem peso zero
                                 BigDecimal assetTargetValue = (isActive && score > 0 && totalCategoryScore > 0)
                                                 ? categoryTargetValue.multiply(new BigDecimal(score)).divide(
-                                                                new BigDecimal(totalCategoryScore), 2,
-                                                                RoundingMode.HALF_UP)
+                                                                new BigDecimal(totalCategoryScore), 2, RoundingMode.HALF_UP)
                                                 : BigDecimal.ZERO;
 
-                                BigDecimal suggestedAporte = assetTargetValue.subtract(asset.getCurrentPositionValue());
-                                if (suggestedAporte.compareTo(BigDecimal.ZERO) < 0)
-                                        suggestedAporte = BigDecimal.ZERO;
+                                BigDecimal gap = assetTargetValue.subtract(asset.getCurrentPositionValue());
+                                if (gap.compareTo(BigDecimal.ZERO) < 0) {
+                                        gap = BigDecimal.ZERO; // Regra de Hold: Não recomendamos vender
+                                }
 
+                                rawGaps.put(asset.getId(), gap);
+                                totalPositiveGap = totalPositiveGap.add(gap);
+                        }
+                }
+
+                // PASSO 2: Fatiar o Aporte e Montar a Resposta
+                List<RebalanceResponse.CategoryRebalanceDTO> categoryDTOs = new ArrayList<>();
+
+                for (AssetCategory category : portfolio.getCategories()) {
+                        BigDecimal redistributedTargetPercentage = redistributedTargets.getOrDefault(category.getId(), BigDecimal.ZERO);
+
+                        BigDecimal currentCategoryValue = category.getAssets().stream()
+                                        .map(Asset::getCurrentPositionValue)
+                                        .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+                        BigDecimal categoryCurrentPercentage = totalCurrentValue.compareTo(BigDecimal.ZERO) > 0
+                                        ? currentCategoryValue.multiply(new BigDecimal("100")).divide(totalCurrentValue, 2, RoundingMode.HALF_UP)
+                                        : BigDecimal.ZERO;
+
+                        List<RebalanceResponse.AssetRebalanceDTO> assetDTOs = new ArrayList<>();
+
+                        for (Asset asset : category.getAssets()) {
                                 BigDecimal assetCurrentPercentage = totalCurrentValue.compareTo(BigDecimal.ZERO) > 0
                                                 ? asset.getCurrentPositionValue().multiply(new BigDecimal("100"))
                                                                 .divide(totalCurrentValue, 2, RoundingMode.HALF_UP)
                                                 : BigDecimal.ZERO;
+
+                                BigDecimal rawGap = rawGaps.getOrDefault(asset.getId(), BigDecimal.ZERO);
+                                BigDecimal suggestedAporte = BigDecimal.ZERO;
+
+                                // Lógica de Fatiamento (Sardinha): Distribuímos os R$ do bolso baseado na proporção da necessidade!
+                                if (totalPositiveGap.compareTo(BigDecimal.ZERO) > 0 && aporteAmount.compareTo(BigDecimal.ZERO) > 0) {
+                                        suggestedAporte = rawGap.multiply(aporteAmount).divide(totalPositiveGap, 2, RoundingMode.HALF_UP);
+                                }
 
                                 assetDTOs.add(new RebalanceResponse.AssetRebalanceDTO(
                                                 asset.getId(),
@@ -152,8 +175,7 @@ public class PortfolioServiceImpl implements PortfolioService {
                                                 assetCurrentPercentage,
                                                 BigDecimal.ZERO, // Target individual opcional
                                                 suggestedAporte,
-                                                suggestedAporte.compareTo(BigDecimal.ZERO) > 0 ? "COMPRAR"
-                                                                : "AGUARDAR"));
+                                                suggestedAporte.compareTo(BigDecimal.ZERO) > 0 ? "COMPRAR" : "AGUARDAR"));
                         }
 
                         categoryDTOs.add(new RebalanceResponse.CategoryRebalanceDTO(

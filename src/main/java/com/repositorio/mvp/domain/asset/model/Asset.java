@@ -1,5 +1,6 @@
 package com.repositorio.mvp.domain.asset.model;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
 
@@ -44,13 +45,13 @@ public class Asset {
 
     @Column(nullable = false)
     @Builder.Default
-    private java.math.BigDecimal currentPositionValue = java.math.BigDecimal.ZERO;
+    private BigDecimal currentPositionValue = BigDecimal.ZERO;
 
     @Column(precision = 19, scale = 4)
-    private java.math.BigDecimal quantity;
+    private BigDecimal quantity;
 
     @Column(precision = 19, scale = 2)
-    private java.math.BigDecimal averagePrice;
+    private BigDecimal averagePrice;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id", nullable = false)

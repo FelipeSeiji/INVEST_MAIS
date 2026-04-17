@@ -16,9 +16,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.repositorio.mvp.common.constants.MessageConstants;
 import com.repositorio.mvp.common.DTO.MessageResponseDTO;
-import com.repositorio.mvp.domain.question.DTO.EvaluationRequest;
-import com.repositorio.mvp.domain.question.DTO.QuestionRequest;
-import com.repositorio.mvp.domain.question.DTO.QuestionResponse;
+import com.repositorio.mvp.domain.question.DTO.EvaluationRequestDTO;
+import com.repositorio.mvp.domain.question.DTO.QuestionRequestDTO;
+import com.repositorio.mvp.domain.question.DTO.QuestionResponseDTO;
 import com.repositorio.mvp.domain.question.service.QuestionService;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -37,19 +37,19 @@ public class QuestionController {
     @PostMapping("/categories/{categoryId}")
     @ResponseStatus(HttpStatus.CREATED)
     @Operation(summary = "Cria uma nova pergunta para uma categoria")
-    public QuestionResponse createQuestion(@PathVariable UUID categoryId, @Valid @RequestBody QuestionRequest request) {
+    public QuestionResponseDTO createQuestion(@PathVariable UUID categoryId, @Valid @RequestBody QuestionRequestDTO request) {
         return questionService.createQuestion(categoryId, request);
     }
 
     @GetMapping("/categories/{categoryId}")
     @Operation(summary = "Lista perguntas de uma categoria")
-    public List<QuestionResponse> listByCategoryId(@PathVariable UUID categoryId) {
+    public List<QuestionResponseDTO> listByCategoryId(@PathVariable UUID categoryId) {
         return questionService.listByCategoryId(categoryId);
     }
 
     @PutMapping("/{id}")
     @Operation(summary = "Atualiza o texto de uma pergunta")
-    public QuestionResponse updateQuestion(@PathVariable UUID id, @Valid @RequestBody QuestionRequest request) {
+    public QuestionResponseDTO updateQuestion(@PathVariable UUID id, @Valid @RequestBody QuestionRequestDTO request) {
         return questionService.updateQuestion(id, request);
     }
 
@@ -63,7 +63,7 @@ public class QuestionController {
     @PostMapping("/assets/{assetId}/evaluate")
     @ResponseStatus(HttpStatus.OK)
     @Operation(summary = "Salva as respostas (pontuação) de um ativo", description = "Envia uma lista de respostas para as perguntas da categoria do ativo.")
-    public MessageResponseDTO saveEvaluations(@PathVariable UUID assetId, @Valid @RequestBody List<EvaluationRequest> evaluations) {
+    public MessageResponseDTO saveEvaluations(@PathVariable UUID assetId, @Valid @RequestBody List<EvaluationRequestDTO> evaluations) {
         questionService.saveEvaluations(assetId, evaluations);
         return new MessageResponseDTO(MessageConstants.Question.EVALUATION_SAVED);
     }

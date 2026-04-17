@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.repositorio.mvp.domain.portfolio.DTO.RebalanceResponse;
+import com.repositorio.mvp.domain.portfolio.DTO.RebalanceResponseDTO;
 import com.repositorio.mvp.domain.portfolio.service.PortfolioService;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -24,13 +24,13 @@ public class PortfolioController {
 
     @GetMapping("/rebalance")
     @Operation(summary = "Calcula o rebalanceamento da carteira", description = "Baseado no valor do aporte, sugere onde investir para atingir os alvos definidos.")
-    public RebalanceResponse rebalance(@RequestParam(defaultValue = "0") BigDecimal aporteAmount) {
+    public RebalanceResponseDTO rebalance(@RequestParam(defaultValue = "0") BigDecimal aporteAmount) {
         return portfolioService.calculateRebalance(aporteAmount);
     }
 
     @GetMapping("/summary")
     @Operation(summary = "Fornece o resumo estratégico da carteira", description = "Retorna o retrato estruturado: Valor Total, Alvos Proporcionais e Distribuição por Categoria.")
-    public com.repositorio.mvp.domain.portfolio.DTO.DashboardResponse getSummary() {
+    public com.repositorio.mvp.domain.portfolio.DTO.DashboardResponseDTO getSummary() {
         return portfolioService.getPortfolioSummary();
     }
 }

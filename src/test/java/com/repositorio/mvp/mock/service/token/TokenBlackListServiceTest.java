@@ -19,6 +19,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import org.apache.commons.codec.digest.DigestUtils;
+
 import com.repositorio.mvp.domain.auth.model.InvalidToken;
 import com.repositorio.mvp.domain.auth.repository.InvalidTokenRepository;
 import com.repositorio.mvp.domain.auth.service.token.TokenBlackListService;
@@ -45,7 +47,7 @@ public class TokenBlackListServiceTest {
         verify(invalidTokenRepository).save(invalidTokenCaptor.capture());
         InvalidToken savedToken = invalidTokenCaptor.getValue();
 
-        assertEquals(token, savedToken.getToken());
+        assertEquals(DigestUtils.sha256Hex(token), savedToken.getToken());
         assertEquals(expiredAt, savedToken.getExpiresAt());
     }
 
@@ -62,25 +64,25 @@ public class TokenBlackListServiceTest {
     @Test
     public void isBlacklisted_WithValidToken_QueriesRepository() {
         String token = "valid_token";
-        when(invalidTokenRepository.existsById(token)).thenReturn(true);
+        when(invalidTokenRepository.existsById(DigestUtils.sha256Hex(token))).thenReturn(true);
 
         boolean isBlacklisted = tokenBlackListService.isBlacklisted(token);
 
         assertTrue(isBlacklisted);
 
-        verify(invalidTokenRepository).existsById(token);
+        verify(invalidTokenRepository).existsById(DigestUtils.sha256Hex(token));
     }
 
     @Test
     public void isBlacklisted_WithInvalidToken_QueriesRepository() {
         String token = "invalid_token";
-        when(invalidTokenRepository.existsById(token)).thenReturn(false);
+        when(invalidTokenRepository.existsById(DigestUtils.sha256Hex(token))).thenReturn(false);
 
         boolean isBlacklisted = tokenBlackListService.isBlacklisted(token);
 
         assertFalse(isBlacklisted);
 
-        verify(invalidTokenRepository).existsById(token);
+        verify(invalidTokenRepository).existsById(DigestUtils.sha256Hex(token));
     }
 
     @Test

@@ -16,9 +16,9 @@ import com.repositorio.mvp.domain.asset.repository.AssetEvaluationRepository;
 import com.repositorio.mvp.domain.asset.repository.AssetRepository;
 import com.repositorio.mvp.domain.portfolio.model.Portfolio;
 import com.repositorio.mvp.domain.portfolio.repository.PortfolioRepository;
-import com.repositorio.mvp.domain.question.DTO.EvaluationRequest;
-import com.repositorio.mvp.domain.question.DTO.QuestionRequest;
-import com.repositorio.mvp.domain.question.DTO.QuestionResponse;
+import com.repositorio.mvp.domain.question.DTO.EvaluationRequestDTO;
+import com.repositorio.mvp.domain.question.DTO.QuestionRequestDTO;
+import com.repositorio.mvp.domain.question.DTO.QuestionResponseDTO;
 import com.repositorio.mvp.domain.question.mapper.QuestionMapper;
 import com.repositorio.mvp.domain.question.model.Question;
 import com.repositorio.mvp.domain.question.repository.QuestionRepository;
@@ -41,7 +41,7 @@ public class QuestionServiceImpl implements QuestionService {
 
     @Override
     @Transactional
-    public QuestionResponse createQuestion(UUID categoryId, QuestionRequest request) {
+    public QuestionResponseDTO createQuestion(UUID categoryId, QuestionRequestDTO request) {
         AssetCategory category = getCategoryForCurrentUser(categoryId);
         
         Question question = questionMapper.toEntity(request);
@@ -52,8 +52,8 @@ public class QuestionServiceImpl implements QuestionService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<QuestionResponse> listByCategoryId(UUID categoryId) {
-        getCategoryForCurrentUser(categoryId); // Valida posse
+    public List<QuestionResponseDTO> listByCategoryId(UUID categoryId) {
+        getCategoryForCurrentUser(categoryId); 
         return questionRepository.findAllByAssetCategoryId(categoryId).stream()
                 .map(questionMapper::toResponse)
                 .toList();
@@ -61,11 +61,11 @@ public class QuestionServiceImpl implements QuestionService {
 
     @Override
     @Transactional
-    public QuestionResponse updateQuestion(UUID id, QuestionRequest request) {
+    public QuestionResponseDTO updateQuestion(UUID id, QuestionRequestDTO request) {
         Question question = questionRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException(MessageConstants.Question.NOT_FOUND));
         
-        getCategoryForCurrentUser(question.getAssetCategory().getId()); // Valida posse
+        getCategoryForCurrentUser(question.getAssetCategory().getId());
         
         question.setText(request.text());
         return questionMapper.toResponse(questionRepository.save(question));
@@ -77,20 +77,18 @@ public class QuestionServiceImpl implements QuestionService {
         Question question = questionRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException(MessageConstants.Question.NOT_FOUND));
         
-        getCategoryForCurrentUser(question.getAssetCategory().getId()); // Valida posse
+        getCategoryForCurrentUser(question.getAssetCategory().getId()); 
         questionRepository.delete(question);
     }
 
     @Override
     @Transactional
-    public void saveEvaluations(UUID assetId, List<EvaluationRequest> evaluations) {
+    public void saveEvaluations(UUID assetId, List<EvaluationRequestDTO> evaluations) {
         Asset asset = assetRepository.findById(assetId)
                 .orElseThrow(() -> new EntityNotFoundException(MessageConstants.Asset.NOT_FOUND));
         
-        getCategoryForCurrentUser(asset.getCategory().getId()); // Valida posse
-
-        // Remove avaliações antigas para as questões enviadas (ou todas do ativo)
-        // Decisão: Substituir as avaliações atuais
+        getCategoryForCurrentUser(asset.getCategory().getId());
+        
         List<AssetEvaluation> currentEvaluations = evaluationRepository.findAllByAssetId(assetId);
         evaluationRepository.deleteAll(currentEvaluations);
 

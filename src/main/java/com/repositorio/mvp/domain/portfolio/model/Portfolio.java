@@ -1,5 +1,6 @@
 package com.repositorio.mvp.domain.portfolio.model;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
 
@@ -40,12 +41,28 @@ public class Portfolio {
     @ToString.Include
     private UUID id;
 
-    // Relacionamento 1:1 estrito com o Usuário
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false, unique = true)
     private User user;
 
-    // A Carteira é dona das categorias. O Cascade garante que, se deletar a carteira, deleta os ativos.
     @OneToMany(mappedBy = "portfolio", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<AssetCategory> categories;
+
+    public void validateAndAddCategoryTarget(BigDecimal newValue, UUID excludeCategoryId) {
+        if (categories == null) {
+            if (newValue.compareTo(new BigDecimal("100")) > 0) {
+                throw new IllegalArgumentException("O percentual alvo total das categorias não pode exceder 100%.");
+            }
+            return;
+        }
+
+        BigDecimal currentTotal = categories.stream()
+                .filter(c -> excludeCategoryId == null || !c.getId().equals(excludeCategoryId))
+                .map(AssetCategory::getTargetPercentage)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        if (currentTotal.add(newValue).compareTo(new BigDecimal("100")) > 0) {
+            throw new IllegalArgumentException("O percentual alvo total das categorias não pode exceder 100%.");
+        }
+    }
 }

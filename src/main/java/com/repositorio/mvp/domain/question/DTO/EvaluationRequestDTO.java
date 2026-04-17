@@ -2,7 +2,7 @@ package com.repositorio.mvp.domain.question.DTO;
 
 import java.util.UUID;
 
-public record EvaluationRequest(
+public record EvaluationRequestDTO(
     UUID questionId,
     boolean isPositive
 ) {}

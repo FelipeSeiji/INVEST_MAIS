@@ -1,6 +1,5 @@
 package com.repositorio.mvp.mock.service.auth;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -8,15 +7,12 @@ import java.time.Instant;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 
-import com.repositorio.mvp.domain.auth.model.InvalidToken;
-import com.repositorio.mvp.domain.auth.repository.InvalidTokenRepository;
 import com.repositorio.mvp.domain.auth.service.auth.SessionService;
-import com.repositorio.mvp.domain.auth.service.token.TokenService;
+import com.repositorio.mvp.domain.auth.service.token.TokenBlackListService;
+import com.repositorio.mvp.domain.auth.service.token.TokenProvider;
 
 import org.mockito.junit.jupiter.MockitoExtension;
 
@@ -27,13 +23,10 @@ public class SessionServiceTest {
     private SessionService sessionService;
 
     @Mock
-    private InvalidTokenRepository invalidTokenRepository;
+    private TokenBlackListService tokenBlackListService;
     
     @Mock
-    private TokenService tokenService;
-
-    @Captor
-    private ArgumentCaptor<InvalidToken> invalidTokenCaptor;
+    private TokenProvider tokenProvider;
 
     @Test
     public void logout_WithBearerPrefix_RemovesPrefixAndSavesToBlacklist() {
@@ -41,15 +34,11 @@ public class SessionServiceTest {
         String tokenWithBearer = "Bearer " + token;
         Instant mockExpirationDate = Instant.now().plusSeconds(3600);
 
-        when(tokenService.getExpiration(token)).thenReturn(mockExpirationDate);
+        when(tokenProvider.getExpiration(token)).thenReturn(mockExpirationDate);
 
         sessionService.logout(tokenWithBearer);
 
-        verify(invalidTokenRepository).save(invalidTokenCaptor.capture());
-        InvalidToken savedToken = invalidTokenCaptor.getValue();
-
-        assertEquals(token, savedToken.getToken());
-        assertEquals(mockExpirationDate, savedToken.getExpiresAt());
+        verify(tokenBlackListService).invalidateToken(token, mockExpirationDate);
     }
 
     @Test
@@ -57,14 +46,10 @@ public class SessionServiceTest {
         String token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.another_valid_jwt";
         Instant mockExpirationDate = Instant.now().plusSeconds(1800);
 
-        when(tokenService.getExpiration(token)).thenReturn(mockExpirationDate);
+        when(tokenProvider.getExpiration(token)).thenReturn(mockExpirationDate);
 
         sessionService.logout(token);
 
-        verify(invalidTokenRepository).save(invalidTokenCaptor.capture());
-        InvalidToken savedToken = invalidTokenCaptor.getValue();
-
-        assertEquals(token, savedToken.getToken());
-        assertEquals(mockExpirationDate, savedToken.getExpiresAt());
+        verify(tokenBlackListService).invalidateToken(token, mockExpirationDate);
     }
 }

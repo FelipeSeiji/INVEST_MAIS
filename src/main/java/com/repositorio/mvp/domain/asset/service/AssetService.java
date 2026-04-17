@@ -3,12 +3,12 @@ package com.repositorio.mvp.domain.asset.service;
 import java.util.List;
 import java.util.UUID;
 
-import com.repositorio.mvp.domain.asset.DTO.AssetRequest;
-import com.repositorio.mvp.domain.asset.DTO.AssetResponse;
+import com.repositorio.mvp.domain.asset.DTO.AssetRequestDTO;
+import com.repositorio.mvp.domain.asset.DTO.AssetResponseDTO;
 
 public interface AssetService {
-    AssetResponse createAsset(UUID categoryId, AssetRequest request);
-    List<AssetResponse> listAssetsByCategory(UUID categoryId);
-    AssetResponse updateAsset(UUID id, AssetRequest request);
+    AssetResponseDTO createAsset(UUID categoryId, AssetRequestDTO request);
+    List<AssetResponseDTO> listAssetsByCategory(UUID categoryId);
+    AssetResponseDTO updateAsset(UUID id, AssetRequestDTO request);
     void deleteAsset(UUID id);
 }

@@ -19,6 +19,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.test.util.ReflectionTestUtils;
+import org.springframework.transaction.support.TransactionCallback;
+import org.springframework.transaction.support.TransactionTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import com.repositorio.mvp.domain.auth.model.PasswordResetToken;
@@ -43,10 +47,17 @@ public class PasswordRecoveryServiceTest {
     @Mock
     private PasswordEncoder passwordEncoder;
 
+    @Mock
+    private JavaMailSender mailSender;
+
+    @Mock
+    private TransactionTemplate transactionTemplate;
+
     private User mockUser;
 
     @BeforeEach
     void setUp() {
+        ReflectionTestUtils.setField(passwordRecoveryService, "tokenSecret", "my_secret_token_key");
         mockUser = UserConstants.createMockUser();
     }
     
@@ -56,6 +67,10 @@ public class PasswordRecoveryServiceTest {
         String expectedHash = org.apache.commons.codec.digest.DigestUtils.sha256Hex(email.toLowerCase());
 
         when(userRepository.findBySecurityEmailHash(expectedHash)).thenReturn(Optional.of(mockUser));
+        when(transactionTemplate.execute(any())).thenAnswer(invocation -> {
+            TransactionCallback callback = invocation.getArgument(0);
+            return callback.doInTransaction(null);
+        });
 
         passwordRecoveryService.createPasswordResetTokenForUser(email);
 

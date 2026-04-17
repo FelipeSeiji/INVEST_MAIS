@@ -29,6 +29,7 @@ import org.springframework.test.util.ReflectionTestUtils;
 import com.repositorio.mvp.domain.user.DTO.UserRequestDTO;
 import com.repositorio.mvp.domain.user.DTO.UserResponseDTO;
 import com.repositorio.mvp.domain.user.mapper.UserMapper;
+import com.repositorio.mvp.domain.portfolio.service.PortfolioService;
 import com.repositorio.mvp.domain.user.model.User;
 import com.repositorio.mvp.domain.user.repository.UserRepository;
 import com.repositorio.mvp.domain.user.service.UserCommandServiceImpl;
@@ -61,6 +62,9 @@ public class UserServiceTest {
 
     @Mock 
     private UserUpdateValidator userUpdateValidator;
+
+    @Mock
+    private PortfolioService portfolioService;
 
     UUID userId = UUID.randomUUID();
 

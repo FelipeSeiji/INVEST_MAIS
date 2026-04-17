@@ -21,43 +21,41 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-            .csrf(csrf -> csrf.disable())
-            .requiresChannel(channel -> channel.anyRequest().requiresSecure()) 
-            .authorizeHttpRequests(auth -> auth
-                .requestMatchers(
-                    "/",
-                    "/static/**",
-                    "/css/**", 
-                    "/js/**",
-                    "/templates/**",
-                    "/index.html",
-                    "/dashboard.html",
-                    "/reset-password.html",
-                    "/h2-console/**", 
-                    "/swagger-ui/**", 
-                    "/v3/api-docs/**", 
-                    "/swagger-ui.html"
-                ).permitAll() 
-                .requestMatchers(HttpMethod.POST, 
-                    "/auth/login", 
-                    "/auth/verify-2fa",
-                    "/api/users",
-                    "/auth/forgot-password",
-                    "/auth/reset-password"
-                ).permitAll()
-                .requestMatchers("/actuator/**").hasRole("ADMIN")
-                .anyRequest().authenticated() 
-            )
-            // CABEÇALHOS DE SEGURANÇA (SECURITY HEADERS)
-            .headers(headers -> headers
-                .frameOptions(frame -> frame.sameOrigin())
-                .httpStrictTransportSecurity(hsts -> hsts
-                    .includeSubDomains(true)
-                    .maxAgeInSeconds(31536000))
-            )
-            .addFilterBefore(rateLimitFilter, UsernamePasswordAuthenticationFilter.class)
-            .addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class);
-            
+                .csrf(csrf -> csrf.disable())
+                .requiresChannel(channel -> channel.anyRequest().requiresSecure())
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers(
+                                "/",
+                                "/static/**",
+                                "/css/**",
+                                "/js/**",
+                                "/templates/**",
+                                "/index.html",
+                                "/dashboard.html",
+                                "/reset-password.html",
+                                "/h2-console/**",
+                                "/swagger-ui/**",
+                                "/v3/api-docs/**",
+                                "/swagger-ui.html")
+                        .permitAll()
+                        .requestMatchers(HttpMethod.POST,
+                                "/auth/login",
+                                "/auth/verify-2fa",
+                                "/api/users",
+                                "/auth/forgot-password",
+                                "/auth/reset-password")
+                        .permitAll()
+                        .requestMatchers("/actuator/**").hasRole("ADMIN")
+                        .anyRequest().authenticated())
+                // CABEÇALHOS DE SEGURANÇA (SECURITY HEADERS)
+                .headers(headers -> headers
+                        .frameOptions(frame -> frame.sameOrigin())
+                        .httpStrictTransportSecurity(hsts -> hsts
+                                .includeSubDomains(true)
+                                .maxAgeInSeconds(31536000)))
+                .addFilterBefore(rateLimitFilter, UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class);
+
         return http.build();
     }
 }

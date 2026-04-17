@@ -4,10 +4,10 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.ReportingPolicy;
 
-import com.repositorio.mvp.domain.asset.DTO.AssetRequest;
-import com.repositorio.mvp.domain.asset.DTO.AssetResponse;
-import com.repositorio.mvp.domain.asset.DTO.CategoryRequest;
-import com.repositorio.mvp.domain.asset.DTO.CategoryResponse;
+import com.repositorio.mvp.domain.asset.DTO.AssetRequestDTO;
+import com.repositorio.mvp.domain.asset.DTO.AssetResponseDTO;
+import com.repositorio.mvp.domain.asset.DTO.CategoryRequestDTO;
+import com.repositorio.mvp.domain.asset.DTO.CategoryResponseDTO;
 import com.repositorio.mvp.domain.asset.model.Asset;
 import com.repositorio.mvp.domain.asset.model.AssetCategory;
 
@@ -16,14 +16,14 @@ public interface AssetMapper {
 
     @Mapping(target = "evaluations", ignore = true)
     @Mapping(target = "category", ignore = true)
-    Asset toEntity(AssetRequest request);
+    Asset toEntity(AssetRequestDTO request);
 
-    AssetResponse toResponse(Asset asset);
+    AssetResponseDTO toResponse(Asset asset);
 
     @Mapping(target = "portfolio", ignore = true)
     @Mapping(target = "questions", ignore = true)
     @Mapping(target = "assets", ignore = true)
-    AssetCategory toEntity(CategoryRequest request);
+    AssetCategory toEntity(CategoryRequestDTO request);
 
-    CategoryResponse toResponse(AssetCategory category);
+    CategoryResponseDTO toResponse(AssetCategory category);
 }

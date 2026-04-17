@@ -38,7 +38,6 @@ public class SecurityIntegrationTest {
     @Test
     @DisplayName("MED-03: Deve retornar 400 (Bad Request) em vez de 409 para IllegalArgumentException")
     void shouldReturn400ForIllegalArgumentException() throws Exception {
-        // Simulando um reset de senha com token inválido que dispara IllegalArgumentException
         String json = """
                 {
                     "token": "token-nao-existente",

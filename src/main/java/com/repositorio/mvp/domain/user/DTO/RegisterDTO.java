@@ -2,9 +2,9 @@ package com.repositorio.mvp.domain.user.DTO;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
-import com.repositorio.mvp.common.validation.ValidEmail;
-import com.repositorio.mvp.common.validation.ValidName;
-import com.repositorio.mvp.common.validation.ValidPassword;
+import com.repositorio.mvp.common.validation.user.ValidEmail;
+import com.repositorio.mvp.common.validation.user.ValidName;
+import com.repositorio.mvp.common.validation.user.ValidPassword;
 
 public record RegisterDTO(
     @Schema(description = "Nome do usuário", example = "User Name")

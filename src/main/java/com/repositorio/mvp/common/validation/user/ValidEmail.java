@@ -1,4 +1,4 @@
-package com.repositorio.mvp.common.validation;
+package com.repositorio.mvp.common.validation.user;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;

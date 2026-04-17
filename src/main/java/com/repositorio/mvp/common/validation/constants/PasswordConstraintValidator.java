@@ -1,6 +1,6 @@
 package com.repositorio.mvp.common.validation.constants;
 
-import com.repositorio.mvp.common.validation.ValidPassword;
+import com.repositorio.mvp.common.validation.user.ValidPassword;
 
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;

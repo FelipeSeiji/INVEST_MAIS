@@ -26,7 +26,7 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequestMapping("/api/assets")
 @RequiredArgsConstructor
-@Tag(name = "Assets", description = "Endpoints segregados (SRP) para gerenciamento de ativos da carteira")
+@Tag(name = "Assets", description = "Endpoints segregadospara ge renciamento de ativos da carteira")
 public class AssetController {
 
     private final AssetService assetService;

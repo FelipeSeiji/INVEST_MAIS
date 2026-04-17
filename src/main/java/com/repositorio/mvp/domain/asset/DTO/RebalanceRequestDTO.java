@@ -3,18 +3,17 @@ package com.repositorio.mvp.domain.asset.DTO;
 import java.math.BigDecimal;
 import java.util.List;
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.PositiveOrZero;
+import com.repositorio.mvp.common.validation.asset.ValidFinanceAmount;
 
 @Schema(description = "Objeto de requisição para solicitar um cálculo/simulação de rebalanceamento da carteira de investimentos")
 public record RebalanceRequestDTO(
-    @PositiveOrZero(message = "O valor do aporte não pode ser negativo")
+        @ValidFinanceAmount
     @Schema(description = "Montante em dinheiro (novo aporte ou resgate se negativo) a ser alocado na carteira", example = "5000.00")
     BigDecimal aporteAmount,
-    
-    @PositiveOrZero(message = "O valor total da carteira não pode ser negativo")
+
+        @ValidFinanceAmount
     @Schema(description = "Valor financeiro total atualizado consolidado do portfólio (se enviado pelo front, do contrário calculado no back)", example = "100000.00")
     BigDecimal totalCurrentPortfolio,
-    
-    @Schema(description = "Lista customizada de categorias e metas caso o usuário esteja simulando um cenário divergente da base de dados")
-    List<CategoryRequestDTO> categories
-) {}
+
+        @Schema(description = "Lista customizada de categorias e metas caso o usuário esteja simulando um cenário divergente da base de dados") List<CategoryRequestDTO> categories) {
+}

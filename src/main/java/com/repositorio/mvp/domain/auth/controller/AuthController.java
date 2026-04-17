@@ -14,6 +14,7 @@ import com.repositorio.mvp.infrastructure.security.util.ClientIp;
 import com.repositorio.mvp.common.DTO.MessageResponseDTO;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.NonNull;
@@ -34,6 +35,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/auth")
 @RequiredArgsConstructor
+@Tag(name = "Authentication", description = "Endpoints públicos para login, 2FA e recuperação de senhas")
 public class AuthController {
 
     private final LoginAttemptService loginAttemptService;

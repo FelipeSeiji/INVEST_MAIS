@@ -27,7 +27,7 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequestMapping("/api/assets/categories")
 @RequiredArgsConstructor
-@Tag(name = "Asset Categories", description = "Endpoints segregados (SRP) para gerenciamento de categorias da carteira")
+@Tag(name = "Asset Categories", description = "Endpoints segregados para gerenciamento de categorias da carteira")
 public class AssetCategoryController {
     private final AssetCategoryCommandService commandService;
     private final AssetCategoryQueryService queryService;

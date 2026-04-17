@@ -4,9 +4,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
-import com.repositorio.mvp.common.validation.ValidEmail;
-import com.repositorio.mvp.common.validation.ValidName;
-import com.repositorio.mvp.common.validation.ValidPassword;
+import com.repositorio.mvp.common.validation.user.ValidEmail;
+import com.repositorio.mvp.common.validation.user.ValidName;
+import com.repositorio.mvp.common.validation.user.ValidPassword;
 
 public record UserRequestDTO(
     @Schema(description = "Nome do usuário", example = "User Name")

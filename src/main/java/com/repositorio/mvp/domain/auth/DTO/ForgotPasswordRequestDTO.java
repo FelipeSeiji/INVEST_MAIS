@@ -1,6 +1,6 @@
 package com.repositorio.mvp.domain.auth.DTO;
 
-import com.repositorio.mvp.common.validation.ValidEmail;
+import com.repositorio.mvp.common.validation.user.ValidEmail;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 

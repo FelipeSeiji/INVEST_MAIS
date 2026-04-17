@@ -1,6 +1,6 @@
 package com.repositorio.mvp.common.validation.constants;
 
-import com.repositorio.mvp.common.validation.ValidEmail;
+import com.repositorio.mvp.common.validation.user.ValidEmail;
 
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;

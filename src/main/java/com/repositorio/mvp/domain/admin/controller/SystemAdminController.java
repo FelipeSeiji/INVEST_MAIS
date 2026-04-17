@@ -12,6 +12,7 @@ import com.repositorio.mvp.common.constants.MessageConstants;
 import com.repositorio.mvp.domain.auth.service.token.TokenBlackListService;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 
 /**
@@ -21,6 +22,7 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequestMapping("/api/admin")
 @RequiredArgsConstructor
+@Tag(name = "Admin", description = "Endpoints de operações administrativas e infraestrutura")
 public class SystemAdminController {
     private final TokenBlackListService tokenBlackListService;
 

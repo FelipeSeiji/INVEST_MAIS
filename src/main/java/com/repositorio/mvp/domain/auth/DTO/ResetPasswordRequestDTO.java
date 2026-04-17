@@ -1,19 +1,16 @@
 package com.repositorio.mvp.domain.auth.DTO;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Pattern;
-import jakarta.validation.constraints.Size;
+import com.repositorio.mvp.common.validation.user.ValidPassword;
+import com.repositorio.mvp.common.validation.auth.ValidToken;
 
 public record ResetPasswordRequestDTO (
 
     @Schema(description = "Token de recuperação", example = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...")
-    @NotBlank(message = "O token de recuperação é obrigatório.")
+    @ValidToken
     String token,
 
     @Schema(description = "Senha do usuário", example = "Password@123")
-    @NotBlank(message = "A senha é obrigatória")
-    @Size(min = 8, max = 50, message = "A senha deve ter no mínimo 8 e no máximo 50 caracteres")
-    @Pattern(regexp = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=!_\\-]).*$", message = "A senha deve conter pelo menos uma letra maiúscula, uma minúscula, um número e um caractere especial")
+    @ValidPassword
     String newPassword
 ){}

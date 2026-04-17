@@ -25,6 +25,7 @@ import com.repositorio.mvp.domain.user.service.interfaces.UserQueryService;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -37,6 +38,7 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequestMapping("/api/users")
 @RequiredArgsConstructor
+@Tag(name = "Users", description = "Endpoints para cadastro e gerenciamento de perfis de usuário")
 public class UserController {
     private final UserCommandService userCommandService;
     private final UserQueryService userQueryService;

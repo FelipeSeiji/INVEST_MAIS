@@ -1,4 +1,4 @@
-package com.repositorio.mvp.domain.asset.service.impl;
+package com.repositorio.mvp.domain.asset.service;
 
 import java.util.UUID;
 
@@ -11,11 +11,12 @@ import com.repositorio.mvp.domain.asset.DTO.CategoryResponseDTO;
 import com.repositorio.mvp.domain.asset.mapper.AssetMapper;
 import com.repositorio.mvp.domain.asset.model.AssetCategory;
 import com.repositorio.mvp.domain.asset.repository.AssetCategoryRepository;
-import com.repositorio.mvp.domain.asset.service.AssetCategoryCommandService;
+import com.repositorio.mvp.domain.asset.service.interfaces.AssetCategoryCommandService;
 import com.repositorio.mvp.domain.portfolio.model.Portfolio;
 import com.repositorio.mvp.infrastructure.security.UserContextService;
 
 import jakarta.persistence.EntityNotFoundException;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -28,7 +29,7 @@ public class AssetCategoryCommandServiceImpl implements AssetCategoryCommandServ
 
     @Override
     @Transactional
-    public CategoryResponseDTO createCategory(CategoryRequestDTO request) {
+    public CategoryResponseDTO createCategory(@NonNull CategoryRequestDTO request) {
         Portfolio portfolio = userContextService.getCurrentUserPortfolio();
         portfolio.validateAndAddCategoryTarget(request.targetPercentage(), null);
 
@@ -40,7 +41,7 @@ public class AssetCategoryCommandServiceImpl implements AssetCategoryCommandServ
 
     @Override
     @Transactional
-    public CategoryResponseDTO updateCategory(UUID id, CategoryRequestDTO request) {
+    public CategoryResponseDTO updateCategory(@NonNull UUID id, @NonNull CategoryRequestDTO request) {
         Portfolio portfolio = userContextService.getCurrentUserPortfolio();
         AssetCategory category = categoryRepository.findByIdAndPortfolioId(id, portfolio.getId())
             .orElseThrow(() -> new EntityNotFoundException(MessageConstants.Asset.CATEGORY_NOT_FOUND));
@@ -54,7 +55,7 @@ public class AssetCategoryCommandServiceImpl implements AssetCategoryCommandServ
 
     @Override
     @Transactional
-    public void deleteCategory(UUID id) {
+    public void deleteCategory(@NonNull UUID id) {
         Portfolio portfolio = userContextService.getCurrentUserPortfolio();
         AssetCategory category = categoryRepository.findByIdAndPortfolioId(id, portfolio.getId())
             .orElseThrow(() -> new EntityNotFoundException(MessageConstants.Asset.CATEGORY_NOT_FOUND));

@@ -1,6 +1,5 @@
-package com.repositorio.mvp.domain.asset.service.impl;
+package com.repositorio.mvp.domain.asset.service;
 
-import java.util.List;
 import java.util.UUID;
 
 import org.springframework.stereotype.Service;
@@ -14,16 +13,17 @@ import com.repositorio.mvp.domain.asset.model.Asset;
 import com.repositorio.mvp.domain.asset.model.AssetCategory;
 import com.repositorio.mvp.domain.asset.repository.AssetCategoryRepository;
 import com.repositorio.mvp.domain.asset.repository.AssetRepository;
-import com.repositorio.mvp.domain.asset.service.AssetService;
+import com.repositorio.mvp.domain.asset.service.interfaces.AssetCommandService;
 import com.repositorio.mvp.domain.portfolio.model.Portfolio;
 import com.repositorio.mvp.infrastructure.security.UserContextService;
 
 import jakarta.persistence.EntityNotFoundException;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
-public class AssetServiceImpl implements AssetService {
+public class AssetCommandServiceImpl implements AssetCommandService {
 
     private final AssetRepository assetRepository;
     private final AssetCategoryRepository categoryRepository;
@@ -32,7 +32,7 @@ public class AssetServiceImpl implements AssetService {
 
     @Override
     @Transactional
-    public AssetResponseDTO createAsset(UUID categoryId, AssetRequestDTO request) {
+    public AssetResponseDTO createAsset(@NonNull UUID categoryId, @NonNull AssetRequestDTO request) {
         AssetCategory category = getCategoryForCurrentUser(categoryId);
         
         Asset asset = assetMapper.toEntity(request);
@@ -45,21 +45,12 @@ public class AssetServiceImpl implements AssetService {
     }
 
     @Override
-    @Transactional(readOnly = true)
-    public List<AssetResponseDTO> listAssetsByCategory(UUID categoryId) {
-        getCategoryForCurrentUser(categoryId);
-        return assetRepository.findAllByCategoryId(categoryId).stream()
-            .map(assetMapper::toResponse)
-            .toList();
-    }
-
-    @Override
     @Transactional
-    public AssetResponseDTO updateAsset(UUID id, AssetRequestDTO request) {
+    public AssetResponseDTO updateAsset(@NonNull UUID id, @NonNull AssetRequestDTO request) {
         Asset asset = assetRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException(MessageConstants.Asset.NOT_FOUND));
         
-        getCategoryForCurrentUser(asset.getCategory().getId()); // Valida posse
+        getCategoryForCurrentUser(asset.getCategory().getId());
 
         asset.setTicker(request.ticker());
         asset.setCurrentPositionValue(request.currentPositionValue());
@@ -71,11 +62,11 @@ public class AssetServiceImpl implements AssetService {
 
     @Override
     @Transactional
-    public void deleteAsset(UUID id) {
+    public void deleteAsset(@NonNull UUID id) {
         Asset asset = assetRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException(MessageConstants.Asset.NOT_FOUND));
         
-        getCategoryForCurrentUser(asset.getCategory().getId()); // Valida posse
+        getCategoryForCurrentUser(asset.getCategory().getId());
         
         assetRepository.delete(asset);
     }

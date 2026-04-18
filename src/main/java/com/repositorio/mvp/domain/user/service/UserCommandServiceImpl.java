@@ -10,7 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.apache.commons.codec.digest.DigestUtils;
 
 import com.repositorio.mvp.common.constants.MessageConstants;
-import com.repositorio.mvp.domain.portfolio.service.PortfolioService;
+import com.repositorio.mvp.domain.portfolio.service.interfaces.PortfolioCommandService;
 import com.repositorio.mvp.domain.user.DTO.UserRequestDTO;
 import com.repositorio.mvp.domain.user.DTO.UserResponseDTO;
 import com.repositorio.mvp.domain.user.DTO.UserUpdateRequestDTO;
@@ -35,7 +35,7 @@ public class UserCommandServiceImpl implements UserCommandService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final UserMapper userMapper;
-    private final PortfolioService portfolioService;
+    private final PortfolioCommandService portfolioCommandService;
     private final List<UserRegisterValidator> registerValidators;
     private final List<UserUpdateValidator> updateValidators;
 
@@ -62,7 +62,7 @@ public class UserCommandServiceImpl implements UserCommandService {
         userRepository.save(user);
 
         // Inicializa a carteira vazia para o novo usuário
-        portfolioService.createPortfolioForUser(user.getId());
+        portfolioCommandService.createPortfolioForUser(user.getId());
 
         return userMapper.toUserResponseDTO(user);
     }

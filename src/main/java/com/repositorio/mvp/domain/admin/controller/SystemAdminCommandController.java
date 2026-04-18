@@ -15,22 +15,13 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 
-/**
- * Controlador de operações administrativas do sistema.
- * Agrupa funções de suporte de infraestrutura e limpeza de dados.
- */
 @RestController
 @RequestMapping("/api/admin")
 @RequiredArgsConstructor
-@Tag(name = "Admin", description = "Endpoints de operações administrativas e infraestrutura")
-public class SystemAdminController {
+@Tag(name = "Admin Commands", description = "Endpoints de operações administrativas e infraestrutura")
+public class SystemAdminCommandController {
     private final TokenBlackListService tokenBlackListService;
 
-    /**
-     * Rota de gatilho manual para forçar a limpeza imediata da tabela de tokens revogados.
-     * Embora exista um cron job automático para isso, esta rota auxilia a manutenção por parte da equipe DevOps.
-     * @return Mensagem de confirmação de execução da rotina.
-     */
     @DeleteMapping("/tokens/expired")
     @ResponseStatus(HttpStatus.OK)
     @PreAuthorize("hasRole('ADMIN')") 

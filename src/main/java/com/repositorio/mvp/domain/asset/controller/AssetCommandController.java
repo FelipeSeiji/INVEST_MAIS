@@ -1,11 +1,9 @@
 package com.repositorio.mvp.domain.asset.controller;
 
-import java.util.List;
 import java.util.UUID;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -16,9 +14,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.repositorio.mvp.domain.asset.DTO.AssetRequestDTO;
 import com.repositorio.mvp.domain.asset.DTO.AssetResponseDTO;
-import com.repositorio.mvp.domain.asset.service.AssetService;
+import com.repositorio.mvp.domain.asset.service.interfaces.AssetCommandService;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -26,34 +25,31 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequestMapping("/api/assets")
 @RequiredArgsConstructor
-@Tag(name = "Assets", description = "Endpoints segregadospara ge renciamento de ativos da carteira")
-public class AssetController {
+@Tag(name = "Asset Commands", description = "Operações de escrita para ativos da carteira")
+public class AssetCommandController {
 
-    private final AssetService assetService;
+    private final AssetCommandService assetCommandService;
 
     @PostMapping("/categories/{categoryId}/assets")
     @ResponseStatus(HttpStatus.CREATED)
     @Operation(summary = "Adiciona um novo ativo em uma categoria")
+    @ApiResponse(responseCode = "201", description = "Ativo criado com sucesso")
     public AssetResponseDTO createAsset(@PathVariable UUID categoryId, @Valid @RequestBody AssetRequestDTO request) {
-        return assetService.createAsset(categoryId, request);
-    }
-
-    @GetMapping("/categories/{categoryId}/assets")
-    @Operation(summary = "Lista ativos de uma categoria específica")
-    public List<AssetResponseDTO> listAssetsByCategory(@PathVariable UUID categoryId) {
-        return assetService.listAssetsByCategory(categoryId);
+        return assetCommandService.createAsset(categoryId, request);
     }
 
     @PutMapping("/{id}")
     @Operation(summary = "Atualiza dados de um ativo (Ticker/Valor)")
+    @ApiResponse(responseCode = "200", description = "Ativo atualizado com sucesso")
     public AssetResponseDTO updateAsset(@PathVariable UUID id, @Valid @RequestBody AssetRequestDTO request) {
-        return assetService.updateAsset(id, request);
+        return assetCommandService.updateAsset(id, request);
     }
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Operation(summary = "Remove um ativo")
+    @ApiResponse(responseCode = "204", description = "Ativo deletado com sucesso")
     public void deleteAsset(@PathVariable UUID id) {
-        assetService.deleteAsset(id);
+        assetCommandService.deleteAsset(id);
     }
 }

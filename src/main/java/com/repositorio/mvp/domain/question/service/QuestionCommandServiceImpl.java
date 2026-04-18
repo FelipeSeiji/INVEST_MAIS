@@ -1,4 +1,4 @@
-package com.repositorio.mvp.domain.question.service.impl;
+package com.repositorio.mvp.domain.question.service;
 
 import java.util.List;
 import java.util.UUID;
@@ -22,15 +22,16 @@ import com.repositorio.mvp.domain.question.DTO.QuestionResponseDTO;
 import com.repositorio.mvp.domain.question.mapper.QuestionMapper;
 import com.repositorio.mvp.domain.question.model.Question;
 import com.repositorio.mvp.domain.question.repository.QuestionRepository;
-import com.repositorio.mvp.domain.question.service.QuestionService;
+import com.repositorio.mvp.domain.question.service.interfaces.QuestionCommandService;
 import com.repositorio.mvp.infrastructure.security.UserDetailsImpl;
 
 import jakarta.persistence.EntityNotFoundException;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
-public class QuestionServiceImpl implements QuestionService {
+public class QuestionCommandServiceImpl implements QuestionCommandService {
 
     private final QuestionRepository questionRepository;
     private final AssetCategoryRepository categoryRepository;
@@ -41,7 +42,7 @@ public class QuestionServiceImpl implements QuestionService {
 
     @Override
     @Transactional
-    public QuestionResponseDTO createQuestion(UUID categoryId, QuestionRequestDTO request) {
+    public QuestionResponseDTO createQuestion(@NonNull UUID categoryId, @NonNull QuestionRequestDTO request) {
         AssetCategory category = getCategoryForCurrentUser(categoryId);
         
         Question question = questionMapper.toEntity(request);
@@ -51,17 +52,8 @@ public class QuestionServiceImpl implements QuestionService {
     }
 
     @Override
-    @Transactional(readOnly = true)
-    public List<QuestionResponseDTO> listByCategoryId(UUID categoryId) {
-        getCategoryForCurrentUser(categoryId); 
-        return questionRepository.findAllByAssetCategoryId(categoryId).stream()
-                .map(questionMapper::toResponse)
-                .toList();
-    }
-
-    @Override
     @Transactional
-    public QuestionResponseDTO updateQuestion(UUID id, QuestionRequestDTO request) {
+    public QuestionResponseDTO updateQuestion(@NonNull UUID id, @NonNull QuestionRequestDTO request) {
         Question question = questionRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException(MessageConstants.Question.NOT_FOUND));
         
@@ -73,7 +65,7 @@ public class QuestionServiceImpl implements QuestionService {
 
     @Override
     @Transactional
-    public void deleteQuestion(UUID id) {
+    public void deleteQuestion(@NonNull UUID id) {
         Question question = questionRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException(MessageConstants.Question.NOT_FOUND));
         
@@ -83,7 +75,7 @@ public class QuestionServiceImpl implements QuestionService {
 
     @Override
     @Transactional
-    public void saveEvaluations(UUID assetId, List<EvaluationRequestDTO> evaluations) {
+    public void saveEvaluations(@NonNull UUID assetId, @NonNull List<EvaluationRequestDTO> evaluations) {
         Asset asset = assetRepository.findById(assetId)
                 .orElseThrow(() -> new EntityNotFoundException(MessageConstants.Asset.NOT_FOUND));
         

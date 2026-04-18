@@ -3,6 +3,7 @@ package com.repositorio.mvp.domain.user.validation;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.springframework.stereotype.Component;
 
+import com.repositorio.mvp.common.constants.MessageConstants;
 import com.repositorio.mvp.domain.user.DTO.UserUpdateRequestDTO;
 import com.repositorio.mvp.domain.user.model.User;
 import com.repositorio.mvp.domain.user.repository.UserRepository;
@@ -20,7 +21,6 @@ public class UserUpdateValidatorImpl implements UserUpdateValidator {
 
     @Override
     public void validate(@NonNull UserUpdateRequestDTO request, @NonNull User user) {
-        // Se o usuário estiver enviando o próprio e-mail atual, não faz nada
         if (request.email().equalsIgnoreCase(user.getEmail())) {
             return;
         }
@@ -28,7 +28,7 @@ public class UserUpdateValidatorImpl implements UserUpdateValidator {
         String hash = DigestUtils.sha256Hex(request.email().toLowerCase());
         
         if (userRepository.existsBySecurityEmailHash(hash)) {
-            throw new IllegalArgumentException("Email já está em uso por outro usuário.");
+            throw new IllegalArgumentException(MessageConstants.User.EMAIL_ALREADY_IN_USE_BY_OTHER);
         }
     }
 }

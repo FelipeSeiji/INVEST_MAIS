@@ -33,12 +33,11 @@ public class PortfolioCommandServiceImpl implements PortfolioCommandService {
     public void createPortfolioForUser(@NonNull UUID userId) {
         if (portfolioRepository.findByUserId(userId).isEmpty()) {
             User user = userRepository.findById(userId)
-                    .orElseThrow(() -> new EntityNotFoundException(
-                            MessageConstants.User.NOT_FOUND_WITH_ID + userId));
+                .orElseThrow(() -> new EntityNotFoundException(MessageConstants.User.NOT_FOUND_WITH_ID + userId));
 
             Portfolio portfolio = Portfolio.builder()
-                    .user(user)
-                    .build();
+                .user(user)
+                .build();
             Portfolio savedPortfolio = portfolioRepository.save(portfolio);
 
             createDefaultCategories(savedPortfolio);
@@ -47,18 +46,36 @@ public class PortfolioCommandServiceImpl implements PortfolioCommandService {
 
     private void createDefaultCategories(Portfolio portfolio) {
         List<AssetCategory> defaults = List.of(
-                AssetCategory.builder().name("AÇÃO NACIONAL").targetPercentage(new BigDecimal("25"))
-                        .portfolio(portfolio).build(),
-                AssetCategory.builder().name("FUNDOS IMOBILIÁRIOS NACIONAL")
-                        .targetPercentage(new BigDecimal("15")).portfolio(portfolio).build(),
-                AssetCategory.builder().name("AÇÃO INTERNACIONAL").targetPercentage(new BigDecimal("20"))
-                        .portfolio(portfolio).build(),
-                AssetCategory.builder().name("RENDA FIXA NACIONAL").targetPercentage(new BigDecimal("25"))
-                        .portfolio(portfolio).build(),
-                AssetCategory.builder().name("CRIPTOMOEDA").targetPercentage(new BigDecimal("10"))
-                        .portfolio(portfolio).build(),
-                AssetCategory.builder().name("RENDA FIXA INTERNACIONAL")
-                        .targetPercentage(new BigDecimal("5")).portfolio(portfolio).build());
+            AssetCategory.builder()
+                .name("AÇÃO NACIONAL")
+                .targetPercentage(new BigDecimal("25"))
+                .portfolio(portfolio)
+                .build(),
+            AssetCategory.builder()
+                .name("FUNDOS IMOBILIÁRIOS NACIONAL")
+                .targetPercentage(new BigDecimal("15"))
+                .portfolio(portfolio)
+                .build(),
+            AssetCategory.builder()
+                .name("AÇÃO INTERNACIONAL")
+                .targetPercentage(new BigDecimal("20"))
+                .portfolio(portfolio)
+                .build(),
+            AssetCategory.builder()
+                .name("RENDA FIXA NACIONAL")
+                .targetPercentage(new BigDecimal("25"))
+                .portfolio(portfolio)
+                .build(),
+            AssetCategory.builder()
+                .name("CRIPTOMOEDA")
+                .targetPercentage(new BigDecimal("10"))
+                .portfolio(portfolio)
+                .build(),
+            AssetCategory.builder()
+                .name("RENDA FIXA INTERNACIONAL")
+                .targetPercentage(new BigDecimal("5"))
+                .portfolio(portfolio)
+                .build());
         categoryRepository.saveAll(defaults);
     }
 }

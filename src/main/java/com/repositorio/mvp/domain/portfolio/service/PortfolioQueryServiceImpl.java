@@ -24,7 +24,6 @@ import lombok.RequiredArgsConstructor;
 @Service
 @RequiredArgsConstructor
 public class PortfolioQueryServiceImpl implements PortfolioQueryService {
-
     private final UserContextService userContextService;
     private final AssetScoreCalculator assetScoreCalculator;
     private final RebalanceEngine rebalanceEngine;
@@ -34,7 +33,8 @@ public class PortfolioQueryServiceImpl implements PortfolioQueryService {
     public RebalanceResponseDTO calculateRebalance(@NonNull BigDecimal aporteAmount) {
         Portfolio portfolio = userContextService.getCurrentUserPortfolioWithCategoriesAndAssets();
 
-        return rebalanceEngine.calculate(portfolio, aporteAmount);
+        return rebalanceEngine.calculate(portfolio, 
+            aporteAmount);
     }
 
     @Override
@@ -45,27 +45,34 @@ public class PortfolioQueryServiceImpl implements PortfolioQueryService {
         BigDecimal totalValue = calculateTotalValue(portfolio);
         
         List<AssetCategory> activeCategories = portfolio.getCategories().stream()
-                .filter(c -> c.getAssets().stream().anyMatch(a -> assetScoreCalculator.calculateScore(a) > 0))
-                .toList();
+            .filter(c -> c.getAssets()
+            .stream()
+            .anyMatch(a -> assetScoreCalculator.calculateScore(a) > 0))
+            .toList();
 
         BigDecimal sumActiveOriginalTargets = activeCategories.stream()
-                .map(AssetCategory::getTargetPercentage)
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
+            .map(AssetCategory::getTargetPercentage)
+            .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-        int totalAssets = (int) portfolio.getCategories().stream()
-                .flatMap(c -> c.getAssets().stream())
+        int totalAssets = (int) portfolio.getCategories()
+            .stream()
+            .flatMap(c -> c.getAssets().stream())
                 .count();
 
         List<DashboardResponseDTO.CategorySummaryDTO> summaries = new ArrayList<>();
 
         for (AssetCategory category : portfolio.getCategories()) {
-            BigDecimal currentCategoryValue = category.getAssets().stream()
-                    .map(Asset::getCurrentPositionValue)
-                    .reduce(BigDecimal.ZERO, BigDecimal::add);
+            BigDecimal currentCategoryValue = category.getAssets()
+                .stream()
+                .map(Asset::getCurrentPositionValue)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-            BigDecimal currentPercentage = totalValue.compareTo(BigDecimal.ZERO) > 0
-                    ? currentCategoryValue.multiply(new BigDecimal("100")).divide(totalValue, 2, RoundingMode.HALF_UP)
-                    : BigDecimal.ZERO;
+            BigDecimal currentPercentage = totalValue.compareTo(BigDecimal.ZERO) > 0 
+                ? currentCategoryValue.multiply(new BigDecimal("100"))
+                    .divide(totalValue, 
+                        2, 
+                        RoundingMode.HALF_UP
+                ): BigDecimal.ZERO;
 
             BigDecimal redistributedTarget = BigDecimal.ZERO;
             if (activeCategories.contains(category) && sumActiveOriginalTargets.compareTo(BigDecimal.ZERO) > 0) {
@@ -80,7 +87,8 @@ public class PortfolioQueryServiceImpl implements PortfolioQueryService {
                     currentPercentage,
                     redistributedTarget,
                     currentCategoryValue,
-                    category.getAssets().size()
+                    category.getAssets()
+                        .size()
             ));
         }
 
@@ -89,8 +97,8 @@ public class PortfolioQueryServiceImpl implements PortfolioQueryService {
 
     private BigDecimal calculateTotalValue(Portfolio portfolio) {
         return portfolio.getCategories().stream()
-                .flatMap(c -> c.getAssets().stream())
-                .map(Asset::getCurrentPositionValue)
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
+            .flatMap(c -> c.getAssets().stream())
+            .map(Asset::getCurrentPositionValue)
+            .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 }

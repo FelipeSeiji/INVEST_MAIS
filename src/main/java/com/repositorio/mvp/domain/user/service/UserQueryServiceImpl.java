@@ -8,6 +8,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.repositorio.mvp.common.constants.MessageConstants;
 import com.repositorio.mvp.domain.user.DTO.UserResponseDTO;
 import com.repositorio.mvp.domain.user.mapper.UserMapper;
 import com.repositorio.mvp.domain.user.repository.UserRepository;
@@ -35,7 +36,7 @@ public class UserQueryServiceImpl implements UserQueryService {
     public UserResponseDTO findUserById(@NonNull UUID id) {
         return userRepository.findById(id)
             .map(userMapper::toUserResponseDTO)
-            .orElseThrow(() -> new EntityNotFoundException("Usuário não encontrado"));
+            .orElseThrow(() -> new EntityNotFoundException(MessageConstants.User.NOT_FOUND));
     }
 
     /**

@@ -40,6 +40,6 @@ public class AssetQueryServiceImpl implements AssetQueryService {
     private void getCategoryForCurrentUser(UUID categoryId) {
         Portfolio portfolio = userContextService.getCurrentUserPortfolio();
         categoryRepository.findByIdAndPortfolioId(categoryId, portfolio.getId())
-                .orElseThrow(() -> new EntityNotFoundException(MessageConstants.Asset.CATEGORY_NOT_FOUND));
+            .orElseThrow(() -> new EntityNotFoundException(MessageConstants.Asset.CATEGORY_NOT_FOUND));
     }
 }

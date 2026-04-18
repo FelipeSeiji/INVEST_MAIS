@@ -26,8 +26,9 @@ public class AssetCategoryQueryServiceImpl implements AssetCategoryQueryService 
     @Transactional(readOnly = true)
     public List<CategoryResponseDTO> listUserCategories() {
         Portfolio portfolio = userContextService.getCurrentUserPortfolio();
-        return categoryRepository.findAllByPortfolioId(portfolio.getId()).stream()
-                .map(assetMapper::toResponse)
-                .toList();
+        return categoryRepository.findAllByPortfolioId(portfolio.getId())
+            .stream()
+            .map(assetMapper::toResponse)
+            .toList();
     }
 }

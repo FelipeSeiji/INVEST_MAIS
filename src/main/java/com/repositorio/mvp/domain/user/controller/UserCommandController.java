@@ -2,7 +2,7 @@ package com.repositorio.mvp.domain.user.controller;
 
 import java.util.UUID;
 
-import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -10,9 +10,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.repositorio.mvp.common.result.ResultMapper;
 import com.repositorio.mvp.domain.user.DTO.UserRequestDTO;
 import com.repositorio.mvp.domain.user.DTO.UserResponseDTO;
 import com.repositorio.mvp.domain.user.DTO.UserUpdateRequestDTO;
@@ -33,28 +33,26 @@ public class UserCommandController {
     private final UserCommandService userCommandService;
 
     @PostMapping
-    @ResponseStatus(HttpStatus.CREATED)
-    @Operation(summary = "Cria um novo usuario", description = "Cria um novo usuario e insere no banco de dados")
-    @ApiResponse(responseCode = "201", description = "Usuario criado com sucesso")
-    public UserResponseDTO createUser(@Valid @RequestBody @NonNull UserRequestDTO userRequestDTO) {
-        return userCommandService.createUser(userRequestDTO);
+    @Operation(summary = "Cria um novo usuário e inicializa sua carteira")
+    @ApiResponse(responseCode = "201", description = "Usuário criado com sucesso")
+    public ResponseEntity<UserResponseDTO> createUser(@Valid @RequestBody @NonNull UserRequestDTO userRequestDTO) {
+        return ResultMapper.created(userCommandService.createUser(userRequestDTO));
     }
 
     @DeleteMapping("/{id}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
     @PreAuthorize("hasRole('ADMIN')")
-    @Operation(summary = "Deleta um usuario", description = "Deleta um usuario do banco de dados pelo id")
-    @ApiResponse(responseCode = "204", description = "Usuario deletado com sucesso")
-    public void deleteUser(@PathVariable @NonNull UUID id) {
-        userCommandService.deleteUserById(id);
+    @Operation(summary = "Exclui permanentemente um usuário pelo ID")
+    @ApiResponse(responseCode = "204", description = "Usuário excluído com sucesso")
+    public ResponseEntity<Void> deleteUser(@PathVariable @NonNull UUID id) {
+        return ResultMapper.noContent(userCommandService.deleteUserById(id));
     }
 
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN') or #id.toString() == authentication.principal.user.id.toString()")
-    @ResponseStatus(HttpStatus.OK)
-    @Operation(summary = "Atualiza um usuario", description = "Atualiza um usuario do banco de dados pelo id")
-    public UserResponseDTO updateUser(@PathVariable @NonNull UUID id,
+    @Operation(summary = "Atualiza o perfil de um usuário (Nome/E-mail)")
+    @ApiResponse(responseCode = "200", description = "Perfil atualizado com sucesso")
+    public ResponseEntity<UserResponseDTO> updateUser(@PathVariable @NonNull UUID id,
             @Valid @RequestBody @NonNull UserUpdateRequestDTO userUpdateRequestDTO) {
-        return userCommandService.updateUserById(id, userUpdateRequestDTO);
+        return ResultMapper.ok(userCommandService.updateUserById(id, userUpdateRequestDTO));
     }
 }

@@ -30,6 +30,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import com.repositorio.mvp.common.constants.LogMessageConstants;
+import com.repositorio.mvp.common.result.ServiceResult;
 
 @Slf4j
 @Service
@@ -53,23 +54,27 @@ public class UserCommandServiceImpl implements UserCommandService {
      */
     @Override
     @Transactional
-    public UserResponseDTO createUser(@NonNull UserRequestDTO userRequestDTO) {
-        registerValidators.forEach(v -> v.validate(userRequestDTO));
+    public ServiceResult<UserResponseDTO> createUser(@NonNull UserRequestDTO userRequestDTO) {
+        try {
+            registerValidators.forEach(v -> v.validate(userRequestDTO));
 
-        User user = userMapper.toUser(userRequestDTO);
-        UserSecurity security = UserSecurity.builder()
-            .password(passwordEncoder.encode(userRequestDTO.password()))
-            .emailHash(DigestUtils.sha256Hex(userRequestDTO.email().toLowerCase()))
-            .role(UserRole.USER)
-            .build();
-        user.setSecurity(security);
-        userRepository.save(user);
-        log.info(LogMessageConstants.AUDIT.USER_CREATED, user.getId(), user.getEmail());
+            User user = userMapper.toUser(userRequestDTO);
+            UserSecurity security = UserSecurity.builder()
+                .password(passwordEncoder.encode(userRequestDTO.password()))
+                .emailHash(DigestUtils.sha256Hex(userRequestDTO.email().toLowerCase()))
+                .role(UserRole.USER)
+                .build();
+            user.setSecurity(security);
+            userRepository.save(user);
+            log.info(LogMessageConstants.AUDIT.USER_CREATED, user.getId(), user.getEmail());
 
-        // Inicializa a carteira vazia para o novo usuário
-        portfolioCommandService.createPortfolioForUser(user.getId());
+            // Inicializa a carteira vazia para o novo usuário
+            portfolioCommandService.createPortfolioForUser(user.getId());
 
-        return userMapper.toUserResponseDTO(user);
+            return ServiceResult.success(userMapper.toUserResponseDTO(user));
+        } catch (Exception e) {
+            return ServiceResult.error(e.getMessage());
+        }
     }
 
     /**
@@ -80,12 +85,13 @@ public class UserCommandServiceImpl implements UserCommandService {
      */
     @Override
     @Transactional
-    public void deleteUserById(@NonNull UUID id) {
+    public ServiceResult<Void> deleteUserById(@NonNull UUID id) {
         if (!userRepository.existsById(id)) {
-            throw new EntityNotFoundException(MessageConstants.User.NOT_FOUND_WITH_ID + id);
+            return ServiceResult.notFound(MessageConstants.User.NOT_FOUND_WITH_ID + id);
         }
         userRepository.deleteById(id);
         log.info(LogMessageConstants.AUDIT.USER_DELETED, id);
+        return ServiceResult.success(null);
     }
 
     /**
@@ -100,25 +106,24 @@ public class UserCommandServiceImpl implements UserCommandService {
      */
     @Override
     @Transactional
-    public UserResponseDTO updateUserById(@NonNull UUID id, @NonNull UserUpdateRequestDTO userUpdateRequestDTO) {
-        User user = userRepository.findById(id)
-            .orElseThrow(() -> new EntityNotFoundException(
-                MessageConstants.User.NOT_FOUND_FOR_UPDATE
-            ));
-        
-        if (!passwordEncoder.matches(userUpdateRequestDTO.currentPassword(), user.getSecurity().getPassword())) {
-            throw new IllegalArgumentException(
-                MessageConstants.User.INVALID_PASSWORD
-            );
-        }
-        
-        updateValidators.forEach(v -> v.validate(userUpdateRequestDTO, user));
-        
-        user.updateProfile(userUpdateRequestDTO.name(), userUpdateRequestDTO.email());
-
-        User updatedUser = userRepository.save(user);
-        log.info(LogMessageConstants.AUDIT.USER_UPDATED, id);
-        return userMapper.toUserResponseDTO(updatedUser);
+    public ServiceResult<UserResponseDTO> updateUserById(@NonNull UUID id, @NonNull UserUpdateRequestDTO userUpdateRequestDTO) {
+        return userRepository.findById(id)
+            .map(user -> {
+                if (!passwordEncoder.matches(userUpdateRequestDTO.currentPassword(), user.getSecurity().getPassword())) {
+                    return ServiceResult.<UserResponseDTO>error(MessageConstants.User.INVALID_PASSWORD);
+                }
+                
+                try {
+                    updateValidators.forEach(v -> v.validate(userUpdateRequestDTO, user));
+                    user.updateProfile(userUpdateRequestDTO.name(), userUpdateRequestDTO.email());
+                    User updatedUser = userRepository.save(user);
+                    log.info(LogMessageConstants.AUDIT.USER_UPDATED, id);
+                    return ServiceResult.success(userMapper.toUserResponseDTO(updatedUser));
+                } catch (Exception e) {
+                    return ServiceResult.<UserResponseDTO>error(e.getMessage());
+                }
+            })
+            .orElseGet(() -> ServiceResult.notFound(MessageConstants.User.NOT_FOUND_FOR_UPDATE));
     }
 
     /**

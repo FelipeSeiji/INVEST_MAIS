@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.repositorio.mvp.common.constants.MessageConstants;
+import com.repositorio.mvp.common.result.ServiceResult;
 import com.repositorio.mvp.domain.asset.model.AssetCategory;
 import com.repositorio.mvp.domain.asset.repository.AssetCategoryRepository;
 import com.repositorio.mvp.domain.portfolio.model.Portfolio;
@@ -30,18 +31,20 @@ public class PortfolioCommandServiceImpl implements PortfolioCommandService {
 
     @Override
     @Transactional
-    public void createPortfolioForUser(@NonNull UUID userId) {
+    public ServiceResult<Void> createPortfolioForUser(@NonNull UUID userId) {
         if (portfolioRepository.findByUserId(userId).isEmpty()) {
-            User user = userRepository.findById(userId)
-                .orElseThrow(() -> new EntityNotFoundException(MessageConstants.User.NOT_FOUND_WITH_ID + userId));
-
-            Portfolio portfolio = Portfolio.builder()
-                .user(user)
-                .build();
-            Portfolio savedPortfolio = portfolioRepository.save(portfolio);
-
-            createDefaultCategories(savedPortfolio);
+            return userRepository.findById(userId)
+                .map(user -> {
+                    Portfolio portfolio = Portfolio.builder()
+                        .user(user)
+                        .build();
+                    Portfolio savedPortfolio = portfolioRepository.save(portfolio);
+                    createDefaultCategories(savedPortfolio);
+                    return ServiceResult.<Void>success(null);
+                })
+                .orElseGet(() -> ServiceResult.notFound(MessageConstants.User.NOT_FOUND_WITH_ID + userId));
         }
+        return ServiceResult.success(null);
     }
 
     private void createDefaultCategories(Portfolio portfolio) {

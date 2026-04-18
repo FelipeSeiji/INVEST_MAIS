@@ -23,6 +23,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import com.repositorio.mvp.common.constants.LogMessageConstants;
+import com.repositorio.mvp.common.result.ServiceResult;
 
 @Slf4j
 @Service
@@ -36,56 +37,65 @@ public class AssetCommandServiceImpl implements AssetCommandService {
 
     @Override
     @Transactional
-    public AssetResponseDTO createAsset(@NonNull UUID categoryId, @NonNull AssetRequestDTO request) {
-        AssetCategory category = getCategoryForCurrentUser(categoryId);
-        
-        Asset asset = assetMapper.toEntity(request);
-        asset.setCategory(category);
-        asset.setCurrentPositionValue(request.currentPositionValue());
-        asset.setQuantity(request.quantity());
-        asset.setAveragePrice(request.averagePrice());
-        
-        Asset savedAsset = assetRepository.save(asset);
-        log.info(LogMessageConstants.AUDIT.ASSET_CREATED, 
-            savedAsset.getId(), 
-            savedAsset.getTicker(),
-            category.getName());
-        return assetMapper.toResponse(savedAsset);
+    public ServiceResult<AssetResponseDTO> createAsset(@NonNull UUID categoryId, @NonNull AssetRequestDTO request) {
+        return getCategoryForCurrentUser(categoryId)
+            .map(category -> {
+                Asset asset = assetMapper.toEntity(request);
+                asset.setCategory(category);
+                asset.setCurrentPositionValue(request.currentPositionValue());
+                asset.setQuantity(request.quantity());
+                asset.setAveragePrice(request.averagePrice());
+                
+                Asset savedAsset = assetRepository.save(asset);
+                log.info(LogMessageConstants.AUDIT.ASSET_CREATED, 
+                    savedAsset.getId(), 
+                    savedAsset.getTicker(),
+                    category.getName());
+                return ServiceResult.success(assetMapper.toResponse(savedAsset));
+            })
+            .orElseGet(() -> ServiceResult.notFound(MessageConstants.Asset.CATEGORY_NOT_FOUND));
     }
 
     @Override
     @Transactional
-    public AssetResponseDTO updateAsset(@NonNull UUID id, @NonNull AssetRequestDTO request) {
-        Asset asset = assetRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException(MessageConstants.Asset.NOT_FOUND));
-        
-        getCategoryForCurrentUser(asset.getCategory().getId());
+    public ServiceResult<AssetResponseDTO> updateAsset(@NonNull UUID id, @NonNull AssetRequestDTO request) {
+        return assetRepository.findById(id)
+            .map(asset -> {
+                // Verifica permissão/existência da categoria
+                if (getCategoryForCurrentUser(asset.getCategory().getId()).isEmpty()) {
+                    return ServiceResult.<AssetResponseDTO>notFound(MessageConstants.Asset.CATEGORY_NOT_FOUND);
+                }
 
-        asset.setTicker(request.ticker());
-        asset.setCurrentPositionValue(request.currentPositionValue());
-        asset.setQuantity(request.quantity());
-        asset.setAveragePrice(request.averagePrice());
+                asset.setTicker(request.ticker());
+                asset.setCurrentPositionValue(request.currentPositionValue());
+                asset.setQuantity(request.quantity());
+                asset.setAveragePrice(request.averagePrice());
 
-        Asset updatedAsset = assetRepository.save(asset);
-        log.info(LogMessageConstants.AUDIT.ASSET_UPDATED, updatedAsset.getId(), updatedAsset.getTicker());
-        return assetMapper.toResponse(updatedAsset);
+                Asset updatedAsset = assetRepository.save(asset);
+                log.info(LogMessageConstants.AUDIT.ASSET_UPDATED, updatedAsset.getId(), updatedAsset.getTicker());
+                return ServiceResult.success(assetMapper.toResponse(updatedAsset));
+            })
+            .orElseGet(() -> ServiceResult.notFound(MessageConstants.Asset.NOT_FOUND));
     }
 
     @Override
     @Transactional
-    public void deleteAsset(@NonNull UUID id) {
-        Asset asset = assetRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException(MessageConstants.Asset.NOT_FOUND));
-        
-        getCategoryForCurrentUser(asset.getCategory().getId());
-        
-        assetRepository.delete(asset);
-        log.info(LogMessageConstants.AUDIT.ASSET_DELETED, id);
+    public ServiceResult<Void> deleteAsset(@NonNull UUID id) {
+        return assetRepository.findById(id)
+            .map(asset -> {
+                if (getCategoryForCurrentUser(asset.getCategory().getId()).isEmpty()) {
+                    return ServiceResult.<Void>notFound(MessageConstants.Asset.CATEGORY_NOT_FOUND);
+                }
+                
+                assetRepository.delete(asset);
+                log.info(LogMessageConstants.AUDIT.ASSET_DELETED, id);
+                return ServiceResult.<Void>success(null);
+            })
+            .orElseGet(() -> ServiceResult.notFound(MessageConstants.Asset.NOT_FOUND));
     }
 
-    private AssetCategory getCategoryForCurrentUser(UUID categoryId) {
+    private java.util.Optional<AssetCategory> getCategoryForCurrentUser(UUID categoryId) {
         Portfolio portfolio = userContextService.getCurrentUserPortfolio();
-        return categoryRepository.findByIdAndPortfolioId(categoryId, portfolio.getId())
-                .orElseThrow(() -> new EntityNotFoundException(MessageConstants.Asset.CATEGORY_NOT_FOUND));
+        return categoryRepository.findByIdAndPortfolioId(categoryId, portfolio.getId());
     }
 }

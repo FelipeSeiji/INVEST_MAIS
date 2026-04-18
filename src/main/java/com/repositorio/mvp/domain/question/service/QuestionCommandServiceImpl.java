@@ -25,6 +25,7 @@ import com.repositorio.mvp.domain.question.repository.QuestionRepository;
 import com.repositorio.mvp.domain.question.service.interfaces.QuestionCommandService;
 import com.repositorio.mvp.infrastructure.security.UserDetailsImpl;
 
+import com.repositorio.mvp.common.result.ServiceResult;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -42,62 +43,88 @@ public class QuestionCommandServiceImpl implements QuestionCommandService {
 
     @Override
     @Transactional
-    public QuestionResponseDTO createQuestion(@NonNull UUID categoryId, @NonNull QuestionRequestDTO request) {
-        AssetCategory category = getCategoryForCurrentUser(categoryId);
-        
-        Question question = questionMapper.toEntity(request);
-        question.setAssetCategory(category);
-        
-        return questionMapper.toResponse(questionRepository.save(question));
+    public ServiceResult<QuestionResponseDTO> createQuestion(@NonNull UUID categoryId, @NonNull QuestionRequestDTO request) {
+        try {
+            AssetCategory category = getCategoryForCurrentUser(categoryId);
+            
+            Question question = questionMapper.toEntity(request);
+            question.setAssetCategory(category);
+            
+            return ServiceResult.success(questionMapper.toResponse(questionRepository.save(question)));
+        } catch (EntityNotFoundException e) {
+            return ServiceResult.notFound(e.getMessage());
+        } catch (Exception e) {
+            return ServiceResult.error(e.getMessage());
+        }
     }
 
     @Override
     @Transactional
-    public QuestionResponseDTO updateQuestion(@NonNull UUID id, @NonNull QuestionRequestDTO request) {
-        Question question = questionRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException(MessageConstants.Question.NOT_FOUND));
-        
-        getCategoryForCurrentUser(question.getAssetCategory().getId());
-        
-        question.setText(request.text());
-        return questionMapper.toResponse(questionRepository.save(question));
+    public ServiceResult<QuestionResponseDTO> updateQuestion(@NonNull UUID id, @NonNull QuestionRequestDTO request) {
+        try {
+            Question question = questionRepository.findById(id)
+                    .orElseThrow(() -> new EntityNotFoundException(MessageConstants.Question.NOT_FOUND));
+            
+            getCategoryForCurrentUser(question.getAssetCategory().getId());
+            
+            question.setText(request.text());
+            return ServiceResult.success(questionMapper.toResponse(questionRepository.save(question)));
+        } catch (EntityNotFoundException e) {
+            return ServiceResult.notFound(e.getMessage());
+        } catch (Exception e) {
+            return ServiceResult.error(e.getMessage());
+        }
     }
 
     @Override
     @Transactional
-    public void deleteQuestion(@NonNull UUID id) {
-        Question question = questionRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException(MessageConstants.Question.NOT_FOUND));
-        
-        getCategoryForCurrentUser(question.getAssetCategory().getId()); 
-        questionRepository.delete(question);
+    public ServiceResult<Void> deleteQuestion(@NonNull UUID id) {
+        try {
+            Question question = questionRepository.findById(id)
+                    .orElseThrow(() -> new EntityNotFoundException(MessageConstants.Question.NOT_FOUND));
+            
+            getCategoryForCurrentUser(question.getAssetCategory().getId()); 
+            questionRepository.delete(question);
+            return ServiceResult.success(null);
+        } catch (EntityNotFoundException e) {
+            return ServiceResult.notFound(e.getMessage());
+        } catch (Exception e) {
+            return ServiceResult.error(e.getMessage());
+        }
     }
 
     @Override
     @Transactional
-    public void saveEvaluations(@NonNull UUID assetId, @NonNull List<EvaluationRequestDTO> evaluations) {
-        Asset asset = assetRepository.findById(assetId)
-                .orElseThrow(() -> new EntityNotFoundException(MessageConstants.Asset.NOT_FOUND));
-        
-        getCategoryForCurrentUser(asset.getCategory().getId());
-        
-        List<AssetEvaluation> currentEvaluations = evaluationRepository.findAllByAssetId(assetId);
-        evaluationRepository.deleteAll(currentEvaluations);
+    public ServiceResult<Void> saveEvaluations(@NonNull UUID assetId, @NonNull List<EvaluationRequestDTO> evaluations) {
+        try {
+            Asset asset = assetRepository.findById(assetId)
+                    .orElseThrow(() -> new EntityNotFoundException(MessageConstants.Asset.NOT_FOUND));
+            
+            getCategoryForCurrentUser(asset.getCategory().getId());
+            
+            List<AssetEvaluation> currentEvaluations = evaluationRepository.findAllByAssetId(assetId);
+            evaluationRepository.deleteAll(currentEvaluations);
 
-        List<AssetEvaluation> newEvaluations = evaluations.stream()
-                .map(req -> {
-                    Question q = questionRepository.findById(req.questionId())
-                            .orElseThrow(() -> new EntityNotFoundException(MessageConstants.Question.NOT_FOUND));
-                    
-                    return AssetEvaluation.builder()
-                            .asset(asset)
-                            .question(q)
-                            .isPositive(req.isPositive())
-                            .build();
-                })
-                .toList();
+            List<AssetEvaluation> newEvaluations = evaluations.stream()
+                    .map(req -> {
+                        Question q = questionRepository.findById(req.questionId())
+                                .orElseThrow(() -> new EntityNotFoundException(MessageConstants.Question.NOT_FOUND));
+                        
+                        return AssetEvaluation.builder()
+                                .asset(asset)
+                                .question(q)
+                                .isPositive(req.isPositive())
+                                .build();
+                    })
+                    .toList();
 
-        evaluationRepository.saveAll(newEvaluations);
+            evaluationRepository.saveAll(newEvaluations);
+            return ServiceResult.success(null);
+        } catch (EntityNotFoundException e) {
+            return ServiceResult.notFound(e.getMessage());
+        } catch (Exception e) {
+            return ServiceResult.error(e.getMessage());
+        }
     }
 
     private AssetCategory getCategoryForCurrentUser(UUID categoryId) {

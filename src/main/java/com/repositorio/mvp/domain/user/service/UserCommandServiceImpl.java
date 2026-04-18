@@ -27,7 +27,11 @@ import com.repositorio.mvp.infrastructure.security.UserDetailsImpl;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+import com.repositorio.mvp.common.constants.LogMessageConstants;
+
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class UserCommandServiceImpl implements UserCommandService {
@@ -60,6 +64,7 @@ public class UserCommandServiceImpl implements UserCommandService {
             .build();
         user.setSecurity(security);
         userRepository.save(user);
+        log.info(LogMessageConstants.AUDIT.USER_CREATED, user.getId(), user.getEmail());
 
         // Inicializa a carteira vazia para o novo usuário
         portfolioCommandService.createPortfolioForUser(user.getId());
@@ -80,6 +85,7 @@ public class UserCommandServiceImpl implements UserCommandService {
             throw new EntityNotFoundException(MessageConstants.User.NOT_FOUND_WITH_ID + id);
         }
         userRepository.deleteById(id);
+        log.info(LogMessageConstants.AUDIT.USER_DELETED, id);
     }
 
     /**
@@ -110,7 +116,9 @@ public class UserCommandServiceImpl implements UserCommandService {
         
         user.updateProfile(userUpdateRequestDTO.name(), userUpdateRequestDTO.email());
 
-        return userMapper.toUserResponseDTO(userRepository.save(user));
+        User updatedUser = userRepository.save(user);
+        log.info(LogMessageConstants.AUDIT.USER_UPDATED, id);
+        return userMapper.toUserResponseDTO(updatedUser);
     }
 
     /**

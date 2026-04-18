@@ -8,6 +8,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+import com.repositorio.mvp.common.constants.LogMessageConstants;
+import com.repositorio.mvp.common.constants.MessageConstants;
 import com.repositorio.mvp.domain.user.service.interfaces.UserCommandService;
 import com.repositorio.mvp.infrastructure.security.util.ClientIp;
 import com.repositorio.mvp.domain.auth.service.token.TokenBlackListService;
@@ -78,7 +80,7 @@ public class SecurityFilter extends OncePerRequestFilter {
             SecurityContextHolder.getContext().setAuthentication(authentication);
         } catch (Exception e) {
             String ip = ClientIp.getClientIp(request);
-            log.warn("ACESSO NEGADO: Falha na validação do JWT. IP: {} | URI: {} | Motivo: {}",
+            log.warn(LogMessageConstants.SECURITY.JWT_VALIDATION_FAILED,
                     ip, request.getRequestURI(), e.getMessage());
             SecurityContextHolder.clearContext();
         }
@@ -93,9 +95,9 @@ public class SecurityFilter extends OncePerRequestFilter {
      */
     private String recoverToken(@NonNull HttpServletRequest request) {
         var authHeader = request.getHeader("Authorization");
-        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+        if (authHeader == null || !authHeader.startsWith(MessageConstants.Auth.BEARER_PREFIX)) {
             return null;
         }
-        return authHeader.substring(7);
+        return authHeader.substring(MessageConstants.Auth.BEARER_PREFIX.length());
     }
 }

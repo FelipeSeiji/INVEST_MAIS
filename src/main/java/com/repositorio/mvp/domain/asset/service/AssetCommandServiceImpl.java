@@ -20,7 +20,11 @@ import com.repositorio.mvp.infrastructure.security.UserContextService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+import com.repositorio.mvp.common.constants.LogMessageConstants;
+
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class AssetCommandServiceImpl implements AssetCommandService {
@@ -41,7 +45,12 @@ public class AssetCommandServiceImpl implements AssetCommandService {
         asset.setQuantity(request.quantity());
         asset.setAveragePrice(request.averagePrice());
         
-        return assetMapper.toResponse(assetRepository.save(asset));
+        Asset savedAsset = assetRepository.save(asset);
+        log.info(LogMessageConstants.AUDIT.ASSET_CREATED, 
+            savedAsset.getId(), 
+            savedAsset.getTicker(),
+            category.getName());
+        return assetMapper.toResponse(savedAsset);
     }
 
     @Override
@@ -57,7 +66,9 @@ public class AssetCommandServiceImpl implements AssetCommandService {
         asset.setQuantity(request.quantity());
         asset.setAveragePrice(request.averagePrice());
 
-        return assetMapper.toResponse(assetRepository.save(asset));
+        Asset updatedAsset = assetRepository.save(asset);
+        log.info(LogMessageConstants.AUDIT.ASSET_UPDATED, updatedAsset.getId(), updatedAsset.getTicker());
+        return assetMapper.toResponse(updatedAsset);
     }
 
     @Override
@@ -69,6 +80,7 @@ public class AssetCommandServiceImpl implements AssetCommandService {
         getCategoryForCurrentUser(asset.getCategory().getId());
         
         assetRepository.delete(asset);
+        log.info(LogMessageConstants.AUDIT.ASSET_DELETED, id);
     }
 
     private AssetCategory getCategoryForCurrentUser(UUID categoryId) {

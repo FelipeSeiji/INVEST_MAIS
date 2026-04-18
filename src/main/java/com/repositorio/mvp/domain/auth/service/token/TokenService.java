@@ -8,6 +8,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import lombok.NonNull;
 
+import com.repositorio.mvp.common.constants.MessageConstants;
+
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTVerificationException;
@@ -17,12 +19,10 @@ import com.auth0.jwt.exceptions.JWTVerificationException;
  */
 @Service
 public class TokenService implements TokenProvider {
-    private static final String MESSAGE_ERR_INVALID_TOKEN = "Token inválido";
 
     @Value("${api.security.token.secret}")
     private String secret;
 
-    private static final String ISSUER = "auth-api";
     private static final long EXPIRATION_MINUTES = 60;
 
     /**
@@ -39,7 +39,7 @@ public class TokenService implements TokenProvider {
         Instant now = Instant.now();
 
         return JWT.create()
-            .withIssuer(ISSUER)
+            .withIssuer(MessageConstants.Auth.TOKEN_ISSUER)
             .withSubject(userId.toString())
             .withIssuedAt(now)
             .withExpiresAt(now.plus(
@@ -62,13 +62,13 @@ public class TokenService implements TokenProvider {
             Algorithm algorithm = Algorithm.HMAC256(secret);
 
             return JWT.require(algorithm)
-                .withIssuer(ISSUER)
+                .withIssuer(MessageConstants.Auth.TOKEN_ISSUER)
                 .build()
                 .verify(token)
                 .getSubject();
 
         } catch (JWTVerificationException exception) {
-            throw new IllegalArgumentException(MESSAGE_ERR_INVALID_TOKEN);
+            throw new IllegalArgumentException(MessageConstants.Auth.ERR_INVALID_JWT);
         }
     }
 
@@ -86,13 +86,13 @@ public class TokenService implements TokenProvider {
             Algorithm algorithm = Algorithm.HMAC256(secret);
 
             return JWT.require(algorithm)
-                .withIssuer(ISSUER)
+                .withIssuer(MessageConstants.Auth.TOKEN_ISSUER)
                 .build()
                 .verify(token)
                 .getExpiresAt()
                 .toInstant();
         } catch (JWTVerificationException exception) {
-            throw new IllegalArgumentException(MESSAGE_ERR_INVALID_TOKEN);
+            throw new IllegalArgumentException(MessageConstants.Auth.ERR_INVALID_JWT);
         }
     }
 }

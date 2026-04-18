@@ -13,6 +13,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.repositorio.mvp.common.constants.MessageConstants;
+import com.repositorio.mvp.common.constants.LogMessageConstants;
 import com.repositorio.mvp.domain.auth.model.PasswordResetToken;
 import com.repositorio.mvp.domain.auth.repository.PasswordResetTokenRepository;
 import com.repositorio.mvp.domain.user.model.User;
@@ -32,12 +34,6 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 @RequiredArgsConstructor
 public class PasswordRecoveryService {
-    private static final String MESSAGE_EMAIL_SUBJECT = "Recuperação de Senha - MVP";
-    private static final String MESSAGE_EMAIL_BODY_TEMPLATE = "Olá %s,\n\nVocê solicitou a recuperação de senha.\nUtilize o token abaixo para redefinir sua senha:\n\n%s\n\nSe você não solicitou isso, ignore este e-mail.";
-    private static final String MESSAGE_ERR_INVALID_TOKEN = "Token inválido ou não encontrado.";
-    private static final String MESSAGE_ERR_EXPIRED_TOKEN = "Token expirado.";
-    private static final String MESSAGE_ERR_HASH_EMAIL = "Erro ao gerar hash do e-mail para busca.";
-    private static final String MESSAGE_ERR_HASH_TOKEN = "Erro ao gerar hash do token.";
 
     private final UserRepository userRepository;
     private final PasswordResetTokenRepository passwordResetTokenRepository;
@@ -81,18 +77,18 @@ public class PasswordRecoveryService {
                 try {
                     SimpleMailMessage message = new SimpleMailMessage();
                     message.setTo(email); 
-                    message.setSubject(MESSAGE_EMAIL_SUBJECT);
+                    message.setSubject(MessageConstants.Auth.EMAIL_RECOVERY_SUBJECT);
                     message.setText(
                         String.format(
-                            MESSAGE_EMAIL_BODY_TEMPLATE, 
+                            MessageConstants.Auth.EMAIL_RECOVERY_BODY, 
                             user.getName(), 
                             token
                         )
                     );
                     mailSender.send(message);
-                    log.info("E-mail de recuperação enviado para {}", email);
+                    log.info(LogMessageConstants.AUTH.PASSWORD_RECOVERY_EMAIL_SENT, email);
                 } catch (Exception e) {
-                    log.error("Erro ao enviar e-mail de recuperação", e);
+                    log.error(LogMessageConstants.AUTH.PASSWORD_RECOVERY_EMAIL_ERROR, e);
                 }
             });
     }
@@ -110,14 +106,14 @@ public class PasswordRecoveryService {
         PasswordResetToken resetToken = passwordResetTokenRepository
             .findByToken(hashToken(token))
             .orElseThrow(() -> new IllegalArgumentException(
-                MESSAGE_ERR_INVALID_TOKEN
+                MessageConstants.Auth.ERR_INVALID_TOKEN
             ));
 
         if (resetToken.getExpiryDate()
             .isBefore(LocalDateTime.now())) {
                 passwordResetTokenRepository.delete(resetToken);
                 throw new IllegalArgumentException(
-                    MESSAGE_ERR_EXPIRED_TOKEN
+                    MessageConstants.Auth.ERR_EXPIRED_TOKEN
                 );
         }
 
@@ -156,7 +152,7 @@ public class PasswordRecoveryService {
             return hexString.toString();
         } catch (Exception e) {
             throw new RuntimeException(
-                MESSAGE_ERR_HASH_EMAIL,
+                MessageConstants.Auth.ERR_HASH_EMAIL,
                 e
             );
         }
@@ -185,7 +181,7 @@ public class PasswordRecoveryService {
                 .withoutPadding()
                 .encodeToString(hash);
         } catch (Exception e) {
-            throw new RuntimeException(MESSAGE_ERR_HASH_TOKEN, e);
+            throw new RuntimeException(MessageConstants.Auth.ERR_HASH_TOKEN, e);
         }
     }
 }

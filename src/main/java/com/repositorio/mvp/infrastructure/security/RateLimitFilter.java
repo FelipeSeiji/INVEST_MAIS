@@ -1,5 +1,7 @@
 package com.repositorio.mvp.infrastructure.security;
 
+import com.repositorio.mvp.common.constants.LogMessageConstants;
+import com.repositorio.mvp.common.constants.MessageConstants;
 import com.repositorio.mvp.infrastructure.security.util.ClientIp;
 import com.repositorio.mvp.domain.auth.service.security.RateLimitingService;
 import io.github.bucket4j.Bucket;
@@ -39,9 +41,9 @@ public class RateLimitFilter extends OncePerRequestFilter {
         if (bucket.tryConsume(1)) {
             filterChain.doFilter(request, response);
         } else {
-            log.warn("BLOQUEIO DDoS (Rate Limit Excedido): IP {} disparou requisições demais.", ip);
+            log.warn(LogMessageConstants.SECURITY.RATE_LIMIT_EXCEEDED_DDOS, ip);
 
-            handlerExceptionResolver.resolveException(request, response, null, new RuntimeException("Muitas requisições. Por favor, aguarde alguns instantes."));
+            handlerExceptionResolver.resolveException(request, response, null, new RuntimeException(MessageConstants.Auth.ERR_RATELIMIT_EXCEEDED));
         }
     }
 }

@@ -18,7 +18,11 @@ import com.repositorio.mvp.infrastructure.security.UserContextService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+import com.repositorio.mvp.common.constants.LogMessageConstants;
+
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class AssetCategoryCommandServiceImpl implements AssetCategoryCommandService {
@@ -36,7 +40,9 @@ public class AssetCategoryCommandServiceImpl implements AssetCategoryCommandServ
         AssetCategory category = assetMapper.toEntity(request);
         category.setPortfolio(portfolio);
         
-        return assetMapper.toResponse(categoryRepository.save(category));
+        AssetCategory savedCategory = categoryRepository.save(category);
+        log.info(LogMessageConstants.AUDIT.CATEGORY_CREATED, savedCategory.getId(), savedCategory.getName());
+        return assetMapper.toResponse(savedCategory);
     }
 
     @Override
@@ -50,7 +56,9 @@ public class AssetCategoryCommandServiceImpl implements AssetCategoryCommandServ
         category.setName(request.name());
         category.setTargetPercentage(request.targetPercentage());
 
-        return assetMapper.toResponse(categoryRepository.save(category));
+        AssetCategory updatedCategory = categoryRepository.save(category);
+        log.info(LogMessageConstants.AUDIT.CATEGORY_UPDATED, updatedCategory.getId(), updatedCategory.getName());
+        return assetMapper.toResponse(updatedCategory);
     }
 
     @Override
@@ -61,5 +69,6 @@ public class AssetCategoryCommandServiceImpl implements AssetCategoryCommandServ
             .orElseThrow(() -> new EntityNotFoundException(MessageConstants.Asset.CATEGORY_NOT_FOUND));
         
         categoryRepository.delete(category);
+        log.info(LogMessageConstants.AUDIT.CATEGORY_DELETED, id);
     }
 }

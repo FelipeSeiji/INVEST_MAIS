@@ -20,7 +20,9 @@ public class UserContextService {
      * Retorna o usuário logado com base no token JWT / Contexto do Spring Security.
      */
     public UserDetailsImpl getCurrentUserDetails() {
-        return (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        return (UserDetailsImpl) SecurityContextHolder.getContext()
+            .getAuthentication()
+            .getPrincipal();
     }
 
     /**
@@ -28,8 +30,9 @@ public class UserContextService {
      */
     public Portfolio getCurrentUserPortfolio() {
         UserDetailsImpl userDetails = getCurrentUserDetails();
-        return portfolioRepository.findByUserId(userDetails.getUser().getId())
-                .orElseThrow(() -> new EntityNotFoundException(MessageConstants.Portfolio.NOT_FOUND));
+        return portfolioRepository.findByUserId(userDetails.getUser()
+            .getId())
+            .orElseThrow(() -> new EntityNotFoundException(MessageConstants.Portfolio.NOT_FOUND));
     }
     
     /**
@@ -37,7 +40,8 @@ public class UserContextService {
      */
     public Portfolio getCurrentUserPortfolioWithCategoriesAndAssets() {
         UserDetailsImpl userDetails = getCurrentUserDetails();
-        return portfolioRepository.findWithCategoriesAndAssetsByUserId(userDetails.getUser().getId())
-                .orElseThrow(() -> new EntityNotFoundException(MessageConstants.Portfolio.NOT_FOUND));
+        return portfolioRepository.findWithCategoriesAndAssetsByUserId(userDetails.getUser()
+            .getId())
+            .orElseThrow(() -> new EntityNotFoundException(MessageConstants.Portfolio.NOT_FOUND));
     }
 }

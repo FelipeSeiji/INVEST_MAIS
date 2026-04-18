@@ -1,5 +1,6 @@
 package com.repositorio.mvp.domain.auth.controller;
 
+import com.repositorio.mvp.common.constants.LogMessageConstants;
 import com.repositorio.mvp.common.constants.MessageConstants;
 import com.repositorio.mvp.domain.auth.DTO.ForgotPasswordRequestDTO;
 import com.repositorio.mvp.domain.auth.DTO.LoginRequestDTO;
@@ -81,10 +82,10 @@ public class AuthCommandController {
         if (!loginAttemptService.isBlocked(ip)) {
             passwordRecoveryService.createPasswordResetTokenForUser(forgotPasswordRequestDTO.email());
         } else {
-            log.warn("RECUPERAÇÃO DE SENHA BLOQUEADA (Rate Limit): IP {} está bloqueado.", ip);
+            log.warn(LogMessageConstants.SECURITY.PASSWORD_RECOVERY_BLOCKED_RATE_LIMIT, ip);
         }
 
-        log.info("RECUPERAÇÃO DE SENHA: Solicitação iniciada para o e-mail: {} a partir do IP: {}",
+        log.info(LogMessageConstants.AUTH.PASSWORD_RECOVERY_INITIATED,
                 forgotPasswordRequestDTO.email(), ip);
 
         return new MessageResponseDTO(MessageConstants.Auth.FORGOT_PASSWORD_SENT);
@@ -102,7 +103,7 @@ public class AuthCommandController {
                 request.token(),
                 request.newPassword());
 
-        log.info("ALERTA DE SEGURANÇA: Senha redefinida com sucesso via token. IP de origem: {}", ip);
+        log.info(LogMessageConstants.AUTH.PASSWORD_RESET_SUCCESS, ip);
 
         return new MessageResponseDTO(MessageConstants.Auth.PASSWORD_RESET_SUCCESS);
     }

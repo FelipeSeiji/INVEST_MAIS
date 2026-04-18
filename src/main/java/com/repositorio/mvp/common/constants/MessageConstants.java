@@ -7,18 +7,28 @@ package com.repositorio.mvp.common.constants;
 public final class MessageConstants {
     
     private MessageConstants() {
-        // Construtor privado para evitar instanciação
     }
 
     public static final class Auth {
         public static final String LOGIN_2FA_SENT = "Código de verificação enviado para o seu e-mail.";
         public static final String FORGOT_PASSWORD_SENT = "Se o e-mail existir, um link de recuperação foi enviado.";
         public static final String PASSWORD_RESET_SUCCESS = "Senha redefinida com sucesso.";
+        public static final String EMAIL_RECOVERY_SUBJECT = "Recuperação de Senha - MVP";
+        public static final String EMAIL_RECOVERY_BODY = "Olá %s,\n\nVocê solicitou a recuperação de senha.\nUtilize o token abaixo para redefinir sua senha:\n\n%s\n\nSe você não solicitou isso, ignore este e-mail.";
         public static final String ERR_TOO_MANY_ATTEMPTS = "Muitas tentativas falhas.";
         public static final String ERR_TOO_MANY_ATTEMPTS_2FA = "Muitas tentativas falhas. Tente novamente mais tarde.";
         public static final String ERR_INVALID_CREDENTIALS = "Credenciais inválidas.";
         public static final String ERR_INVALID_2FA = "Código 2FA inválido.";
         public static final String ERR_EXPIRED_2FA = "Código 2FA expirado.";
+        public static final String ERR_INVALID_TOKEN = "Token inválido ou não encontrado.";
+        public static final String ERR_EXPIRED_TOKEN = "Token expirado.";
+        public static final String ERR_HASH_EMAIL = "Erro ao gerar hash do e-mail para busca.";
+        public static final String ERR_HASH_TOKEN = "Erro ao gerar hash do token.";
+        public static final String BEARER_PREFIX = "Bearer ";
+        public static final String TOKEN_ISSUER = "auth-api";
+        public static final String PREFIX_2FA = "2FA:";
+        public static final String ERR_INVALID_JWT = "Token inválido";
+        public static final String ERR_RATELIMIT_EXCEEDED = "Muitas requisições. Por favor, aguarde alguns instantes.";
     }
 
     public static final class User {

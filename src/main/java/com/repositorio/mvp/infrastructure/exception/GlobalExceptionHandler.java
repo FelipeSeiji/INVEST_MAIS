@@ -7,6 +7,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import com.repositorio.mvp.common.constants.LogMessageConstants;
 import com.repositorio.mvp.common.constants.MessageConstants;
 import com.repositorio.mvp.infrastructure.exception.util.ProblemDetailBuilder;
 
@@ -21,7 +22,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ProblemDetail handleValidationExceptions(MethodArgumentNotValidException ex) {
         log.warn(
-            "Validação falhou (400): {} erros encontrados. Detalhe: {}", 
+            LogMessageConstants.ERROR.VALIDATION_FAILED, 
             ex.getErrorCount(), 
             ex.getMessage()
         );
@@ -31,7 +32,7 @@ public class GlobalExceptionHandler {
     //404
     @ExceptionHandler(EntityNotFoundException.class)
     public ProblemDetail handleEntityNotFoundException(EntityNotFoundException ex) {
-        log.warn("Recurso não encontrado (404): {}", 
+        log.warn(LogMessageConstants.ERROR.RESOURCE_NOT_FOUND, 
             ex.getMessage()
         );
         return ProblemDetailBuilder.build(
@@ -45,7 +46,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(IllegalArgumentException.class)
     public ProblemDetail handleIllegalArgumentException(IllegalArgumentException ex) {
         log.warn(
-            "Regra de negócio violada (400): {}", 
+            LogMessageConstants.ERROR.BUSINESS_RULE_VIOLATION, 
             ex.getMessage()
         );
         return ProblemDetailBuilder.build(
@@ -59,7 +60,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(DataIntegrityViolationException.class)
     public ProblemDetail handleDataIntegrityViolationException(DataIntegrityViolationException ex) {
         log.warn(
-            "Violação de integridade no banco de dados (409): {}", 
+            LogMessageConstants.ERROR.DATA_INTEGRITY_VIOLATION, 
             ex.getMostSpecificCause().getMessage());
         return ProblemDetailBuilder.build(
             HttpStatus.CONFLICT, 
@@ -72,7 +73,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(Exception.class)
     public ProblemDetail handleGenericException(Exception ex) {
         log.error(
-            "ERRO INTERNO SEVERO (500): Ocorreu uma exceção não tratada.", 
+            LogMessageConstants.ERROR.INTERNAL_SERVER_ERROR, 
             ex
         );
         

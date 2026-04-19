@@ -11,13 +11,13 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.repositorio.mvp.common.DTO.MessageResponseDTO;
-import com.repositorio.mvp.domain.admin.controller.SystemAdminController;
+import com.repositorio.mvp.domain.admin.controller.SystemAdminCommandController;
 import com.repositorio.mvp.domain.auth.service.token.TokenBlackListService;
 
 @ExtendWith(MockitoExtension.class)
-public class SystemAdminControllerTest {
+public class SystemAdminCommandControllerTest {
     @InjectMocks
-    private SystemAdminController systemAdminController;
+    private SystemAdminCommandController systemAdminController;
 
     @Mock
     private TokenBlackListService tokenBlackListService;

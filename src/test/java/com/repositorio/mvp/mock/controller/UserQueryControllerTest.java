@@ -2,8 +2,6 @@ package com.repositorio.mvp.mock.controller;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -22,22 +20,15 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import com.repositorio.mvp.domain.user.DTO.UserRequestDTO;
 import com.repositorio.mvp.domain.user.DTO.UserResponseDTO;
-import com.repositorio.mvp.domain.user.DTO.UserUpdateRequestDTO;
-import com.repositorio.mvp.domain.user.controller.UserController;
-import com.repositorio.mvp.domain.user.service.interfaces.UserCommandService;
+import com.repositorio.mvp.domain.user.controller.UserQueryController;
 import com.repositorio.mvp.domain.user.service.interfaces.UserQueryService;
-import com.repositorio.mvp.shared.UserConstants;
 
 @ExtendWith(MockitoExtension.class)
-public class UserControllerTest {
+public class UserQueryControllerTest {
 
     @InjectMocks
-    private UserController userController;
-
-    @Mock
-    private UserCommandService userCommandService;
+    private UserQueryController userController;
 
     @Mock
     private UserQueryService userQueryService;
@@ -49,40 +40,6 @@ public class UserControllerTest {
     void setUp() {
         mockUserId = UUID.randomUUID();
         mockResponseDTO = new UserResponseDTO(mockUserId, "User", "example@gmail.com");
-    }
-
-    @Test
-    public void createUser_PassesDataToService_AndReturnsResponseDTO() {
-        UserRequestDTO requestDTO = UserConstants.USER;
-        when(userCommandService.createUser(requestDTO)).thenReturn(mockResponseDTO);
-
-        UserResponseDTO response = userController.createUser(requestDTO);
-        assertNotNull(response);
-        assertEquals(mockUserId, response.id());
-        assertEquals(requestDTO.name(), response.name());
-
-        verify(userCommandService).createUser(requestDTO);
-    }
-
-    @Test
-    public void updateUser_PassesDataToService_AndReturnsUpdatedUser() {
-        UserUpdateRequestDTO updateRequest = new UserUpdateRequestDTO("User Updated", "newEmail@gmail.com", "Password@123");
-        UserResponseDTO updatedResponse = new UserResponseDTO(mockUserId, "User Updated", "newEmail@gmail.com");
-
-        when(userCommandService.updateUserById(eq(mockUserId), any(UserUpdateRequestDTO.class)))
-                .thenReturn(updatedResponse);
-
-        UserResponseDTO response = userController.updateUser(mockUserId, updateRequest);
-
-        assertEquals("User Updated", response.name());
-        verify(userCommandService).updateUserById(mockUserId, updateRequest);
-    }
-
-    @Test
-    public void deleteUser_CallsServiceToDelete() {
-        userController.deleteUser(mockUserId);
-
-        verify(userCommandService).deleteUserById(mockUserId);
     }
 
     @Test

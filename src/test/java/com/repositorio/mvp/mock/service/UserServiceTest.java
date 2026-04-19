@@ -29,7 +29,8 @@ import org.springframework.test.util.ReflectionTestUtils;
 import com.repositorio.mvp.domain.user.DTO.UserRequestDTO;
 import com.repositorio.mvp.domain.user.DTO.UserResponseDTO;
 import com.repositorio.mvp.domain.user.mapper.UserMapper;
-import com.repositorio.mvp.domain.portfolio.service.PortfolioService;
+import com.repositorio.mvp.domain.portfolio.service.interfaces.PortfolioCommandService;
+import com.repositorio.mvp.common.result.ServiceResult;
 import com.repositorio.mvp.domain.user.model.User;
 import com.repositorio.mvp.domain.user.repository.UserRepository;
 import com.repositorio.mvp.domain.user.service.UserCommandServiceImpl;
@@ -64,7 +65,7 @@ public class UserServiceTest {
     private UserUpdateValidator userUpdateValidator;
 
     @Mock
-    private PortfolioService portfolioService;
+    private PortfolioCommandService portfolioCommandService;
 
     UUID userId = UUID.randomUUID();
 
@@ -95,7 +96,8 @@ public class UserServiceTest {
         when(userRepository.save(any(User.class))).thenReturn(user);
         when(userMapper.toUserResponseDTO(any(User.class))).thenReturn(expectedResponse);
 
-        UserResponseDTO createdUser = userCommandService.createUser(USER);
+        ServiceResult<UserResponseDTO> result = userCommandService.createUser(USER);
+        UserResponseDTO createdUser = ((ServiceResult.Success<UserResponseDTO>) result).data();
 
         assertThat(createdUser).isNotNull();
         assertThat(createdUser.id()).isEqualTo(userId);

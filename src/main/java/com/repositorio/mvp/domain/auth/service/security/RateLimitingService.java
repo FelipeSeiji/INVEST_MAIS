@@ -23,6 +23,11 @@ public class RateLimitingService {
             .maximumSize(10000)
             .build();
 
+    private final Cache<String, Boolean> bannedIps = Caffeine.newBuilder()
+            .expireAfterWrite(24, TimeUnit.HOURS)
+            .maximumSize(5000)
+            .build();
+
     /**
      * Resolve ou cria um Bucket de requisições associado a um determinado endereço
      * IP.
@@ -32,6 +37,38 @@ public class RateLimitingService {
      */
     public Bucket resolveBucket(@NonNull String ip) {
         return cache.get(ip, this::newBucket);
+    }
+
+    /**
+     * Resolve ou cria um Bucket específico para o endpoint de cadastro de usuários.
+     * Política mais rígida: 3 cadastros por hora por IP para prevenir spam.
+     * 
+     * @param ip Endereço IP do cliente.
+     * @return Bucket de cadastro associado ao IP.
+     */
+    public Bucket resolveRegistrationBucket(@NonNull String ip) {
+        return cache.get("REG_" + ip, k -> Bucket.builder()
+                .addLimit(Bandwidth.classic(3, Refill.greedy(3, Duration.ofHours(1))))
+                .build());
+    }
+
+    /**
+     * Bane um endereço IP por 24 horas.
+     * 
+     * @param ip Endereço IP a ser banido.
+     */
+    public void banIp(@NonNull String ip) {
+        bannedIps.put(ip, Boolean.TRUE);
+    }
+
+    /**
+     * Verifica se um endereço IP está na lista de banimento.
+     * 
+     * @param ip Endereço IP do cliente.
+     * @return True se o IP estiver banido.
+     */
+    public boolean isBanned(@NonNull String ip) {
+        return bannedIps.getIfPresent(ip) != null;
     }
 
     /**

@@ -17,7 +17,7 @@ import com.repositorio.mvp.domain.auth.DTO.LoginRequestDTO;
 import com.repositorio.mvp.domain.auth.DTO.ResetPasswordRequestDTO;
 import com.repositorio.mvp.domain.auth.DTO.TokenResponseDTO;
 import com.repositorio.mvp.domain.auth.DTO.Verify2FARequestDTO;
-import com.repositorio.mvp.domain.auth.controller.AuthController;
+import com.repositorio.mvp.domain.auth.controller.AuthCommandController;
 import com.repositorio.mvp.domain.auth.service.auth.PasswordRecoveryService;
 import com.repositorio.mvp.domain.auth.service.auth.SessionService;
 import com.repositorio.mvp.domain.auth.service.login.LoginAttemptService;
@@ -29,7 +29,7 @@ import jakarta.servlet.http.HttpServletRequest;
 @ExtendWith(MockitoExtension.class)
 public class AuthControllerTest {
     @InjectMocks
-    private AuthController authController;
+    private AuthCommandController authController;
 
     @Mock
     private LoginService loginService;

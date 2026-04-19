@@ -12,18 +12,25 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.repositorio.mvp.common.constants.MessageConstants;
 import com.repositorio.mvp.common.result.ResultMapper;
 import com.repositorio.mvp.domain.user.DTO.UserRequestDTO;
 import com.repositorio.mvp.domain.user.DTO.UserResponseDTO;
 import com.repositorio.mvp.domain.user.DTO.UserUpdateRequestDTO;
 import com.repositorio.mvp.domain.user.service.interfaces.UserCommandService;
+import com.repositorio.mvp.domain.auth.service.security.RateLimitingService;
+import com.repositorio.mvp.infrastructure.security.util.ClientIp;
 
+import io.github.bucket4j.Bucket;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+
+import com.repositorio.mvp.infrastructure.exception.RateLimitExceededException;
 
 @RestController
 @RequestMapping("/api/users")
@@ -31,11 +38,22 @@ import lombok.RequiredArgsConstructor;
 @Tag(name = "User Commands", description = "Operações de escrita para cadastro e gerenciamento de perfis de usuário")
 public class UserCommandController {
     private final UserCommandService userCommandService;
+    private final RateLimitingService rateLimitingService;
 
     @PostMapping
     @Operation(summary = "Cria um novo usuário e inicializa sua carteira")
     @ApiResponse(responseCode = "201", description = "Usuário criado com sucesso")
-    public ResponseEntity<UserResponseDTO> createUser(@Valid @RequestBody @NonNull UserRequestDTO userRequestDTO) {
+    public ResponseEntity<UserResponseDTO> createUser(
+            @Valid @RequestBody @NonNull UserRequestDTO userRequestDTO,
+            HttpServletRequest request) {
+        
+        String ip = ClientIp.getClientIp(request);
+        Bucket bucket = rateLimitingService.resolveRegistrationBucket(ip);
+
+        if (!bucket.tryConsume(1)) {
+            throw new RateLimitExceededException(MessageConstants.Auth.ERR_RATELIMIT_EXCEEDED);
+        }
+
         return ResultMapper.created(userCommandService.createUser(userRequestDTO));
     }
 

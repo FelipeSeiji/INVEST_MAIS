@@ -14,16 +14,6 @@ public class ClientIp {
      * @return String contendo o IP real do cliente.
      */
     public static String getClientIp(HttpServletRequest request) {
-        String ipAddress = request.getHeader("X-Forwarded-For");
-
-        if (ipAddress != null && !ipAddress.isEmpty() && !"unknown".equalsIgnoreCase(ipAddress)) {
-            String cleanIp = ipAddress.split(",")[0].trim();
-            
-            if (cleanIp.length() <= 45) { 
-                return cleanIp;
-            }
-        }
-
         return request.getRemoteAddr();
     }
 }

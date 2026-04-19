@@ -18,6 +18,17 @@ import lombok.extern.slf4j.Slf4j;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
     
+    //429
+    @ExceptionHandler(RateLimitExceededException.class)
+    public ProblemDetail handleRateLimitExceededException(RateLimitExceededException ex) {
+        log.warn(LogMessageConstants.ERROR.BUSINESS_RULE_VIOLATION, ex.getMessage());
+        return ProblemDetailBuilder.build(
+            HttpStatus.TOO_MANY_REQUESTS, 
+            "Limite de Requisições Excedido", 
+            ex.getMessage()
+        );
+    }
+
     //400
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ProblemDetail handleValidationExceptions(MethodArgumentNotValidException ex) {

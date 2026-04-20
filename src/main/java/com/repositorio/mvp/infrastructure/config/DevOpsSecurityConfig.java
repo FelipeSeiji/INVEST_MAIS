@@ -7,8 +7,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 /**
- * Configurações de Hardening de Infraestrutura / DevOps.
- * Objetivo: Reduzir a superfície de reconhecimento (Anti-Nmap / Fingerprinting).
+ * Configurações de Hardening de Infraestrutura
  */
 @Configuration
 public class DevOpsSecurityConfig {

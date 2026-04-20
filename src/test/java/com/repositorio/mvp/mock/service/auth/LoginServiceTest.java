@@ -33,6 +33,7 @@ import com.repositorio.mvp.domain.auth.service.login.LoginAttemptService;
 import com.repositorio.mvp.domain.auth.service.login.LoginService;
 import com.repositorio.mvp.domain.auth.service.login.TwoFactorService;
 import com.repositorio.mvp.domain.auth.service.token.TokenService;
+import com.repositorio.mvp.infrastructure.exception.RateLimitExceededException;
 import com.repositorio.mvp.shared.UserConstants;
 
 import org.mockito.InjectMocks;
@@ -68,6 +69,7 @@ public class LoginServiceTest {
     @BeforeEach
     void setUp() {
         mockUser = UserConstants.createMockUser(); 
+        mockUser.getSecurity().setEmailVerified(true); // E-mail verificado por padrão nos testes legados
     }
 
    @Test
@@ -115,11 +117,28 @@ public class LoginServiceTest {
     }
 
     @Test
-    public void initiateLogin_WhenIpIsBlocked_ThrowsException() {
+    public void initiateLogin_WithUnverifiedEmail_ThrowsException() {
+        LoginRequestDTO loginRequestDTO = new LoginRequestDTO(UserConstants.USER.email(), UserConstants.USER.password());
+        mockUser.getSecurity().setEmailVerified(false);
+
+        when(loginAttemptService.isBlocked(MOCK_IP)).thenReturn(false);
+        when(loginAttemptService.isBlocked(loginRequestDTO.email())).thenReturn(false);
+        when(userRepository.findBySecurityEmailHash(anyString())).thenReturn(Optional.of(mockUser));
+        when(passwordEncoder.matches(anyString(), anyString())).thenReturn(true);
+
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+            loginService.initiateLogin(loginRequestDTO, MOCK_IP);
+        });
+
+        assertTrue(exception.getMessage().contains("E-mail não verificado"));
+    }
+
+    @Test
+    public void initiateLogin_WhenIpIsBlocked_ThrowsRateLimitException() {
         LoginRequestDTO loginRequestDTO = new LoginRequestDTO(UserConstants.USER.email(), UserConstants.USER.password());
         when(loginAttemptService.isBlocked(MOCK_IP)).thenReturn(true);
 
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+        RateLimitExceededException exception = assertThrows(RateLimitExceededException.class, () -> {
             loginService.initiateLogin(loginRequestDTO, MOCK_IP);
         });
 
@@ -161,6 +180,7 @@ public class LoginServiceTest {
 
         assertEquals("Código 2FA inválido.", exception.getMessage());
         verify(loginAttemptService).loginFailed(MOCK_IP); 
+        verify(loginAttemptService, never()).loginFailed(request.email()); // Confirmando mitigação de DoS (C-01)
         verify(tokenService, never()).generateToken(any());
     }
 

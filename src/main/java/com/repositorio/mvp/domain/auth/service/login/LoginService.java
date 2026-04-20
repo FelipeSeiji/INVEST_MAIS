@@ -15,6 +15,7 @@ import com.repositorio.mvp.domain.user.model.User;
 import com.repositorio.mvp.domain.user.repository.UserRepository;
 import com.repositorio.mvp.domain.auth.service.interfaces.TwoFactorNotification;
 import com.repositorio.mvp.domain.auth.service.token.TokenProvider;
+import com.repositorio.mvp.infrastructure.exception.RateLimitExceededException;
 
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -53,7 +54,7 @@ public class LoginService {
             log.warn(LogMessageConstants.SECURITY.BRUTE_FORCE_LOGIN_BLOCKED, 
                 ip, 
                 loginRequest.email());
-            throw new IllegalArgumentException(MessageConstants.Auth.ERR_TOO_MANY_ATTEMPTS);
+            throw new RateLimitExceededException(MessageConstants.Auth.ERR_TOO_MANY_ATTEMPTS);
         }
 
         String searchHash = DigestUtils
@@ -80,6 +81,11 @@ public class LoginService {
                     ip, 
                     maskEmail(user.getEmail()));
                 throw new IllegalArgumentException(MessageConstants.Auth.ERR_INVALID_CREDENTIALS);
+        }
+
+        if (!user.getSecurity().isEmailVerified()) {
+            log.warn("Tentativa de login em conta não verificada: {}", maskEmail(user.getEmail()));
+            throw new IllegalArgumentException(MessageConstants.Auth.ERR_INVALID_CREDENTIALS);
         }
 
         loginAttemptService.loginSucceeded(ip);
@@ -113,11 +119,11 @@ public class LoginService {
     public String verify2FAAndGenerateToken(@NonNull Verify2FARequestDTO verifyRequest, @NonNull String ip) {
         String attemptKey = MessageConstants.Auth.PREFIX_2FA + verifyRequest.email();
 
-        if (loginAttemptService.isBlocked(ip) || loginAttemptService.isBlocked(attemptKey)) {
+        if (loginAttemptService.isBlocked(ip)) {
             log.warn(LogMessageConstants.SECURITY.BRUTE_FORCE_2FA_BLOCKED, 
                 ip, 
                 verifyRequest.email());
-            throw new IllegalArgumentException(MessageConstants.Auth.ERR_TOO_MANY_ATTEMPTS_2FA);
+            throw new RateLimitExceededException(MessageConstants.Auth.ERR_TOO_MANY_ATTEMPTS_2FA);
         }
 
         String searchHash = DigestUtils.sha256Hex(verifyRequest.email()
@@ -130,7 +136,6 @@ public class LoginService {
                 .getTwoFactorCode()
                 .equals(verifyRequest.code())) {
                     loginAttemptService.loginFailed(ip);
-                    loginAttemptService.loginFailed(attemptKey);
                     log.warn(LogMessageConstants.AUTH.LOGIN_2FA_FAILED_INVALID_CODE, 
                         ip, 
                         maskEmail(user.getEmail()));

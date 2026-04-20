@@ -13,6 +13,10 @@ import com.repositorio.mvp.domain.auth.service.login.LoginAttemptService;
 import com.repositorio.mvp.domain.auth.service.login.LoginService;
 import com.repositorio.mvp.infrastructure.security.util.ClientIp;
 import com.repositorio.mvp.common.DTO.MessageResponseDTO;
+import com.repositorio.mvp.domain.auth.service.security.RateLimitingService;
+import com.repositorio.mvp.infrastructure.exception.RateLimitExceededException;
+
+import io.github.bucket4j.Bucket;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -36,6 +40,7 @@ public class AuthCommandController {
     private final LoginService loginService;
     private final SessionService sessionService;
     private final PasswordRecoveryService passwordRecoveryService;
+    private final RateLimitingService rateLimitingService;
 
     @PostMapping("/login")
     @ResponseStatus(HttpStatus.OK)
@@ -43,6 +48,12 @@ public class AuthCommandController {
     @ApiResponse(responseCode = "200", description = "Código 2FA enviado com sucesso")
     public MessageResponseDTO login(@Valid @RequestBody @NonNull LoginRequestDTO loginRequest, @NonNull HttpServletRequest request) {
         String ip = ClientIp.getClientIp(request);
+        Bucket bucket = rateLimitingService.resolveLoginBucket(ip);
+
+        if (!bucket.tryConsume(1)) {
+            throw new RateLimitExceededException(MessageConstants.Auth.ERR_RATELIMIT_EXCEEDED);
+        }
+
         loginService.initiateLogin(loginRequest, ip);
 
         return new MessageResponseDTO(MessageConstants.Auth.LOGIN_2FA_SENT);
@@ -87,6 +98,13 @@ public class AuthCommandController {
 
         log.info(LogMessageConstants.AUTH.PASSWORD_RECOVERY_INITIATED,
                 forgotPasswordRequestDTO.email(), ip);
+
+        // Mitigação de Timing Attack: Equalizar tempo de resposta
+        try {
+            Thread.sleep(50);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
 
         return new MessageResponseDTO(MessageConstants.Auth.FORGOT_PASSWORD_SENT);
     }

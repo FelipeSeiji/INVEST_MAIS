@@ -63,6 +63,7 @@ public class UserCommandServiceImpl implements UserCommandService {
                 .password(passwordEncoder.encode(userRequestDTO.password()))
                 .emailHash(DigestUtils.sha256Hex(userRequestDTO.email().toLowerCase()))
                 .role(UserRole.USER)
+                .emailVerified(false)
                 .build();
             user.setSecurity(security);
             userRepository.save(user);
@@ -72,8 +73,12 @@ public class UserCommandServiceImpl implements UserCommandService {
             portfolioCommandService.createPortfolioForUser(user.getId());
 
             return ServiceResult.success(userMapper.toUserResponseDTO(user));
+        } catch (org.springframework.dao.DataIntegrityViolationException e) {
+            log.warn("Tentativa de registro duplicado omitida para segurança.");
+            return ServiceResult.error(MessageConstants.User.EMAIL_ALREADY_IN_USE);
         } catch (Exception e) {
-            return ServiceResult.error(e.getMessage());
+            log.error("Erro inesperado no registro de usuário: {}", e.getMessage());
+            return ServiceResult.error("Ocorreu um erro ao processar seu cadastro. Tente novamente mais tarde.");
         }
     }
 

@@ -53,6 +53,19 @@ public class RateLimitingService {
     }
 
     /**
+     * Resolve ou cria um Bucket específico para o endpoint de login.
+     * Política rígida: 5 tentativas por 15 minutos para prevenir brute-force.
+     * 
+     * @param ip Endereço IP do cliente.
+     * @return Bucket de login associado ao IP.
+     */
+    public Bucket resolveLoginBucket(@NonNull String ip) {
+        return cache.get("LOGIN_" + ip, k -> Bucket.builder()
+                .addLimit(Bandwidth.classic(5, Refill.greedy(5, Duration.ofMinutes(15))))
+                .build());
+    }
+
+    /**
      * Bane um endereço IP por 24 horas.
      * 
      * @param ip Endereço IP a ser banido.
@@ -80,9 +93,9 @@ public class RateLimitingService {
      * @return Uma instância configurada de Bucket.
      */
     private Bucket newBucket(String ip) {
-        Bandwidth limit = Bandwidth.classic(50,
+        Bandwidth limit = Bandwidth.classic(20,
                 Refill.greedy(
-                        50,
+                        20,
                         Duration.ofMinutes(1)));
         return Bucket.builder()
                 .addLimit(limit)

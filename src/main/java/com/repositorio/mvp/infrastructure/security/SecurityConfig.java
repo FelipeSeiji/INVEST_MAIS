@@ -75,7 +75,6 @@ public class SecurityConfig {
                                 "/js/**",
                                 "/templates/**",
                                 "/index.html",
-                                "/dashboard.html",
                                 "/reset-password.html")
                         .permitAll()
                         .requestMatchers(HttpMethod.POST,

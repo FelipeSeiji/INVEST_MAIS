@@ -3,6 +3,7 @@ package com.repositorio.mvp.infrastructure.exception;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -26,6 +27,17 @@ public class GlobalExceptionHandler {
             HttpStatus.TOO_MANY_REQUESTS, 
             "Limite de Requisições Excedido", 
             ex.getMessage()
+        );
+    }
+    
+    //400
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ProblemDetail handleHttpMessageNotReadableException(HttpMessageNotReadableException ex) {
+        log.warn(LogMessageConstants.ERROR.VALIDATION_FAILED, "Malformed JSON", ex.getMessage());
+        return ProblemDetailBuilder.build(
+            HttpStatus.BAD_REQUEST,
+            "Requisição Malformada",
+            "O corpo da requisição contém dados inválidos ou em formato incorreto."
         );
     }
 

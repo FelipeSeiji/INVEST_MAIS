@@ -33,12 +33,6 @@
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
 
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-devtools</artifactId>
-            <scope>runtime</scope>
-            <optional>true</optional>
-        </dependency>
 
         <dependency>
             <groupId>org.postgresql</groupId>
@@ -126,7 +120,6 @@
 
         <dependency>
             <groupId>org.bouncycastle</groupId>
-            <!-- LOW-02: Atualizado de bcpkix-jdk15on:1.70 (com CVEs) para bcpkix-jdk18on:1.78.1 -->
             <artifactId>bcpkix-jdk18on</artifactId>
             <version>1.78.1</version>
         </dependency>
@@ -172,7 +165,6 @@
                         <path>
                             <groupId>org.mapstruct</groupId>
                             <artifactId>mapstruct-processor</artifactId>
-                            <!-- LOW-03: Mantém em sincronia com a dependência principal -->
                             <version>1.6.3</version>
                         </path>
                     </annotationProcessorPaths>

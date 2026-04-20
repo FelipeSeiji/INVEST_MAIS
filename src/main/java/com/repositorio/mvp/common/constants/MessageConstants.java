@@ -67,7 +67,7 @@ public final class MessageConstants {
         public static final String TITLE_INTERNAL_ERROR = "Erro interno do servidor";
         public static final String TITLE_BAD_REQUEST = "Requisição inválida";
         
-        public static final String DETAIL_DATA_INTEGRITY = "A operação não pôde ser concluída pois o registro já existe.";
+        public static final String DETAIL_DATA_INTEGRITY = "Se os dados informados forem válidos, sua solicitação será processada.";
         public static final String DETAIL_INTERNAL_ERROR = "Ocorreu um erro inesperado. Nossa equipe já foi notificada.";
     }
 

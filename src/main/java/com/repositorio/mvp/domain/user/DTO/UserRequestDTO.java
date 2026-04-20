@@ -4,10 +4,12 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.repositorio.mvp.common.validation.user.ValidEmail;
 import com.repositorio.mvp.common.validation.user.ValidName;
 import com.repositorio.mvp.common.validation.user.ValidPassword;
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 public record UserRequestDTO(
     @Schema(description = "Nome do usuário", example = "User Name")
     @ValidName

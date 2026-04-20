@@ -24,7 +24,7 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 @Component
-@Order(0) // Executa antes de qualquer outro filtro de segurança
+@Order(0)
 @RequiredArgsConstructor
 public class HoneypotFilter extends OncePerRequestFilter {
 
@@ -57,16 +57,13 @@ public class HoneypotFilter extends OncePerRequestFilter {
         String path = request.getRequestURI();
         String ip = ClientIp.getClientIp(request);
         
-        // LOG TEMPORÁRIO PARA DEBUG (Remover depois)
         log.info("DEBUG SECURITY: IP extraído: '{}', Path: '{}'", ip, path);
 
-        // Permite acesso local para o desenvolvedor (não cai no Honeypot)
         if (isLocalhost(ip)) {
             filterChain.doFilter(request, response);
             return;
         }
 
-        // Se o caminho acessado está na lista negra de honeypots
         if (isHoneypotPath(path)) {
             log.error("ALERTA DE SEGURANÇA: IP {} atingiu o Honeypot no caminho: {}. Banindo IP por 24h.", ip, path);
             rateLimitingService.banIp(ip);

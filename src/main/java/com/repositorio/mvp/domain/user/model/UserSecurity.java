@@ -44,6 +44,10 @@ public class UserSecurity {
     @Column(nullable = false, unique = true, length = 64)
     private String emailHash;
 
+    @Column(nullable = false)
+    @Builder.Default
+    private boolean emailVerified = false;
+
     public void generateTwoFactorCode(String code, LocalDateTime expiry) {
         this.twoFactorCode = code;
         this.twoFactorExpiry = expiry;

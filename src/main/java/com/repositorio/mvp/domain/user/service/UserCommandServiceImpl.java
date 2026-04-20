@@ -73,7 +73,7 @@ public class UserCommandServiceImpl implements UserCommandService {
             portfolioCommandService.createPortfolioForUser(user.getId());
 
             return ServiceResult.success(userMapper.toUserResponseDTO(user));
-        } catch (org.springframework.dao.DataIntegrityViolationException e) {
+        } catch (org.springframework.dao.DataIntegrityViolationException _) {
             log.warn("Tentativa de registro duplicado omitida para segurança.");
             return ServiceResult.error(MessageConstants.User.EMAIL_ALREADY_IN_USE);
         } catch (Exception e) {

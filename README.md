@@ -1,16 +1,16 @@
 # INVESTE+ 🚀
 
-[![Java Version](https://img.shields.io/badge/Java-21-orange?style=for-the-badge&logo=openjdk)](https://openjdk.org/)
+[![Java Version](https://img.shields.io/badge/Java-25-orange?style=for-the-badge&logo=openjdk)](https://openjdk.org/)
 [![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.5-brightgreen?style=for-the-badge&logo=springboot)](https://spring.io/projects/spring-boot)
 [![Security](https://img.shields.io/badge/Seguran%C3%A7a-Refor%C3%A7ada-red?style=for-the-badge&logo=springsecurity)](https://spring.io/projects/spring-security)
 
-O **INVESTE+** é um backend robusto e de alta performance para gestão de investimentos, construído com **Spring Boot 3.5** e **Java 21**. Desenvolvido com mentalidade *security-first*, o projeto implementa padrões avançados de autenticação, filtros de infraestrutura defensivos e segue rigorosamente os princípios **SOLID** e **Domain-Driven Design (DDD)** para garantir escalabilidade e manutenibilidade.
+O **INVESTE+** é um backend robusto e de alta performance para gestão de investimentos, construído com **Spring Boot 3.5** e **Java 25**. Desenvolvido com mentalidade *security-first*, o projeto implementa padrões avançados de autenticação, filtros de infraestrutura defensivos e segue rigorosamente os princípios **SOLID** e **Domain-Driven Design (DDD)** para garantir escalabilidade e manutenibilidade.
 
 ---
 
 ## 🛠 Tecnologias
 
-- **Core**: Java 21 LTS & Spring Boot 3.5.x
+- **Core**: Java 25 LTS & Spring Boot 3.5.x
 - **Persistência**: PostgreSQL (Produção) / H2 (Desenvolvimento & Testes)
 - **Segurança**: 
   - Spring Security com JWT (java-jwt)
@@ -107,7 +107,7 @@ graph TD
 ## 🚀 Como Começar
 
 ### Pré-requisitos
-- JDK 21
+- JDK 25
 - Maven 3.x
 - H2 / PostgreSQL
 

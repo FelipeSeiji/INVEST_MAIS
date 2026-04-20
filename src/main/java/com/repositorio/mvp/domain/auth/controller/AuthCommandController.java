@@ -102,7 +102,7 @@ public class AuthCommandController {
         // Mitigação de Timing Attack: Equalizar tempo de resposta
         try {
             Thread.sleep(50);
-        } catch (InterruptedException e) {
+        } catch (InterruptedException _) {
             Thread.currentThread().interrupt();
         }
 

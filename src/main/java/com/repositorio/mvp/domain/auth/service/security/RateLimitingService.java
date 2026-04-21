@@ -47,7 +47,7 @@ public class RateLimitingService {
      * @return Bucket de cadastro associado ao IP.
      */
     public Bucket resolveRegistrationBucket(@NonNull String ip) {
-        return cache.get("REG_" + ip, k -> Bucket.builder()
+        return cache.get("REG_" + ip, _ -> Bucket.builder()
                 .addLimit(Bandwidth.classic(3, Refill.greedy(3, Duration.ofHours(1))))
                 .build());
     }
@@ -60,7 +60,7 @@ public class RateLimitingService {
      * @return Bucket de login associado ao IP.
      */
     public Bucket resolveLoginBucket(@NonNull String ip) {
-        return cache.get("LOGIN_" + ip, k -> Bucket.builder()
+        return cache.get("LOGIN_" + ip, _ -> Bucket.builder()
                 .addLimit(Bandwidth.classic(5, Refill.greedy(5, Duration.ofMinutes(15))))
                 .build());
     }

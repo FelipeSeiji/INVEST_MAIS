@@ -24,6 +24,10 @@ import com.repositorio.mvp.domain.auth.service.login.LoginAttemptService;
 import com.repositorio.mvp.domain.auth.service.login.LoginService;
 import com.repositorio.mvp.shared.UserConstants;
 
+import com.repositorio.mvp.common.result.ServiceResult;
+import com.repositorio.mvp.domain.auth.service.security.RateLimitingService;
+import io.github.bucket4j.Bucket;
+import org.springframework.http.ResponseEntity;
 import jakarta.servlet.http.HttpServletRequest;
 
 @ExtendWith(MockitoExtension.class)
@@ -44,6 +48,12 @@ public class AuthControllerTest {
     private LoginAttemptService loginAttemptService;
 
     @Mock
+    private RateLimitingService rateLimitingService;
+
+    @Mock
+    private Bucket bucket;
+
+    @Mock
     private HttpServletRequest httpRequest;
 
     private final String MOCK_IP = "192.168.0.50";
@@ -52,11 +62,16 @@ public class AuthControllerTest {
     @Test
     public void login_ExtractsIpAndCallsLoginService() {
         when(httpRequest.getRemoteAddr()).thenReturn(MOCK_IP);
+        when(rateLimitingService.resolveLoginBucket(MOCK_IP)).thenReturn(bucket);
+        when(bucket.tryConsume(1)).thenReturn(true);
+        
         LoginRequestDTO requestDTO = new LoginRequestDTO(UserConstants.USER.email(), UserConstants.USER.password());
-        MessageResponseDTO response = authController.login(requestDTO, httpRequest);
+        when(loginService.initiateLogin(requestDTO, MOCK_IP)).thenReturn(ServiceResult.success(null));
 
-        assertNotNull(response);
-        assertEquals("Código de verificação enviado para o seu e-mail.", response.message());
+        ResponseEntity<MessageResponseDTO> response = authController.login(requestDTO, httpRequest);
+
+        assertNotNull(response.getBody());
+        assertEquals("Código de verificação enviado para o seu e-mail.", response.getBody().message());
         
         verify(loginService).initiateLogin(requestDTO, MOCK_IP);
     }
@@ -67,12 +82,12 @@ public class AuthControllerTest {
         Verify2FARequestDTO verifyRequest = new Verify2FARequestDTO(UserConstants.USER.email(), "123456");
         String expectedJwt = "meu.token.jwt";
         
-        when(loginService.verify2FAAndGenerateToken(verifyRequest, MOCK_IP)).thenReturn(expectedJwt);
+        when(loginService.verify2FAAndGenerateToken(verifyRequest, MOCK_IP)).thenReturn(ServiceResult.success(expectedJwt));
 
-        TokenResponseDTO response = authController.verify2FA(verifyRequest, httpRequest);
+        ResponseEntity<TokenResponseDTO> response = authController.verify2FA(verifyRequest, httpRequest);
 
-        assertNotNull(response);
-        assertEquals(expectedJwt, response.token());
+        assertNotNull(response.getBody());
+        assertEquals(expectedJwt, response.getBody().token());
         
         verify(loginService).verify2FAAndGenerateToken(verifyRequest, MOCK_IP);
     }
@@ -80,8 +95,11 @@ public class AuthControllerTest {
     @Test
     public void logout_CallsSessionService() {
         String token = "Bearer token_jwt_aqui";
-        authController.logout(token);
+        when(sessionService.logout(token)).thenReturn(ServiceResult.success(null));
+        
+        ResponseEntity<Void> response = authController.logout(token);
 
+        assertEquals(204, response.getStatusCode().value());
         verify(sessionService).logout(token);
     }
 
@@ -89,24 +107,26 @@ public class AuthControllerTest {
     public void forgotPassword_CallsPasswordRecoveryService() {
         when(httpRequest.getRemoteAddr()).thenReturn(MOCK_IP);
         ForgotPasswordRequestDTO requestDTO = new ForgotPasswordRequestDTO(UserConstants.USER.email());
+        when(passwordRecoveryService.initiatePasswordRecovery(requestDTO.email(), MOCK_IP)).thenReturn(ServiceResult.success(null));
 
-        MessageResponseDTO response = authController.forgotPassword(requestDTO, httpRequest);
+        ResponseEntity<MessageResponseDTO> response = authController.forgotPassword(requestDTO, httpRequest);
 
-        assertNotNull(response);
-        assertEquals("Se o e-mail existir, um link de recuperação foi enviado.", response.message());
+        assertNotNull(response.getBody());
+        assertEquals("Se o e-mail existir, um link de recuperação foi enviado.", response.getBody().message());
         
-        verify(passwordRecoveryService).createPasswordResetTokenForUser(requestDTO.email());
+        verify(passwordRecoveryService).initiatePasswordRecovery(requestDTO.email(), MOCK_IP);
     }
 
     @Test
     public void resetPassword_CallsPasswordRecoveryService() {
         when(httpRequest.getRemoteAddr()).thenReturn(MOCK_IP);
         ResetPasswordRequestDTO requestDTO = new ResetPasswordRequestDTO("token_de_recuperacao", "NovaSenha@123");
+        when(passwordRecoveryService.resetPassword(requestDTO.token(), requestDTO.newPassword())).thenReturn(ServiceResult.success(null));
 
-        MessageResponseDTO response = authController.resetPassword(requestDTO, httpRequest);
+        ResponseEntity<MessageResponseDTO> response = authController.resetPassword(requestDTO, httpRequest);
 
-        assertNotNull(response);
-        assertEquals("Senha redefinida com sucesso.", response.message());
+        assertNotNull(response.getBody());
+        assertEquals("Senha redefinida com sucesso.", response.getBody().message());
         
         verify(passwordRecoveryService).resetPassword(requestDTO.token(), requestDTO.newPassword());
     }

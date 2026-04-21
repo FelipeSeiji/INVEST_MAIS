@@ -8,6 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.repositorio.mvp.domain.auth.model.InvalidToken;
 import com.repositorio.mvp.domain.auth.repository.InvalidTokenRepository;
+import com.repositorio.mvp.common.result.ServiceResult;
 import org.apache.commons.codec.digest.DigestUtils;
 
 import lombok.RequiredArgsConstructor;
@@ -65,7 +66,8 @@ public class TokenBlackListService {
      */
     @Scheduled(cron = "0 0 3 * * *")
     @Transactional
-    public void removeExpiredTokens() {
+    public ServiceResult<Void> removeExpiredTokens() {
         invalidTokenRepository.deleteByExpiresAtBefore(Instant.now());
+        return ServiceResult.success(null);
     }
 }

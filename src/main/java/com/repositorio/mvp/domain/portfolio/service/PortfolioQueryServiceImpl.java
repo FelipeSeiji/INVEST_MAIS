@@ -8,6 +8,7 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.repositorio.mvp.common.result.ServiceResult;
 import com.repositorio.mvp.domain.asset.engine.AssetScoreCalculator;
 import com.repositorio.mvp.domain.asset.model.Asset;
 import com.repositorio.mvp.domain.asset.model.AssetCategory;
@@ -18,6 +19,7 @@ import com.repositorio.mvp.domain.portfolio.model.Portfolio;
 import com.repositorio.mvp.domain.portfolio.service.interfaces.PortfolioQueryService;
 import com.repositorio.mvp.infrastructure.security.UserContextService;
 
+import jakarta.persistence.EntityNotFoundException;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
@@ -43,11 +45,17 @@ public class PortfolioQueryServiceImpl implements PortfolioQueryService {
      */
     @Override
     @Transactional(readOnly = true)
-    public RebalanceResponseDTO calculateRebalance(@NonNull BigDecimal aporteAmount) {
-        Portfolio portfolio = userContextService.getCurrentUserPortfolioWithCategoriesAndAssets();
+    public ServiceResult<RebalanceResponseDTO> calculateRebalance(@NonNull BigDecimal aporteAmount) {
+        try {
+            Portfolio portfolio = userContextService.getCurrentUserPortfolioWithCategoriesAndAssets();
 
-        return rebalanceEngine.calculate(portfolio, 
-            aporteAmount);
+            return ServiceResult.success(rebalanceEngine.calculate(portfolio, 
+                aporteAmount));
+        } catch (EntityNotFoundException e) {
+            return ServiceResult.notFound(e.getMessage());
+        } catch (Exception e) {
+            return ServiceResult.error(e.getMessage());
+        }
     }
 
     /**
@@ -58,8 +66,9 @@ public class PortfolioQueryServiceImpl implements PortfolioQueryService {
      */
     @Override
     @Transactional(readOnly = true)
-    public DashboardResponseDTO getPortfolioSummary() {
-        Portfolio portfolio = userContextService.getCurrentUserPortfolioWithCategoriesAndAssets();
+    public ServiceResult<DashboardResponseDTO> getPortfolioSummary() {
+        try {
+            Portfolio portfolio = userContextService.getCurrentUserPortfolioWithCategoriesAndAssets();
 
         BigDecimal totalValue = calculateTotalValue(portfolio);
         
@@ -111,7 +120,12 @@ public class PortfolioQueryServiceImpl implements PortfolioQueryService {
             ));
         }
 
-        return new DashboardResponseDTO(totalValue, summaries, totalAssets);
+            return ServiceResult.success(new DashboardResponseDTO(totalValue, summaries, totalAssets));
+        } catch (EntityNotFoundException e) {
+            return ServiceResult.notFound(e.getMessage());
+        } catch (Exception e) {
+            return ServiceResult.error(e.getMessage());
+        }
     }
 
     private BigDecimal calculateTotalValue(Portfolio portfolio) {

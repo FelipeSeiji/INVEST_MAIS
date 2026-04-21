@@ -15,8 +15,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.repositorio.mvp.common.constants.MessageConstants;
 import com.repositorio.mvp.common.constants.LogMessageConstants;
+import com.repositorio.mvp.common.result.ServiceResult;
 import com.repositorio.mvp.domain.auth.model.PasswordResetToken;
 import com.repositorio.mvp.domain.auth.repository.PasswordResetTokenRepository;
+import com.repositorio.mvp.domain.auth.service.login.LoginAttemptService;
 import com.repositorio.mvp.domain.user.model.User;
 import com.repositorio.mvp.domain.user.repository.UserRepository;
 
@@ -40,10 +42,39 @@ public class PasswordRecoveryService {
     private final PasswordEncoder passwordEncoder;
     private final JavaMailSender mailSender;
     private final TransactionTemplate transactionTemplate;
+    private final LoginAttemptService loginAttemptService;
     private final SecureRandom secureRandom = new SecureRandom();
 
     @Value("${api.security.token.secret}")
     private String tokenSecret;
+
+    /**
+     * Inicia o processo de recuperação de senha de forma segura.
+     * Valida rate limit e delega a criação do token para um processo assíncrono
+     * para mitigar ataques de enumeração de conta e tempo.
+     * 
+     * @param email E-mail para recuperação.
+     * @param ip IP do solicitante para auditoria e rate limit.
+     * @return ServiceResult<Void> Sempre retorna sucesso (mitigação).
+     */
+    public ServiceResult<Void> initiatePasswordRecovery(@NonNull String email, @NonNull String ip) {
+        if (!loginAttemptService.isBlocked(ip)) {
+            createPasswordResetTokenForUser(email);
+        } else {
+            log.warn(LogMessageConstants.SECURITY.PASSWORD_RECOVERY_BLOCKED_RATE_LIMIT, ip);
+        }
+
+        log.info(LogMessageConstants.AUTH.PASSWORD_RECOVERY_INITIATED, email, ip);
+
+        // Mitigação de Timing Attack: Equalizar tempo de resposta
+        try {
+            Thread.sleep(50);
+        } catch (InterruptedException _) {
+            Thread.currentThread().interrupt();
+        }
+
+        return ServiceResult.success(null);
+    }
 
     /**
      * Cria um token de recuperação seguro e o associa ao e-mail do usuário.
@@ -69,7 +100,7 @@ public class PasswordRecoveryService {
                 String hashedToken = hashToken(token);
                 
                 // Persistência em transação isolada
-                transactionTemplate.execute(status -> {
+                transactionTemplate.execute(_ -> {
                     PasswordResetToken myToken = new PasswordResetToken(hashedToken, "hmac-v1", user);
                     return passwordResetTokenRepository.save(myToken);
                 });
@@ -102,19 +133,19 @@ public class PasswordRecoveryService {
      * @throws IllegalArgumentException Caso o token seja inválido ou já tenha expirado.
      */
     @Transactional
-    public void resetPassword(@NonNull String token, @NonNull String newPassword) {
+    public ServiceResult<Void> resetPassword(@NonNull String token, @NonNull String newPassword) {
         PasswordResetToken resetToken = passwordResetTokenRepository
             .findByToken(hashToken(token))
-            .orElseThrow(() -> new IllegalArgumentException(
-                MessageConstants.Auth.ERR_INVALID_TOKEN
-            ));
+            .orElse(null);
+
+        if (resetToken == null) {
+            return ServiceResult.error(MessageConstants.Auth.ERR_INVALID_TOKEN);
+        }
 
         if (resetToken.getExpiryDate()
             .isBefore(LocalDateTime.now())) {
                 passwordResetTokenRepository.delete(resetToken);
-                throw new IllegalArgumentException(
-                    MessageConstants.Auth.ERR_EXPIRED_TOKEN
-                );
+                return ServiceResult.error(MessageConstants.Auth.ERR_EXPIRED_TOKEN);
         }
 
         User user = resetToken.getUser();
@@ -123,6 +154,8 @@ public class PasswordRecoveryService {
             .encode(newPassword));
         userRepository.save(user);
         passwordResetTokenRepository.delete(resetToken);
+        
+        return ServiceResult.success(null);
     }
 
     /**
@@ -150,11 +183,9 @@ public class PasswordRecoveryService {
                 hexString.append(hex);
             }
             return hexString.toString();
-        } catch (Exception e) {
+        } catch (Exception _) {
             throw new RuntimeException(
-                MessageConstants.Auth.ERR_HASH_EMAIL,
-                e
-            );
+                MessageConstants.Auth.ERR_HASH_EMAIL);
         }
     }
 

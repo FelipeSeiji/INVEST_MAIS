@@ -2,8 +2,11 @@ package com.repositorio.mvp.domain.user.controller;
 
 import java.util.UUID;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.ErrorResponseException;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -13,7 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.repositorio.mvp.common.constants.MessageConstants;
-import com.repositorio.mvp.common.result.ResultMapper;
+import com.repositorio.mvp.common.result.ServiceResult;
 import com.repositorio.mvp.domain.user.DTO.UserRequestDTO;
 import com.repositorio.mvp.domain.user.DTO.UserResponseDTO;
 import com.repositorio.mvp.domain.user.DTO.UserUpdateRequestDTO;
@@ -54,7 +57,13 @@ public class UserCommandController {
             throw new RateLimitExceededException(MessageConstants.Auth.ERR_RATELIMIT_EXCEEDED);
         }
 
-        return ResultMapper.created(userCommandService.createUser(userRequestDTO));
+        ServiceResult<UserResponseDTO> result = userCommandService.createUser(userRequestDTO);
+        
+        return switch (result) {
+            case ServiceResult.Success<UserResponseDTO> s -> ResponseEntity.status(HttpStatus.CREATED).body(s.data());
+            case ServiceResult.NotFound<UserResponseDTO> n -> throw new ErrorResponseException(HttpStatus.NOT_FOUND, ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, n.message()), null);
+            case ServiceResult.Error<UserResponseDTO> e -> throw new ErrorResponseException(HttpStatus.BAD_REQUEST, ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, e.message()), null);
+        };
     }
 
     @DeleteMapping("/{id}")
@@ -62,7 +71,13 @@ public class UserCommandController {
     @Operation(summary = "Exclui permanentemente um usuário pelo ID")
     @ApiResponse(responseCode = "204", description = "Usuário excluído com sucesso")
     public ResponseEntity<Void> deleteUser(@PathVariable @NonNull UUID id) {
-        return ResultMapper.noContent(userCommandService.deleteUserById(id));
+        ServiceResult<Void> result = userCommandService.deleteUserById(id);
+        
+        return switch (result) {
+            case ServiceResult.Success<Void> _ -> ResponseEntity.noContent().build();
+            case ServiceResult.NotFound<Void> n -> throw new ErrorResponseException(HttpStatus.NOT_FOUND, ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, n.message()), null);
+            case ServiceResult.Error<Void> e -> throw new ErrorResponseException(HttpStatus.BAD_REQUEST, ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, e.message()), null);
+        };
     }
 
     @PutMapping("/{id}")
@@ -71,6 +86,12 @@ public class UserCommandController {
     @ApiResponse(responseCode = "200", description = "Perfil atualizado com sucesso")
     public ResponseEntity<UserResponseDTO> updateUser(@PathVariable @NonNull UUID id,
             @Valid @RequestBody @NonNull UserUpdateRequestDTO userUpdateRequestDTO) {
-        return ResultMapper.ok(userCommandService.updateUserById(id, userUpdateRequestDTO));
+        ServiceResult<UserResponseDTO> result = userCommandService.updateUserById(id, userUpdateRequestDTO);
+        
+        return switch (result) {
+            case ServiceResult.Success<UserResponseDTO> s -> ResponseEntity.ok(s.data());
+            case ServiceResult.NotFound<UserResponseDTO> n -> throw new ErrorResponseException(HttpStatus.NOT_FOUND, ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, n.message()), null);
+            case ServiceResult.Error<UserResponseDTO> e -> throw new ErrorResponseException(HttpStatus.BAD_REQUEST, ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, e.message()), null);
+        };
     }
 }

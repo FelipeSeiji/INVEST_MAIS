@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.repositorio.mvp.common.constants.MessageConstants;
+import com.repositorio.mvp.common.result.ServiceResult;
 import com.repositorio.mvp.domain.user.DTO.UserResponseDTO;
 import com.repositorio.mvp.domain.user.mapper.UserMapper;
 import com.repositorio.mvp.domain.user.repository.UserRepository;
@@ -33,10 +34,10 @@ public class UserQueryServiceImpl implements UserQueryService {
      */
     @Override
     @Transactional(readOnly = true)
-    public UserResponseDTO findUserById(@NonNull UUID id) {
+    public ServiceResult<UserResponseDTO> findUserById(@NonNull UUID id) {
         return userRepository.findById(id)
-            .map(userMapper::toUserResponseDTO)
-            .orElseThrow(() -> new EntityNotFoundException(MessageConstants.User.NOT_FOUND));
+            .map(user -> ServiceResult.success(userMapper.toUserResponseDTO(user)))
+            .orElse(ServiceResult.notFound(MessageConstants.User.NOT_FOUND));
     }
 
     /**
@@ -47,8 +48,9 @@ public class UserQueryServiceImpl implements UserQueryService {
      */
     @Override
     @Transactional(readOnly = true)
-    public Page<UserResponseDTO> listAllUsers(@NonNull Pageable pageable) {
-        return userRepository.findAll(pageable)
+    public ServiceResult<Page<UserResponseDTO>> listAllUsers(@NonNull Pageable pageable) {
+        Page<UserResponseDTO> users = userRepository.findAll(pageable)
             .map(userMapper::toUserResponseDTO);
+        return ServiceResult.success(users);
     }
 }

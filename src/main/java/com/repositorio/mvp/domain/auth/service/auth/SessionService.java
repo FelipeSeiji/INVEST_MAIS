@@ -2,6 +2,7 @@ package com.repositorio.mvp.domain.auth.service.auth;
 
 import org.springframework.stereotype.Service;
 
+import com.repositorio.mvp.common.result.ServiceResult;
 import com.repositorio.mvp.domain.auth.service.token.TokenBlackListService;
 import com.repositorio.mvp.domain.auth.service.token.TokenProvider;
 
@@ -30,11 +31,12 @@ public class SessionService {
      * @param token String do token JWT (pode conter o prefixo "Bearer ").
      */
     @Transactional
-    public void logout(@NonNull String token){
-        String tokenJWT = token.replace(BEARER_PREFIX,"");
+    public ServiceResult<Void> logout(@NonNull String token) {
+        String tokenJWT = token.replace(BEARER_PREFIX, "");
         tokenBlackListService.invalidateToken(
             tokenJWT,
             tokenProvider.getExpiration(tokenJWT)
         );
+        return ServiceResult.success(null);
     }
 }

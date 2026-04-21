@@ -6,6 +6,7 @@ import java.util.UUID;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.repositorio.mvp.common.result.ServiceResult;
 import com.repositorio.mvp.common.constants.MessageConstants;
 import com.repositorio.mvp.domain.asset.DTO.AssetResponseDTO;
 import com.repositorio.mvp.domain.asset.mapper.AssetMapper;
@@ -41,16 +42,16 @@ public class AssetQueryServiceImpl implements AssetQueryService {
      */
     @Override
     @Transactional(readOnly = true)
-    public List<AssetResponseDTO> listAssetsByCategory(@NonNull UUID categoryId) {
-        getCategoryForCurrentUser(categoryId);
-        return assetRepository.findAllByCategoryId(categoryId).stream()
-            .map(assetMapper::toResponse)
-            .toList();
-    }
-
-    private void getCategoryForCurrentUser(UUID categoryId) {
+    public ServiceResult<List<AssetResponseDTO>> listAssetsByCategory(@NonNull UUID categoryId) {
         Portfolio portfolio = userContextService.getCurrentUserPortfolio();
-        categoryRepository.findByIdAndPortfolioId(categoryId, portfolio.getId())
-            .orElseThrow(() -> new EntityNotFoundException(MessageConstants.Asset.CATEGORY_NOT_FOUND));
+        
+        return categoryRepository.findByIdAndPortfolioId(categoryId, portfolio.getId())
+            .map(category -> {
+                List<AssetResponseDTO> assets = assetRepository.findAllByCategoryId(categoryId).stream()
+                    .map(assetMapper::toResponse)
+                    .toList();
+                return ServiceResult.success(assets);
+            })
+            .orElse(ServiceResult.notFound(MessageConstants.Asset.CATEGORY_NOT_FOUND));
     }
 }

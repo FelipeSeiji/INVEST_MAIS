@@ -133,7 +133,8 @@ public class UserServiceTest {
         when(userRepository.findById(userId)).thenReturn(Optional.of(user));
         when(userMapper.toUserResponseDTO(user)).thenReturn(expectedResponse);
 
-        UserResponseDTO foundUser = userQueryService.findUserById(userId);
+        ServiceResult<UserResponseDTO> result = userQueryService.findUserById(userId);
+        UserResponseDTO foundUser = ((ServiceResult.Success<UserResponseDTO>) result).data();
 
         assertThat(foundUser).isNotNull();
         assertThat(foundUser.id()).isEqualTo(userId);
@@ -145,10 +146,10 @@ public class UserServiceTest {
     public void findUserById_WithInvalidId_ThrowException() {
         when(userRepository.findById(userId)).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> {
-            userQueryService.findUserById(userId);
-        }).isInstanceOf(EntityNotFoundException.class)
-          .hasMessage("Usuário não encontrado");
+        ServiceResult<UserResponseDTO> result = userQueryService.findUserById(userId);
+        
+        assertThat(result).isInstanceOf(ServiceResult.NotFound.class);
+        assertThat(((ServiceResult.NotFound<UserResponseDTO>) result).message()).isEqualTo("Usuário não encontrado");
     }
 
     @Test
@@ -182,7 +183,7 @@ public class UserServiceTest {
         when(userMapper.toUserResponseDTO(user1)).thenReturn(expectedResponse1);
         when(userMapper.toUserResponseDTO(user2)).thenReturn(expectedResponse2);
 
-        Page<UserResponseDTO> resultPage = userQueryService.listAllUsers(pageable);
+        Page<UserResponseDTO> resultPage = ((ServiceResult.Success<Page<UserResponseDTO>>) userQueryService.listAllUsers(pageable)).data();
         List<UserResponseDTO> users = resultPage.getContent();
 
         assertThat(users).isNotNull();

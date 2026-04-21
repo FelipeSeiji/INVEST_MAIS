@@ -67,7 +67,7 @@ public class TokenService implements TokenProvider {
                 .verify(token)
                 .getSubject();
 
-        } catch (JWTVerificationException exception) {
+        } catch (JWTVerificationException _) {
             throw new IllegalArgumentException(MessageConstants.Auth.ERR_INVALID_JWT);
         }
     }

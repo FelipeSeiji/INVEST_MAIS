@@ -10,6 +10,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import org.springframework.http.ResponseEntity;
 import com.repositorio.mvp.common.DTO.MessageResponseDTO;
 import com.repositorio.mvp.domain.admin.controller.SystemAdminCommandController;
 import com.repositorio.mvp.domain.auth.service.token.TokenBlackListService;
@@ -24,11 +25,11 @@ public class SystemAdminCommandControllerTest {
 
     @Test
     public void forceRemoveExpiredTokens_CallsServiceAndReturnsSuccessMessage() {
-        MessageResponseDTO response = systemAdminController.forceRemoveExpiredTokens();
+        ResponseEntity<MessageResponseDTO> responseEntity = systemAdminController.forceRemoveExpiredTokens();
 
         verify(tokenBlackListService).removeExpiredTokens();
         
-        assertNotNull(response);
-        assertEquals("Rotina de limpeza de tokens executada com sucesso.", response.message());
+        assertNotNull(responseEntity.getBody());
+        assertEquals("Rotina de limpeza de tokens executada com sucesso.", responseEntity.getBody().message());
     }
 }

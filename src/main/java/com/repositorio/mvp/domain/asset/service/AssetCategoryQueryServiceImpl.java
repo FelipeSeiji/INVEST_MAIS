@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.repositorio.mvp.common.result.ServiceResult;
 import com.repositorio.mvp.domain.asset.DTO.CategoryResponseDTO;
 import com.repositorio.mvp.domain.asset.mapper.AssetMapper;
 import com.repositorio.mvp.domain.asset.repository.AssetCategoryRepository;
@@ -24,11 +25,11 @@ public class AssetCategoryQueryServiceImpl implements AssetCategoryQueryService 
 
     @Override
     @Transactional(readOnly = true)
-    public List<CategoryResponseDTO> listUserCategories() {
+    public ServiceResult<List<CategoryResponseDTO>> listUserCategories() {
         Portfolio portfolio = userContextService.getCurrentUserPortfolio();
-        return categoryRepository.findAllByPortfolioId(portfolio.getId())
-            .stream()
+        List<CategoryResponseDTO> categories = categoryRepository.findAllByPortfolioId(portfolio.getId()).stream()
             .map(assetMapper::toResponse)
             .toList();
+        return ServiceResult.success(categories);
     }
 }

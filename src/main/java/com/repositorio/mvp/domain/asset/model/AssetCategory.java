@@ -28,6 +28,11 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
+/**
+ * Entidade que representa uma categoria de ativos (ex: Ações, FIIs, Tesouro Direto).
+ * Permite ao usuário definir uma porcentagem alvo para cada categoria, servindo de base
+ * para o algoritmo de rebalanceamento da carteira.
+ */
 @Entity
 @Table(name = "TB_ASSET_CATEGORY")
 @Getter

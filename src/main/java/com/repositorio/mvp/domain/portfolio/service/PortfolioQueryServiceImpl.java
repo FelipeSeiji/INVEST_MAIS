@@ -21,6 +21,11 @@ import com.repositorio.mvp.infrastructure.security.UserContextService;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
+/**
+ * Implementação do serviço de consultas para Carteiras (Portfolios).
+ * Provê funcionalidades de análise da carteira, incluindo o cálculo de rebalanceamento
+ * e a geração de resumos para o Dashboard do usuário.
+ */
 @Service
 @RequiredArgsConstructor
 public class PortfolioQueryServiceImpl implements PortfolioQueryService {
@@ -28,6 +33,14 @@ public class PortfolioQueryServiceImpl implements PortfolioQueryService {
     private final AssetScoreCalculator assetScoreCalculator;
     private final RebalanceEngine rebalanceEngine;
 
+    /**
+     * Calcula a sugestão de aporte (rebalanceamento) baseada no valor disponível.
+     * Utiliza o motor de rebalanceamento para distribuir o aporte entre os ativos
+     * que mais precisam de capital para atingir os alvos definidos.
+     * 
+     * @param aporteAmount Valor em dinheiro disponível para novos investimentos.
+     * @return DTO contendo a lista de ativos sugeridos para compra e as quantidades.
+     */
     @Override
     @Transactional(readOnly = true)
     public RebalanceResponseDTO calculateRebalance(@NonNull BigDecimal aporteAmount) {
@@ -37,6 +50,12 @@ public class PortfolioQueryServiceImpl implements PortfolioQueryService {
             aporteAmount);
     }
 
+    /**
+     * Gera um resumo consolidado da carteira para visualização no Dashboard.
+     * Consolida valores totais, distribuição por categoria e alvos redistribuídos.
+     * 
+     * @return DashboardResponseDTO com os dados agregados da carteira.
+     */
     @Override
     @Transactional(readOnly = true)
     public DashboardResponseDTO getPortfolioSummary() {

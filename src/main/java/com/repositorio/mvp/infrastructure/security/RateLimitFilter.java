@@ -21,6 +21,12 @@ import org.springframework.web.servlet.HandlerExceptionResolver;
 
 import java.io.IOException;
 
+/**
+ * Filtro de controle de vazão (Rate Limiting) por IP.
+ * Utiliza o algoritmo Token Bucket (via Bucket4j) para proteger a API contra
+ * ataques de negação de serviço (DoS) e brute-force.
+ * IPs que excedem drasticamente o limite ou tentam acessar honeypots podem ser banidos.
+ */
 @Slf4j
 @Component
 @Order(1)

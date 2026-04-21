@@ -22,6 +22,10 @@ import jakarta.persistence.EntityNotFoundException;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
+/**
+ * Implementação do serviço de consultas para Perguntas.
+ * Permite a recuperação do questionário configurado para uma categoria de ativos.
+ */
 @Service
 @RequiredArgsConstructor
 public class QuestionQueryServiceImpl implements QuestionQueryService {
@@ -31,6 +35,12 @@ public class QuestionQueryServiceImpl implements QuestionQueryService {
     private final PortfolioRepository portfolioRepository;
     private final QuestionMapper questionMapper;
 
+    /**
+     * Lista todas as perguntas associadas a uma categoria de ativos específica do usuário.
+     * 
+     * @param categoryId UUID da categoria desejada.
+     * @return Lista de DTOs representando as perguntas da categoria.
+     */
     @Override
     @Transactional(readOnly = true)
     public List<QuestionResponseDTO> listByCategoryId(@NonNull UUID categoryId){

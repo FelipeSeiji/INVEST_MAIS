@@ -15,6 +15,11 @@ import com.repositorio.mvp.infrastructure.exception.util.ProblemDetailBuilder;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 
+/**
+ * Manipulador global de exceções para toda a aplicação.
+ * Captura exceções lançadas pelos Controllers, Services ou Infraestrutura e
+ * as converte em respostas padronizadas usando o padrão RFC 7807 (Problem Detail).
+ */
 @Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {

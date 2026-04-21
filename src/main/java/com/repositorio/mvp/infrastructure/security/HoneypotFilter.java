@@ -20,7 +20,8 @@ import lombok.extern.slf4j.Slf4j;
 
 /**
  * Filtro Honeypot (Armadilha) para detectar e banir ferramentas de reconhecimento (Gobuster, scanners).
- * Monitora caminhos comuns usados em ataques e bane o IP do atacante no primeiro toque.
+ * Monitora caminhos comuns usados em ataques (ex: /.env, /admin) e bane o IP do atacante
+ * por 24 horas no primeiro toque, protegendo a infraestrutura contra ataques de enumeração.
  */
 @Slf4j
 @Component

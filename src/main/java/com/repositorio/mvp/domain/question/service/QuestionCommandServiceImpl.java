@@ -30,6 +30,11 @@ import jakarta.persistence.EntityNotFoundException;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
+/**
+ * Implementação do serviço de comandos para Perguntas e Avaliações.
+ * Gerenta o questionário qualitativo (Buy & Hold) associado a cada categoria de ativo,
+ * permitindo que o usuário personalize os critérios de avaliação de seus ativos.
+ */
 @Service
 @RequiredArgsConstructor
 public class QuestionCommandServiceImpl implements QuestionCommandService {
@@ -41,6 +46,13 @@ public class QuestionCommandServiceImpl implements QuestionCommandService {
     private final PortfolioRepository portfolioRepository;
     private final QuestionMapper questionMapper;
 
+    /**
+     * Cria uma nova pergunta qualitativa para uma categoria de ativos.
+     * 
+     * @param categoryId UUID da categoria que receberá a pergunta.
+     * @param request DTO com o texto da pergunta.
+     * @return ServiceResult com a pergunta criada ou erro se a categoria não pertencer ao usuário.
+     */
     @Override
     @Transactional
     public ServiceResult<QuestionResponseDTO> createQuestion(@NonNull UUID categoryId, @NonNull QuestionRequestDTO request) {
@@ -58,6 +70,13 @@ public class QuestionCommandServiceImpl implements QuestionCommandService {
         }
     }
 
+    /**
+     * Atualiza o texto de uma pergunta existente.
+     * 
+     * @param id UUID da pergunta a ser editada.
+     * @param request Novo texto da pergunta.
+     * @return ServiceResult com a pergunta atualizada.
+     */
     @Override
     @Transactional
     public ServiceResult<QuestionResponseDTO> updateQuestion(@NonNull UUID id, @NonNull QuestionRequestDTO request) {
@@ -76,6 +95,12 @@ public class QuestionCommandServiceImpl implements QuestionCommandService {
         }
     }
 
+    /**
+     * Remove uma pergunta qualitativa da categoria.
+     * 
+     * @param id UUID da pergunta a ser removida.
+     * @return ServiceResult de sucesso ou erro se não encontrada.
+     */
     @Override
     @Transactional
     public ServiceResult<Void> deleteQuestion(@NonNull UUID id) {
@@ -93,6 +118,14 @@ public class QuestionCommandServiceImpl implements QuestionCommandService {
         }
     }
 
+    /**
+     * Salva as respostas (avaliações) de um ativo para o questionário da sua categoria.
+     * Este método limpa as avaliações anteriores do ativo e registra as novas.
+     * 
+     * @param assetId UUID do ativo que está sendo avaliado.
+     * @param evaluations Lista de respostas (ID da pergunta e se é positivo/negativo).
+     * @return ServiceResult indicando sucesso.
+     */
     @Override
     @Transactional
     public ServiceResult<Void> saveEvaluations(@NonNull UUID assetId, @NonNull List<EvaluationRequestDTO> evaluations) {

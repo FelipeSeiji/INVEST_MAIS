@@ -17,7 +17,6 @@ import com.repositorio.mvp.domain.asset.service.interfaces.AssetCommandService;
 import com.repositorio.mvp.domain.portfolio.model.Portfolio;
 import com.repositorio.mvp.infrastructure.security.UserContextService;
 
-import jakarta.persistence.EntityNotFoundException;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -25,6 +24,11 @@ import lombok.extern.slf4j.Slf4j;
 import com.repositorio.mvp.common.constants.LogMessageConstants;
 import com.repositorio.mvp.common.result.ServiceResult;
 
+/**
+ * Implementação do serviço de comandos para ativos (Assets).
+ * Gerencia a criação, atualização e exclusão de ativos na carteira do usuário,
+ * garantindo que as operações sejam restritas ao contexto do usuário autenticado.
+ */
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -35,6 +39,13 @@ public class AssetCommandServiceImpl implements AssetCommandService {
     private final UserContextService userContextService;
     private final AssetMapper assetMapper;
 
+    /**
+     * Registra um novo ativo em uma categoria de investimento específica.
+     * 
+     * @param categoryId UUID da categoria de destino.
+     * @param request DTO com os dados do ativo (ticker, quantidade, preço médio, valor atual).
+     * @return ServiceResult com o DTO do ativo criado ou erro caso a categoria não exista.
+     */
     @Override
     @Transactional
     public ServiceResult<AssetResponseDTO> createAsset(@NonNull UUID categoryId, @NonNull AssetRequestDTO request) {
@@ -56,6 +67,13 @@ public class AssetCommandServiceImpl implements AssetCommandService {
             .orElseGet(() -> ServiceResult.notFound(MessageConstants.Asset.CATEGORY_NOT_FOUND));
     }
 
+    /**
+     * Atualiza os dados de um ativo existente.
+     * 
+     * @param id UUID do ativo a ser atualizado.
+     * @param request Novos dados do ativo.
+     * @return ServiceResult com o ativo atualizado ou erro caso não seja encontrado.
+     */
     @Override
     @Transactional
     public ServiceResult<AssetResponseDTO> updateAsset(@NonNull UUID id, @NonNull AssetRequestDTO request) {
@@ -78,6 +96,12 @@ public class AssetCommandServiceImpl implements AssetCommandService {
             .orElseGet(() -> ServiceResult.notFound(MessageConstants.Asset.NOT_FOUND));
     }
 
+    /**
+     * Remove permanentemente um ativo da carteira.
+     * 
+     * @param id UUID do ativo a ser removido.
+     * @return ServiceResult indicando sucesso ou erro caso o ativo não seja encontrado.
+     */
     @Override
     @Transactional
     public ServiceResult<Void> deleteAsset(@NonNull UUID id) {

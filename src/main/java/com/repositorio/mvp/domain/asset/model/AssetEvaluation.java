@@ -22,6 +22,11 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
+/**
+ * Entidade que representa a resposta de um ativo a uma pergunta específica do questionário.
+ * Vincula o Ativo à Pergunta e armazena se a resposta foi positiva (soma ponto)
+ * ou negativa (não soma ponto).
+ */
 @Entity
 @Table(name = "TB_ASSET_EVALUATION", uniqueConstraints = {
         @UniqueConstraint(columnNames = {"asset_id", "question_id"})

@@ -19,6 +19,10 @@ import jakarta.persistence.EntityNotFoundException;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
+/**
+ * Implementação do serviço de consultas para ativos (Assets).
+ * Fornece métodos para recuperar informações sobre os ativos vinculados às categorias da carteira.
+ */
 @Service
 @RequiredArgsConstructor
 public class AssetQueryServiceImpl implements AssetQueryService {
@@ -28,6 +32,13 @@ public class AssetQueryServiceImpl implements AssetQueryService {
     private final UserContextService userContextService;
     private final AssetMapper assetMapper;
 
+    /**
+     * Lista todos os ativos pertencentes a uma categoria específica do usuário.
+     * 
+     * @param categoryId UUID da categoria cujos ativos devem ser recuperados.
+     * @return Lista de DTOs representando os ativos encontrados na categoria.
+     * @throws EntityNotFoundException Caso a categoria informada não pertença à carteira do usuário.
+     */
     @Override
     @Transactional(readOnly = true)
     public List<AssetResponseDTO> listAssetsByCategory(@NonNull UUID categoryId) {

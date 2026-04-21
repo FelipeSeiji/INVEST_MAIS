@@ -16,12 +16,29 @@ import com.repositorio.mvp.domain.portfolio.model.Portfolio;
 
 import lombok.RequiredArgsConstructor;
 
+/**
+ * Implementação do motor de rebalanceamento de carteira.
+ * Utiliza o algoritmo de "Gap de Alocação" para sugerir onde investir o novo aporte.
+ * O motor considera as porcentagens alvo das categorias (redistribuídas entre as ativas)
+ * e o Score individual de cada ativo para priorizar a distribuição do capital.
+ */
 @Component
 @RequiredArgsConstructor
 public class JavaRebalanceEngineImpl implements RebalanceEngine {
 
     private final AssetScoreCalculator assetScoreCalculator;
 
+    /**
+     * Calcula as sugestões de compra baseadas no estado atual da carteira e no valor do aporte.
+     * 1. Calcula o valor total e o novo valor projetado (com o aporte).
+     * 2. Redistribui os alvos entre as categorias que possuem ativos com Score > 0.
+     * 3. Calcula o "Gap" (diferença) entre o valor ideal (target) e o valor atual de cada ativo.
+     * 4. Distribui o aporte proporcionalmente ao Gap positivo de cada ativo.
+     * 
+     * @param portfolio Entidade da carteira contendo categorias e ativos carregados.
+     * @param aporteAmount Valor total disponível para investimento.
+     * @return RebalanceResponseDTO com os dados detalhados de sugestão por categoria e ativo.
+     */
     @Override
     public RebalanceResponseDTO calculate(Portfolio portfolio, BigDecimal aporteAmount) {
         

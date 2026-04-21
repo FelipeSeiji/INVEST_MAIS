@@ -11,6 +11,11 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 import lombok.RequiredArgsConstructor;
 
+/**
+ * Configuração principal de segurança da aplicação baseada em Spring Security.
+ * Define a política de acesso (RBAC), filtros de segurança customizados (JWT, Rate Limit),
+ * e cabeçalhos de proteção (HSTS, CSP, Frame Options).
+ */
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor

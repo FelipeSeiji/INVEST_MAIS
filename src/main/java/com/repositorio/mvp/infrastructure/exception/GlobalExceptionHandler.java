@@ -1,9 +1,12 @@
 package com.repositorio.mvp.infrastructure.exception;
 
+import jakarta.persistence.EntityNotFoundException;
+
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.web.ErrorResponseException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -12,7 +15,6 @@ import com.repositorio.mvp.common.constants.LogMessageConstants;
 import com.repositorio.mvp.common.constants.MessageConstants;
 import com.repositorio.mvp.infrastructure.exception.util.ProblemDetailBuilder;
 
-import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -95,6 +97,13 @@ public class GlobalExceptionHandler {
             MessageConstants.Exception.TITLE_CONFLICT, 
             MessageConstants.Exception.DETAIL_DATA_INTEGRITY
         );
+    }
+
+    // Trata exceções lançadas como ErrorResponseException
+    @ExceptionHandler(ErrorResponseException.class)
+    public ProblemDetail handleErrorResponseException(ErrorResponseException ex) {
+        log.warn("Erro de resposta HTTP: {}", ex.getMessage());
+        return (ProblemDetail) ex.getBody();
     }
 
     //500

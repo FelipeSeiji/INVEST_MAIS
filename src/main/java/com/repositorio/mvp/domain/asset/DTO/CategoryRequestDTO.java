@@ -3,9 +3,11 @@ package com.repositorio.mvp.domain.asset.DTO;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
-import io.swagger.v3.oas.annotations.media.Schema;
+
 import com.repositorio.mvp.common.validation.asset.ValidCategoryName;
 import com.repositorio.mvp.common.validation.asset.ValidTargetPercentage;
+
+import io.swagger.v3.oas.annotations.media.Schema;
 
 @Schema(description = "Objeto de requisição para a criação ou alteração de uma Categoria de Investimentos")
 public record CategoryRequestDTO(

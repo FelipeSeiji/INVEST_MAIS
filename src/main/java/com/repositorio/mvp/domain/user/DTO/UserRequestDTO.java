@@ -1,13 +1,13 @@
 package com.repositorio.mvp.domain.user.DTO;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-
-import io.swagger.v3.oas.annotations.media.Schema;
-
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.repositorio.mvp.common.validation.user.ValidEmail;
 import com.repositorio.mvp.common.validation.user.ValidName;
 import com.repositorio.mvp.common.validation.user.ValidPassword;
+
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+import io.swagger.v3.oas.annotations.media.Schema;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public record UserRequestDTO(

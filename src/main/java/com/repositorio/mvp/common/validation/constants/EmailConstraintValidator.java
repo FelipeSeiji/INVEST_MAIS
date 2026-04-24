@@ -1,9 +1,9 @@
 package com.repositorio.mvp.common.validation.constants;
 
-import com.repositorio.mvp.common.validation.user.ValidEmail;
-
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
+
+import com.repositorio.mvp.common.validation.user.ValidEmail;
 
 public class EmailConstraintValidator implements ConstraintValidator<ValidEmail, String> {
     private static final String EMAIL_PATTERN = "^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$";

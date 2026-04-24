@@ -1,8 +1,9 @@
 package com.repositorio.mvp.domain.auth.DTO;
 
-import io.swagger.v3.oas.annotations.media.Schema;
-import com.repositorio.mvp.common.validation.user.ValidPassword;
 import com.repositorio.mvp.common.validation.auth.ValidToken;
+import com.repositorio.mvp.common.validation.user.ValidPassword;
+
+import io.swagger.v3.oas.annotations.media.Schema;
 
 public record ResetPasswordRequestDTO (
 

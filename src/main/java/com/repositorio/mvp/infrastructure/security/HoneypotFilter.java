@@ -3,6 +3,11 @@ package com.repositorio.mvp.infrastructure.security;
 import java.io.IOException;
 import java.util.Set;
 
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -10,10 +15,6 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import com.repositorio.mvp.domain.auth.service.security.RateLimitingService;
 import com.repositorio.mvp.infrastructure.security.util.ClientIp;
 
-import jakarta.servlet.FilterChain;
-import jakarta.servlet.ServletException;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

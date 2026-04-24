@@ -1,6 +1,7 @@
 package com.repositorio.mvp.domain.user.service.interfaces;
 
 import java.util.UUID;
+
 import org.springframework.security.core.userdetails.UserDetails;
 
 import com.repositorio.mvp.common.result.ServiceResult;

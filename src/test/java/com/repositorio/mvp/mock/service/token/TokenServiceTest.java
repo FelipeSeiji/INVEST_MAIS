@@ -1,7 +1,5 @@
 package com.repositorio.mvp.mock.service.token;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 import java.time.Instant;
 import java.util.UUID;
 
@@ -13,6 +11,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import com.repositorio.mvp.domain.auth.service.token.TokenService;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(MockitoExtension.class)
 public class TokenServiceTest {

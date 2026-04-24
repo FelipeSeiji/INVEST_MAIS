@@ -2,13 +2,14 @@ package com.repositorio.mvp.domain.user.model;
 
 import java.time.LocalDateTime;
 
-import com.repositorio.mvp.domain.user.model.enums.UserRole;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.validation.constraints.NotBlank;
+
+import com.repositorio.mvp.domain.user.model.enums.UserRole;
+
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

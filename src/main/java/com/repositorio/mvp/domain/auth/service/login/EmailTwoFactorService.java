@@ -4,8 +4,9 @@ import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Component;
 
-import com.repositorio.mvp.domain.user.model.User;
 import com.repositorio.mvp.domain.auth.service.interfaces.TwoFactorNotification;
+import com.repositorio.mvp.domain.user.model.User;
+
 import lombok.RequiredArgsConstructor;
 
 /**

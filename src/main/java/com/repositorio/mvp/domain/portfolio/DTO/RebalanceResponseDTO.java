@@ -3,6 +3,7 @@ package com.repositorio.mvp.domain.portfolio.DTO;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
+
 import io.swagger.v3.oas.annotations.media.Schema;
 
 @Schema(description = "A resposta mestra produzida pela Engine de Rebalanceamento. Informa visualmente os aportes em cascata (Carteira -> Categoria -> Ativo).")

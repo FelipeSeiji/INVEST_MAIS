@@ -2,9 +2,10 @@ package com.repositorio.mvp.domain.user.service;
 
 import java.util.UUID;
 
+import jakarta.persistence.EntityNotFoundException;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -15,7 +16,6 @@ import com.repositorio.mvp.domain.user.mapper.UserMapper;
 import com.repositorio.mvp.domain.user.repository.UserRepository;
 import com.repositorio.mvp.domain.user.service.interfaces.UserQueryService;
 
-import jakarta.persistence.EntityNotFoundException;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 

@@ -5,6 +5,8 @@ import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
 
+import jakarta.persistence.EntityNotFoundException;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,7 +21,6 @@ import com.repositorio.mvp.domain.portfolio.model.Portfolio;
 import com.repositorio.mvp.domain.portfolio.service.interfaces.PortfolioQueryService;
 import com.repositorio.mvp.infrastructure.security.UserContextService;
 
-import jakarta.persistence.EntityNotFoundException;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 

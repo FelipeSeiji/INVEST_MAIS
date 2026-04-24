@@ -1,12 +1,13 @@
 package com.repositorio.mvp.domain.auth.service.auth;
 
+import jakarta.transaction.Transactional;
+
 import org.springframework.stereotype.Service;
 
 import com.repositorio.mvp.common.result.ServiceResult;
 import com.repositorio.mvp.domain.auth.service.token.TokenBlackListService;
 import com.repositorio.mvp.domain.auth.service.token.TokenProvider;
 
-import jakarta.transaction.Transactional;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 

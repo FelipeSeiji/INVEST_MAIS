@@ -1,10 +1,13 @@
 package com.repositorio.mvp.domain.auth.service.login;
 
+import java.util.concurrent.TimeUnit;
+
+import org.springframework.stereotype.Service;
+
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
-import org.springframework.stereotype.Service;
+
 import lombok.NonNull;
-import java.util.concurrent.TimeUnit;
 
 /**
  * Serviço responsável por monitorar e mitigar ataques de força bruta.

@@ -1,5 +1,29 @@
 package com.repositorio.mvp.mock.service.auth;
 
+import java.time.LocalDateTime;
+import java.util.Optional;
+
+import org.apache.commons.codec.digest.DigestUtils;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.crypto.password.PasswordEncoder;
+
+import com.repositorio.mvp.common.result.ServiceResult;
+import com.repositorio.mvp.domain.auth.DTO.LoginRequestDTO;
+import com.repositorio.mvp.domain.auth.DTO.Verify2FARequestDTO;
+import com.repositorio.mvp.domain.auth.service.interfaces.TwoFactorNotification;
+import com.repositorio.mvp.domain.auth.service.login.LoginAttemptService;
+import com.repositorio.mvp.domain.auth.service.login.LoginService;
+import com.repositorio.mvp.domain.auth.service.login.TwoFactorService;
+import com.repositorio.mvp.domain.auth.service.token.TokenService;
+import com.repositorio.mvp.domain.user.model.User;
+import com.repositorio.mvp.domain.user.repository.UserRepository;
+import com.repositorio.mvp.shared.UserConstants;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -11,31 +35,6 @@ import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-
-import java.time.LocalDateTime;
-import java.util.Optional;
-
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.apache.commons.codec.digest.DigestUtils;
-
-import com.repositorio.mvp.domain.auth.DTO.LoginRequestDTO;
-import com.repositorio.mvp.domain.auth.DTO.Verify2FARequestDTO;
-import com.repositorio.mvp.domain.user.model.User;
-import com.repositorio.mvp.domain.user.repository.UserRepository;
-import com.repositorio.mvp.domain.auth.service.interfaces.TwoFactorNotification;
-import com.repositorio.mvp.domain.auth.service.login.LoginAttemptService;
-import com.repositorio.mvp.domain.auth.service.login.LoginService;
-import com.repositorio.mvp.domain.auth.service.login.TwoFactorService;
-import com.repositorio.mvp.domain.auth.service.token.TokenService;
-import com.repositorio.mvp.common.result.ServiceResult;
-import com.repositorio.mvp.shared.UserConstants;
-
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
 
 @ExtendWith(MockitoExtension.class)
 public class LoginServiceTest {

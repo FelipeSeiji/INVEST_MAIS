@@ -2,8 +2,6 @@ package com.repositorio.mvp.domain.question.model;
 
 import java.util.UUID;
 
-import com.repositorio.mvp.domain.asset.model.AssetCategory;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -13,6 +11,9 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+
+import com.repositorio.mvp.domain.asset.model.AssetCategory;
+
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

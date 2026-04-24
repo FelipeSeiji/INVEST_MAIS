@@ -2,8 +2,10 @@ package com.repositorio.mvp.domain.asset.DTO;
 
 import java.math.BigDecimal;
 import java.util.List;
-import io.swagger.v3.oas.annotations.media.Schema;
+
 import com.repositorio.mvp.common.validation.asset.ValidFinanceAmount;
+
+import io.swagger.v3.oas.annotations.media.Schema;
 
 @Schema(description = "Objeto de requisição para solicitar um cálculo/simulação de rebalanceamento da carteira de investimentos")
 public record RebalanceRequestDTO(

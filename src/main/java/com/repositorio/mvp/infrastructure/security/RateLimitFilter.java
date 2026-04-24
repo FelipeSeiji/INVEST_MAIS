@@ -1,25 +1,28 @@
 package com.repositorio.mvp.infrastructure.security;
 
-import com.repositorio.mvp.common.constants.LogMessageConstants;
-import com.repositorio.mvp.common.constants.MessageConstants;
-import com.repositorio.mvp.infrastructure.security.util.ClientIp;
-import com.repositorio.mvp.domain.auth.service.security.RateLimitingService;
-import io.github.bucket4j.Bucket;
+import java.io.IOException;
+
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import com.repositorio.mvp.infrastructure.exception.RateLimitExceededException;
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.web.servlet.HandlerExceptionResolver;
 
-import java.io.IOException;
+import com.repositorio.mvp.common.constants.LogMessageConstants;
+import com.repositorio.mvp.common.constants.MessageConstants;
+import com.repositorio.mvp.domain.auth.service.security.RateLimitingService;
+import com.repositorio.mvp.infrastructure.exception.RateLimitExceededException;
+import com.repositorio.mvp.infrastructure.security.util.ClientIp;
+
+import io.github.bucket4j.Bucket;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Filtro de controle de vazão (Rate Limiting) por IP.

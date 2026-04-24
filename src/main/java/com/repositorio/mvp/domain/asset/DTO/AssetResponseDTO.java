@@ -2,6 +2,7 @@ package com.repositorio.mvp.domain.asset.DTO;
 
 import java.math.BigDecimal;
 import java.util.UUID;
+
 import io.swagger.v3.oas.annotations.media.Schema;
 
 @Schema(description = "Objeto de resposta representando um ativo pertencente a uma categoria na carteira")

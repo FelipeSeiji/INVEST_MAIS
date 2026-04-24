@@ -9,12 +9,12 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.repositorio.mvp.common.constants.LogMessageConstants;
 import com.repositorio.mvp.common.constants.MessageConstants;
-import com.repositorio.mvp.domain.user.model.User;
 import com.repositorio.mvp.common.result.ServiceResult;
 import com.repositorio.mvp.domain.auth.DTO.LoginRequestDTO;
 import com.repositorio.mvp.domain.auth.DTO.Verify2FARequestDTO;
 import com.repositorio.mvp.domain.auth.service.interfaces.TwoFactorNotification;
 import com.repositorio.mvp.domain.auth.service.token.TokenProvider;
+import com.repositorio.mvp.domain.user.model.User;
 import com.repositorio.mvp.domain.user.repository.UserRepository;
 
 import lombok.NonNull;

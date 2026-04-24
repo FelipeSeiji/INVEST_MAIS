@@ -2,9 +2,11 @@ package com.repositorio.mvp.domain.asset.DTO;
 
 import java.math.BigDecimal;
 import java.util.UUID;
-import io.swagger.v3.oas.annotations.media.Schema;
+
 import com.repositorio.mvp.common.validation.asset.ValidFinanceAmount;
 import com.repositorio.mvp.common.validation.asset.ValidTicker;
+
+import io.swagger.v3.oas.annotations.media.Schema;
 
 @Schema(description = "Objeto de requisição contendo os dados necessários para criar ou atualizar um ativo")
 public record AssetRequestDTO(

@@ -1,13 +1,8 @@
 package com.repositorio.mvp.mock.controller;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
 import java.util.UUID;
+
+import jakarta.servlet.http.HttpServletRequest;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -18,16 +13,22 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.ResponseEntity;
 
 import com.repositorio.mvp.common.result.ServiceResult;
+import com.repositorio.mvp.domain.auth.service.security.RateLimitingService;
 import com.repositorio.mvp.domain.user.DTO.UserRequestDTO;
 import com.repositorio.mvp.domain.user.DTO.UserResponseDTO;
 import com.repositorio.mvp.domain.user.DTO.UserUpdateRequestDTO;
 import com.repositorio.mvp.domain.user.controller.UserCommandController;
 import com.repositorio.mvp.domain.user.service.interfaces.UserCommandService;
-import com.repositorio.mvp.domain.auth.service.security.RateLimitingService;
 import com.repositorio.mvp.shared.UserConstants;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 import io.github.bucket4j.Bucket;
-import jakarta.servlet.http.HttpServletRequest;
 
 @ExtendWith(MockitoExtension.class)
 public class UserCommandControllerTest {

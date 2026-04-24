@@ -1,11 +1,5 @@
 package com.repositorio.mvp.mock.service.validation;
 
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
 import java.util.UUID;
 
 import org.apache.commons.codec.digest.DigestUtils;
@@ -19,9 +13,15 @@ import com.repositorio.mvp.domain.user.DTO.UserRequestDTO;
 import com.repositorio.mvp.domain.user.DTO.UserUpdateRequestDTO;
 import com.repositorio.mvp.domain.user.model.User;
 import com.repositorio.mvp.domain.user.repository.UserRepository;
-
 import com.repositorio.mvp.domain.user.validation.UserRegisterValidatorImpl;
 import com.repositorio.mvp.domain.user.validation.UserUpdateValidatorImpl;
+import com.repositorio.mvp.common.constants.MessageConstants;
+
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 public class UserValidationTest {
@@ -61,7 +61,7 @@ public class UserValidationTest {
             registerValidator.validate(requestDTO);
         });
 
-        assertEquals("Email já está em uso", exception.getMessage());
+        assertEquals(MessageConstants.User.EMAIL_ALREADY_IN_USE, exception.getMessage());
     }
 
     @Test
@@ -95,6 +95,6 @@ public class UserValidationTest {
             updateValidator.validate(requestDTO, existingUser);
         });
 
-        assertEquals("Email já está em uso por outro usuário.", exception.getMessage());
+        assertEquals(MessageConstants.User.EMAIL_ALREADY_IN_USE_BY_OTHER, exception.getMessage());
     }
 }

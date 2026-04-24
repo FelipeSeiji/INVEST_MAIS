@@ -3,6 +3,7 @@ package com.repositorio.mvp.domain.portfolio.DTO;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
+
 import io.swagger.v3.oas.annotations.media.Schema;
 
 @Schema(description = "Objeto de resposta consolidado que contém todos os dados cruciais para a exibição principal da UI (Dashboard) da carteira do usuário.")

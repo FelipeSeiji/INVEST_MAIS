@@ -3,12 +3,13 @@ package com.repositorio.mvp.domain.question.service;
 import java.util.List;
 import java.util.UUID;
 
+import jakarta.persistence.EntityNotFoundException;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.repositorio.mvp.common.constants.MessageConstants;
 import com.repositorio.mvp.common.result.ServiceResult;
-import com.repositorio.mvp.domain.asset.model.AssetCategory;
 import com.repositorio.mvp.domain.asset.repository.AssetCategoryRepository;
 import com.repositorio.mvp.domain.portfolio.model.Portfolio;
 import com.repositorio.mvp.domain.question.DTO.QuestionResponseDTO;
@@ -17,7 +18,6 @@ import com.repositorio.mvp.domain.question.repository.QuestionRepository;
 import com.repositorio.mvp.domain.question.service.interfaces.QuestionQueryService;
 import com.repositorio.mvp.infrastructure.security.UserContextService;
 
-import jakarta.persistence.EntityNotFoundException;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 

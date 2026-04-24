@@ -1,11 +1,14 @@
 package com.repositorio.mvp.domain.asset.service;
 
+import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.repositorio.mvp.common.constants.LogMessageConstants;
 import com.repositorio.mvp.common.constants.MessageConstants;
+import com.repositorio.mvp.common.result.ServiceResult;
 import com.repositorio.mvp.domain.asset.DTO.AssetRequestDTO;
 import com.repositorio.mvp.domain.asset.DTO.AssetResponseDTO;
 import com.repositorio.mvp.domain.asset.mapper.AssetMapper;
@@ -20,9 +23,6 @@ import com.repositorio.mvp.infrastructure.security.UserContextService;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-
-import com.repositorio.mvp.common.constants.LogMessageConstants;
-import com.repositorio.mvp.common.result.ServiceResult;
 
 /**
  * Implementação do serviço de comandos para ativos (Assets).
@@ -118,7 +118,7 @@ public class AssetCommandServiceImpl implements AssetCommandService {
             .orElseGet(() -> ServiceResult.notFound(MessageConstants.Asset.NOT_FOUND));
     }
 
-    private java.util.Optional<AssetCategory> getCategoryForCurrentUser(UUID categoryId) {
+    private Optional<AssetCategory> getCategoryForCurrentUser(UUID categoryId) {
         Portfolio portfolio = userContextService.getCurrentUserPortfolio();
         return categoryRepository.findByIdAndPortfolioId(categoryId, portfolio.getId());
     }

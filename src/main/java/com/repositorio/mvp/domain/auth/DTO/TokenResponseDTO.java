@@ -1,6 +1,7 @@
 package com.repositorio.mvp.domain.auth.DTO;
 
 import jakarta.validation.constraints.NotBlank;
+
 import io.swagger.v3.oas.annotations.media.Schema;
 
 public record TokenResponseDTO(

@@ -1,9 +1,9 @@
 package com.repositorio.mvp.common.validation.constants;
 
-import com.repositorio.mvp.common.validation.user.ValidName;
-
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
+
+import com.repositorio.mvp.common.validation.user.ValidName;
 
 public class NameConstraintValidator implements ConstraintValidator<ValidName, String> {
     private static final String NAME_PATTERN = "^[a-zA-ZÀ-ÿ\\s]+$";

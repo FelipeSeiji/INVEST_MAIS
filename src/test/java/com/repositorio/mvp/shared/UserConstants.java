@@ -4,6 +4,7 @@ import java.util.UUID;
 
 import com.repositorio.mvp.domain.user.DTO.UserRequestDTO;
 import com.repositorio.mvp.domain.user.model.User;
+import com.repositorio.mvp.domain.user.model.UserSecurity;
 
 public class UserConstants {
     public static final UserRequestDTO USER = new UserRequestDTO(
@@ -23,7 +24,7 @@ public class UserConstants {
         .id(UUID.randomUUID())
         .name(USER.name())
         .email(USER.email())
-        .security(com.repositorio.mvp.domain.user.model.UserSecurity.builder().password("password").build())
+        .security(UserSecurity.builder().password("password").build())
         .build();
     }
 }

@@ -1,9 +1,5 @@
 package com.repositorio.mvp.mock.service.login;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.verify;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -15,9 +11,13 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 
-import com.repositorio.mvp.domain.user.model.User;
 import com.repositorio.mvp.domain.auth.service.login.EmailTwoFactorService;
+import com.repositorio.mvp.domain.user.model.User;
 import com.repositorio.mvp.shared.UserConstants;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
 public class EmailTwoFactorServiceTest{

@@ -2,6 +2,9 @@ package com.repositorio.mvp.domain.user.controller;
 
 import java.util.UUID;
 
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
@@ -17,23 +20,20 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.repositorio.mvp.common.constants.MessageConstants;
 import com.repositorio.mvp.common.result.ServiceResult;
+import com.repositorio.mvp.domain.auth.service.security.RateLimitingService;
 import com.repositorio.mvp.domain.user.DTO.UserRequestDTO;
 import com.repositorio.mvp.domain.user.DTO.UserResponseDTO;
 import com.repositorio.mvp.domain.user.DTO.UserUpdateRequestDTO;
 import com.repositorio.mvp.domain.user.service.interfaces.UserCommandService;
-import com.repositorio.mvp.domain.auth.service.security.RateLimitingService;
+import com.repositorio.mvp.infrastructure.exception.RateLimitExceededException;
 import com.repositorio.mvp.infrastructure.security.util.ClientIp;
 
 import io.github.bucket4j.Bucket;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.validation.Valid;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-
-import com.repositorio.mvp.infrastructure.exception.RateLimitExceededException;
 
 @RestController
 @RequestMapping("/api/users")

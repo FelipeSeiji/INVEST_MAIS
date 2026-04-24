@@ -2,6 +2,11 @@ package com.repositorio.mvp.infrastructure.security;
 
 import java.io.IOException;
 
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -10,15 +15,11 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import com.repositorio.mvp.common.constants.LogMessageConstants;
 import com.repositorio.mvp.common.constants.MessageConstants;
-import com.repositorio.mvp.domain.user.service.interfaces.UserCommandService;
-import com.repositorio.mvp.infrastructure.security.util.ClientIp;
 import com.repositorio.mvp.domain.auth.service.token.TokenBlackListService;
 import com.repositorio.mvp.domain.auth.service.token.TokenService;
+import com.repositorio.mvp.domain.user.service.interfaces.UserCommandService;
+import com.repositorio.mvp.infrastructure.security.util.ClientIp;
 
-import jakarta.servlet.FilterChain;
-import jakarta.servlet.ServletException;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

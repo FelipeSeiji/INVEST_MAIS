@@ -2,11 +2,6 @@ package com.repositorio.mvp.domain.user.model;
 
 import java.util.UUID;
 
-import org.apache.commons.codec.digest.DigestUtils;
-
-import com.repositorio.mvp.domain.portfolio.model.Portfolio;
-import com.repositorio.mvp.infrastructure.util.AttributeEncryptor;
-
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
@@ -20,6 +15,12 @@ import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+
+import org.apache.commons.codec.digest.DigestUtils;
+
+import com.repositorio.mvp.domain.portfolio.model.Portfolio;
+import com.repositorio.mvp.infrastructure.util.AttributeEncryptor;
+
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

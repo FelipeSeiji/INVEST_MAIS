@@ -2,14 +2,14 @@ package com.repositorio.mvp.domain.auth.service.token;
 
 import java.time.Instant;
 
+import org.apache.commons.codec.digest.DigestUtils;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.repositorio.mvp.common.result.ServiceResult;
 import com.repositorio.mvp.domain.auth.model.InvalidToken;
 import com.repositorio.mvp.domain.auth.repository.InvalidTokenRepository;
-import com.repositorio.mvp.common.result.ServiceResult;
-import org.apache.commons.codec.digest.DigestUtils;
 
 import lombok.RequiredArgsConstructor;
 

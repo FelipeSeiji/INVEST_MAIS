@@ -1,14 +1,5 @@
 package com.repositorio.mvp.mock.service.auth;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
 import java.time.LocalDateTime;
 import java.util.Optional;
 
@@ -20,17 +11,26 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.transaction.support.TransactionCallback;
 import org.springframework.transaction.support.TransactionTemplate;
-import org.springframework.security.crypto.password.PasswordEncoder;
 
+import com.repositorio.mvp.common.result.ServiceResult;
 import com.repositorio.mvp.domain.auth.model.PasswordResetToken;
 import com.repositorio.mvp.domain.auth.repository.PasswordResetTokenRepository;
+import com.repositorio.mvp.domain.auth.service.auth.PasswordRecoveryService;
 import com.repositorio.mvp.domain.user.model.User;
 import com.repositorio.mvp.domain.user.repository.UserRepository;
-import com.repositorio.mvp.domain.auth.service.auth.PasswordRecoveryService;
 import com.repositorio.mvp.shared.UserConstants;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 public class PasswordRecoveryServiceTest {
@@ -111,23 +111,22 @@ public class PasswordRecoveryServiceTest {
     }
 
     @Test
-    public void resetPassword_WithInvalidToken_ThrowsException() {
+    public void resetPassword_WithInvalidToken_ReturnsError() {
         String invalidToken = "invalid_token";
         String newPassword = "newPassword@123";
         
         when(passwordResetTokenRepository.findByToken(anyString())).thenReturn(Optional.empty());
 
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
-            passwordRecoveryService.resetPassword(invalidToken, newPassword);
-        });
+        ServiceResult<Void> result = passwordRecoveryService.resetPassword(invalidToken, newPassword);
 
-        assertEquals("Token inválido ou não encontrado.", exception.getMessage());
+        assertTrue(result instanceof ServiceResult.Error);
+        assertEquals("Token inválido ou não encontrado.", ((ServiceResult.Error<Void>) result).message());
 
         verify(userRepository, never()).save(any());
     }
 
     @Test
-    public void resetPassword_WithExpiredToken_ThrowsExceptionAndDeletesToken() {
+    public void resetPassword_WithExpiredToken_ReturnsErrorAndDeletesToken() {
         String token = "token_expirado";
         String newPassword = "newPassword@123";   
         PasswordResetToken expiredToken = new PasswordResetToken(token, "hmac-v1", mockUser);
@@ -136,11 +135,10 @@ public class PasswordRecoveryServiceTest {
 
         when(passwordResetTokenRepository.findByToken(anyString())).thenReturn(Optional.of(expiredToken));
 
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
-            passwordRecoveryService.resetPassword(token, newPassword);
-        });
+        ServiceResult<Void> result = passwordRecoveryService.resetPassword(token, newPassword);
 
-        assertTrue(exception.getMessage().contains("expirado"));
+        assertTrue(result instanceof ServiceResult.Error);
+        assertTrue(((ServiceResult.Error<Void>) result).message().contains("expirado"));
 
         verify(passwordResetTokenRepository).delete(expiredToken);
         verify(userRepository, never()).save(any());

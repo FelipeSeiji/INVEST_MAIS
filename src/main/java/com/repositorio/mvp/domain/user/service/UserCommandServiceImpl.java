@@ -3,13 +3,18 @@ package com.repositorio.mvp.domain.user.service;
 import java.util.List;
 import java.util.UUID;
 
+import jakarta.persistence.EntityNotFoundException;
+
+import org.apache.commons.codec.digest.DigestUtils;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.apache.commons.codec.digest.DigestUtils;
 
+import com.repositorio.mvp.common.constants.LogMessageConstants;
 import com.repositorio.mvp.common.constants.MessageConstants;
+import com.repositorio.mvp.common.result.ServiceResult;
 import com.repositorio.mvp.domain.portfolio.service.interfaces.PortfolioCommandService;
 import com.repositorio.mvp.domain.user.DTO.UserRequestDTO;
 import com.repositorio.mvp.domain.user.DTO.UserResponseDTO;
@@ -24,13 +29,9 @@ import com.repositorio.mvp.domain.user.validation.interfaces.UserRegisterValidat
 import com.repositorio.mvp.domain.user.validation.interfaces.UserUpdateValidator;
 import com.repositorio.mvp.infrastructure.security.UserDetailsImpl;
 
-import jakarta.persistence.EntityNotFoundException;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-
-import com.repositorio.mvp.common.constants.LogMessageConstants;
-import com.repositorio.mvp.common.result.ServiceResult;
 
 @Slf4j
 @Service
@@ -73,7 +74,7 @@ public class UserCommandServiceImpl implements UserCommandService {
             portfolioCommandService.createPortfolioForUser(user.getId());
 
             return ServiceResult.success(userMapper.toUserResponseDTO(user));
-        } catch (org.springframework.dao.DataIntegrityViolationException _) {
+        } catch (DataIntegrityViolationException _) {
             log.warn("Tentativa de registro duplicado omitida para segurança.");
             return ServiceResult.error(MessageConstants.User.EMAIL_ALREADY_IN_USE);
         } catch (Exception e) {

@@ -1,15 +1,17 @@
 package com.repositorio.mvp.domain.auth.service.security;
 
+import java.time.Duration;
+import java.util.concurrent.TimeUnit;
+
+import org.springframework.stereotype.Service;
+
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
+
 import io.github.bucket4j.Bandwidth;
 import io.github.bucket4j.Bucket;
 import io.github.bucket4j.Refill;
-import org.springframework.stereotype.Service;
 import lombok.NonNull;
-
-import java.time.Duration;
-import java.util.concurrent.TimeUnit;
 
 /**
  * Serviço de Rate Limiting para proteção da infraestrutura da API.

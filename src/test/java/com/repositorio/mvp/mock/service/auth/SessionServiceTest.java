@@ -1,20 +1,19 @@
 package com.repositorio.mvp.mock.service.auth;
 
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
 import java.time.Instant;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.repositorio.mvp.domain.auth.service.auth.SessionService;
 import com.repositorio.mvp.domain.auth.service.token.TokenBlackListService;
 import com.repositorio.mvp.domain.auth.service.token.TokenProvider;
 
-import org.mockito.junit.jupiter.MockitoExtension;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 public class SessionServiceTest {

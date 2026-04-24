@@ -6,8 +6,10 @@ import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.header.writers.ReferrerPolicyHeaderWriter.ReferrerPolicy;
 
 import lombok.RequiredArgsConstructor;
 
@@ -28,7 +30,7 @@ public class SecurityConfig {
      * Isso é mais robusto que permitAll() pois remove os filtros da jogada.
      */
     @Bean
-    public org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer webSecurityCustomizer() {
+    public WebSecurityCustomizer webSecurityCustomizer() {
         return (web) -> web.ignoring().requestMatchers(
             "/h2-console/**",
             "/h2-console",
@@ -115,7 +117,7 @@ public class SecurityConfig {
                                                 "frame-ancestors 'self'; " +
                                                 "form-action 'self';"))
                         .referrerPolicy(referrer -> referrer
-                                .policy(org.springframework.security.web.header.writers.ReferrerPolicyHeaderWriter.ReferrerPolicy.STRICT_ORIGIN_WHEN_CROSS_ORIGIN))
+                                .policy(ReferrerPolicy.STRICT_ORIGIN_WHEN_CROSS_ORIGIN))
                         .permissionsPolicy(permissions -> permissions
                                 .policy("geolocation=(), microphone=(), camera=()")))
                 .addFilterBefore(rateLimitFilter, UsernamePasswordAuthenticationFilter.class)

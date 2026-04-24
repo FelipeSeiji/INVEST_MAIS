@@ -1,44 +1,44 @@
 package com.repositorio.mvp.mock.service;
 
-import static com.repositorio.mvp.shared.UserConstants.INVALID_USER;
-import static com.repositorio.mvp.shared.UserConstants.USER;
-import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.doThrow;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
-
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.util.ReflectionTestUtils;
 
+import com.repositorio.mvp.common.constants.MessageConstants;
+import com.repositorio.mvp.common.result.ServiceResult;
+import com.repositorio.mvp.domain.portfolio.service.interfaces.PortfolioCommandService;
 import com.repositorio.mvp.domain.user.DTO.UserRequestDTO;
 import com.repositorio.mvp.domain.user.DTO.UserResponseDTO;
 import com.repositorio.mvp.domain.user.mapper.UserMapper;
-import com.repositorio.mvp.domain.portfolio.service.interfaces.PortfolioCommandService;
-import com.repositorio.mvp.common.result.ServiceResult;
 import com.repositorio.mvp.domain.user.model.User;
+import com.repositorio.mvp.domain.user.model.UserSecurity;
 import com.repositorio.mvp.domain.user.repository.UserRepository;
 import com.repositorio.mvp.domain.user.service.UserCommandServiceImpl;
 import com.repositorio.mvp.domain.user.service.UserQueryServiceImpl;
 import com.repositorio.mvp.domain.user.validation.interfaces.UserRegisterValidator;
 import com.repositorio.mvp.domain.user.validation.interfaces.UserUpdateValidator;
 
-import jakarta.persistence.EntityNotFoundException;
+import static com.repositorio.mvp.shared.UserConstants.INVALID_USER;
+import static com.repositorio.mvp.shared.UserConstants.USER;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.when;
+
 
 @ExtendWith(MockitoExtension.class)
 public class UserServiceTest {
@@ -85,7 +85,7 @@ public class UserServiceTest {
             .id(userId)
             .name(USER.name())
             .email(USER.email())
-            .security(com.repositorio.mvp.domain.user.model.UserSecurity.builder().password("senha_encriptada").build())
+            .security(UserSecurity.builder().password("senha_encriptada").build())
             .build();
 
         UserResponseDTO expectedResponse =
@@ -106,16 +106,15 @@ public class UserServiceTest {
     }
 
     @Test
-    public void createUser_WithEmailAlreadyInUse_ThrowException() {
-        // CORREÇÃO AQUI: Usando o método real da interface e passando a classe correta
-        doThrow(new IllegalArgumentException("Email já está em uso"))
+    public void createUser_WithEmailAlreadyInUse_ReturnsError() {
+        doThrow(new IllegalArgumentException(MessageConstants.User.EMAIL_ALREADY_IN_USE))
             .when(userRegisterValidator)
             .validate(any(UserRequestDTO.class));
 
-        assertThatThrownBy(() -> {
-            userCommandService.createUser(INVALID_USER);
-        }).isInstanceOf(IllegalArgumentException.class)
-          .hasMessage("Email já está em uso");
+        ServiceResult<UserResponseDTO> result = userCommandService.createUser(INVALID_USER);
+        
+        assertThat(result).isInstanceOf(ServiceResult.Error.class);
+        assertThat(((ServiceResult.Error<UserResponseDTO>) result).message()).isEqualTo(MessageConstants.User.EMAIL_ALREADY_IN_USE);
     }
 
     @Test
@@ -124,7 +123,7 @@ public class UserServiceTest {
             .id(userId)
             .name(USER.name())
             .email(USER.email())
-            .security(com.repositorio.mvp.domain.user.model.UserSecurity.builder().password(USER.password()).build())
+            .security(UserSecurity.builder().password(USER.password()).build())
             .build();
 
         UserResponseDTO expectedResponse =
@@ -149,7 +148,8 @@ public class UserServiceTest {
         ServiceResult<UserResponseDTO> result = userQueryService.findUserById(userId);
         
         assertThat(result).isInstanceOf(ServiceResult.NotFound.class);
-        assertThat(((ServiceResult.NotFound<UserResponseDTO>) result).message()).isEqualTo("Usuário não encontrado");
+        ServiceResult.NotFound<UserResponseDTO> error = (ServiceResult.NotFound<UserResponseDTO>) result;
+        assertThat(error.message()).isEqualTo(MessageConstants.User.NOT_FOUND);
     }
 
     @Test
@@ -160,14 +160,14 @@ public class UserServiceTest {
             .id(userId)
             .name(USER.name())
             .email(USER.email())
-            .security(com.repositorio.mvp.domain.user.model.UserSecurity.builder().password(USER.password()).build())
+            .security(UserSecurity.builder().password(USER.password()).build())
             .build();
 
         User user2 = User.builder()
             .id(userId2)
             .name("Maria")
             .email("maria@gmail.com")
-            .security(com.repositorio.mvp.domain.user.model.UserSecurity.builder().password("1234").build())
+            .security(UserSecurity.builder().password("1234").build())
             .build();
 
         UserResponseDTO expectedResponse1 =

@@ -8,6 +8,7 @@ import com.repositorio.mvp.domain.user.DTO.UserUpdateRequestDTO;
 import com.repositorio.mvp.domain.user.model.User;
 import com.repositorio.mvp.domain.user.repository.UserRepository;
 import com.repositorio.mvp.domain.user.validation.interfaces.UserUpdateValidator;
+
 import lombok.NonNull;
 
 @Component

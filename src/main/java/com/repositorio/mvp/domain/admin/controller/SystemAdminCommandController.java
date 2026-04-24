@@ -1,9 +1,10 @@
 package com.repositorio.mvp.domain.admin.controller;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.ErrorResponseException;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.ErrorResponseException;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -33,8 +34,8 @@ public class SystemAdminCommandController {
         
         return switch (result) {
             case ServiceResult.Success<Void> _ -> ResponseEntity.ok(new MessageResponseDTO(MessageConstants.Admin.TOKEN_CLEANUP_SUCCESS));
-            case ServiceResult.NotFound<Void> n -> throw new ErrorResponseException(org.springframework.http.HttpStatus.NOT_FOUND, ProblemDetail.forStatusAndDetail(org.springframework.http.HttpStatus.NOT_FOUND, n.message()), null);
-            case ServiceResult.Error<Void> e -> throw new ErrorResponseException(org.springframework.http.HttpStatus.BAD_REQUEST, ProblemDetail.forStatusAndDetail(org.springframework.http.HttpStatus.BAD_REQUEST, e.message()), null);
+            case ServiceResult.NotFound<Void> n -> throw new ErrorResponseException(HttpStatus.NOT_FOUND, ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, n.message()), null);
+            case ServiceResult.Error<Void> e -> throw new ErrorResponseException(HttpStatus.BAD_REQUEST, ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, e.message()), null);
         };
     }
 }

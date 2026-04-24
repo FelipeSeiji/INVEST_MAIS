@@ -1,17 +1,16 @@
 package com.repositorio.mvp.mock.controller.auth;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import jakarta.servlet.http.HttpServletRequest;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.http.ResponseEntity;
 
 import com.repositorio.mvp.common.DTO.MessageResponseDTO;
+import com.repositorio.mvp.common.result.ServiceResult;
 import com.repositorio.mvp.domain.auth.DTO.ForgotPasswordRequestDTO;
 import com.repositorio.mvp.domain.auth.DTO.LoginRequestDTO;
 import com.repositorio.mvp.domain.auth.DTO.ResetPasswordRequestDTO;
@@ -22,13 +21,15 @@ import com.repositorio.mvp.domain.auth.service.auth.PasswordRecoveryService;
 import com.repositorio.mvp.domain.auth.service.auth.SessionService;
 import com.repositorio.mvp.domain.auth.service.login.LoginAttemptService;
 import com.repositorio.mvp.domain.auth.service.login.LoginService;
+import com.repositorio.mvp.domain.auth.service.security.RateLimitingService;
 import com.repositorio.mvp.shared.UserConstants;
 
-import com.repositorio.mvp.common.result.ServiceResult;
-import com.repositorio.mvp.domain.auth.service.security.RateLimitingService;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 import io.github.bucket4j.Bucket;
-import org.springframework.http.ResponseEntity;
-import jakarta.servlet.http.HttpServletRequest;
 
 @ExtendWith(MockitoExtension.class)
 public class AuthControllerTest {

@@ -1,5 +1,7 @@
 package com.repositorio.mvp.infrastructure.security;
 
+import jakarta.persistence.EntityNotFoundException;
+
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
@@ -7,7 +9,6 @@ import com.repositorio.mvp.common.constants.MessageConstants;
 import com.repositorio.mvp.domain.portfolio.model.Portfolio;
 import com.repositorio.mvp.domain.portfolio.repository.PortfolioRepository;
 
-import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 
 @Service

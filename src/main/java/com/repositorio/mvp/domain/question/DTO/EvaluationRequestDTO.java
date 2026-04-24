@@ -2,9 +2,10 @@ package com.repositorio.mvp.domain.question.DTO;
 
 import java.util.UUID;
 
-import io.swagger.v3.oas.annotations.media.Schema;
-import com.repositorio.mvp.common.validation.question.ValidQuestionId;
 import com.repositorio.mvp.common.validation.question.ValidIsPositive;
+import com.repositorio.mvp.common.validation.question.ValidQuestionId;
+
+import io.swagger.v3.oas.annotations.media.Schema;
 
 public record EvaluationRequestDTO(
         @ValidQuestionId 

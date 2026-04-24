@@ -1,7 +1,19 @@
 package com.repositorio.mvp.domain.auth.controller;
 
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ProblemDetail;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.web.ErrorResponseException;
+import org.springframework.web.bind.annotation.*;
+
+import com.repositorio.mvp.common.DTO.MessageResponseDTO;
 import com.repositorio.mvp.common.constants.LogMessageConstants;
 import com.repositorio.mvp.common.constants.MessageConstants;
+import com.repositorio.mvp.common.result.ServiceResult;
 import com.repositorio.mvp.domain.auth.DTO.ForgotPasswordRequestDTO;
 import com.repositorio.mvp.domain.auth.DTO.LoginRequestDTO;
 import com.repositorio.mvp.domain.auth.DTO.ResetPasswordRequestDTO;
@@ -11,28 +23,16 @@ import com.repositorio.mvp.domain.auth.service.auth.PasswordRecoveryService;
 import com.repositorio.mvp.domain.auth.service.auth.SessionService;
 import com.repositorio.mvp.domain.auth.service.login.LoginAttemptService;
 import com.repositorio.mvp.domain.auth.service.login.LoginService;
-import com.repositorio.mvp.infrastructure.security.util.ClientIp;
-import com.repositorio.mvp.common.DTO.MessageResponseDTO;
 import com.repositorio.mvp.domain.auth.service.security.RateLimitingService;
-import com.repositorio.mvp.infrastructure.exception.RateLimitExceededException;
-import com.repositorio.mvp.common.result.ServiceResult;
+import com.repositorio.mvp.infrastructure.security.util.ClientIp;
 
 import io.github.bucket4j.Bucket;
-
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.validation.Valid;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ProblemDetail;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.ErrorResponseException;
-import org.springframework.web.bind.annotation.*;
 
 @Slf4j
 @RestController

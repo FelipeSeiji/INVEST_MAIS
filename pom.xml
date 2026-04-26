@@ -176,7 +176,7 @@
                 <version>1.15.0</version>
                 <configuration>
                     <workingDirectory>frontend</workingDirectory>
-                    <nodeVersion>v20.11.1</nodeVersion>
+                    <nodeVersion>v22.13.1</nodeVersion>
                 </configuration>
                 <executions>
                     <execution>

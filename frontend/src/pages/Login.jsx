@@ -21,6 +21,7 @@ export default function Login() {
     const [isLoadingLogin, setIsLoadingLogin] = useState(false);
     const [isLoading2FA, setIsLoading2FA] = useState(false);
     const [isLoadingRegister, setIsLoadingRegister] = useState(false);
+    const [showTerms, setShowTerms] = useState(false);
 
 
     const handleLogin = async () => {
@@ -93,6 +94,11 @@ export default function Login() {
             return;
         }
 
+        setShowTerms(true);
+    };
+
+    const confirmRegistration = async () => {
+        setShowTerms(false);
         setIsLoadingRegister(true);
         setRegMsg({ text: '', color: '' });
 
@@ -194,6 +200,25 @@ export default function Login() {
                 </button>
                 <div className="message" style={{ color: regMsg.color }}>{regMsg.text}</div>
             </div>
+
+            {showTerms && (
+                <div className="modal-overlay">
+                    <div className="modal-content">
+                        <div className="modal-header">
+                            <h3>Termos e Condições</h3>
+                        </div>
+                        <div className="modal-body">
+                            <p>Bem-vindo ao <strong>INVEST +</strong>. </p>
+                            <h4>Consentimento</h4>
+                            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean augue purus, finibus sed ultrices vel, efficitur eget nisl. Phasellus vehicula in ex at dignissim. Suspendisse rhoncus, tellus quis cursus semper, velit diam ornare lorem, et aliquam justo felis at nulla. Cras dui felis, interdum sit amet sodales nec, lacinia sit amet nisl. Nullam sed nulla cursus, facilisis sapien eu, congue nisi. Proin id eros sollicitudin, elementum elit in, lacinia tortor. Vivamus condimentum rhoncus felis a faucibus. Cras at augue pretium, efficitur orci vitae, sollicitudin est. Fusce dictum libero pretium lectus auctor, at semper enim commodo. Nulla vitae ipsum id magna ornare aliquam. Nunc ut tortor ac mi consequat fringilla. Ut vel massa sed enim vehicula porttitor. Morbi dictum sem ut nulla porta porta. Quisque in lobortis arcu.</p>
+                        </div>
+                        <div className="modal-footer">
+                            <button className="btn-secondary" onClick={() => setShowTerms(false)}>Cancelar</button>
+                            <button className="btn-primary" onClick={confirmRegistration}>Concordar e Criar Conta</button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }

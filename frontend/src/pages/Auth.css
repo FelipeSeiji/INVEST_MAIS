@@ -68,7 +68,6 @@
 .hidden { display: none; }
 .step-box { transition: all 0.5s ease; }
 
-/* Modal Styles */
 .modal-overlay {
     position: fixed;
     top: 0;

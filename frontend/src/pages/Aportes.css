@@ -1,16 +1,19 @@
+/* Container principal da página de Aportes */
 .aportes-container {
     padding: 40px;
     max-width: 1200px;
     margin: 0 auto;
     text-align: left;
-    animation: fadeIn 0.5s ease-out;
+    animation: fadeIn 0.5s ease-out; /* Efeito suave ao carregar a página */
 }
 
+/* Animação de entrada (Fade In + Subida leve) */
 @keyframes fadeIn {
     from { opacity: 0; transform: translateY(10px); }
     to { opacity: 1; transform: translateY(0); }
 }
 
+/* Seção de Cabeçalho (Título e Botão de Ação) */
 .header-section {
     display: flex;
     justify-content: space-between;
@@ -21,11 +24,13 @@
 .header-section h1 {
     margin: 0;
     font-size: 32px;
+    /* Gradiente moderno no texto do título */
     background: linear-gradient(135deg, var(--text-main) 0%, #71717a 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
 }
 
+/* Botão de Adicionar Categoria */
 .add-category-btn {
     background: var(--text-main);
     color: white;
@@ -44,13 +49,14 @@
     box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
 }
 
-/* Categories Grid */
+/* Grid de Categorias (Organização dos Cards) */
 .categories-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
     gap: 30px;
 }
 
+/* Estilização do Card de Categoria Individual */
 .category-card {
     background: var(--bg-card);
     border: 1px solid var(--border-color);
@@ -74,6 +80,7 @@
     margin-bottom: 20px;
 }
 
+/* Título e Badge de Alvo dentro da Categoria */
 .category-info {
     display: flex;
     flex-direction: column;
@@ -98,6 +105,7 @@
     align-self: flex-start;
 }
 
+/* Botões de ação da Categoria (Editar/Excluir) */
 .category-actions {
     display: flex;
     gap: 8px;
@@ -127,12 +135,13 @@
     color: #ef4444;
 }
 
-/* Assets List */
+/* Lista de Ativos dentro de cada Categoria */
 .assets-list {
     margin-top: 10px;
     flex-grow: 1;
 }
 
+/* Item de Ativo Individual */
 .asset-item {
     display: flex;
     justify-content: space-between;
@@ -155,6 +164,7 @@
     gap: 12px;
 }
 
+/* Estilo do Ticker (ex: PETR4) */
 .asset-ticker {
     font-weight: 700;
     color: var(--text-main);
@@ -164,6 +174,7 @@
     box-shadow: 0 1px 2px rgba(0,0,0,0.05);
 }
 
+/* Badge de Score (Nota do Ativo) */
 .asset-score {
     font-size: 12px;
     font-weight: 600;
@@ -190,6 +201,7 @@
     color: var(--text-muted);
 }
 
+/* Botão de Adicionar Ativo (Estilo pontilhado/dashed) */
 .add-asset-btn {
     width: 100%;
     background: transparent;
@@ -207,13 +219,10 @@
     background: var(--bg-primary);
 }
 
-/* Modal */
+/* Overlay do Modal (Fundo escurecido e blur) */
 .modal-overlay {
     position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
+    top: 0; left: 0; right: 0; bottom: 0;
     background: rgba(0, 0, 0, 0.4);
     backdrop-filter: blur(4px);
     display: flex;
@@ -223,6 +232,7 @@
     animation: fadeIn 0.3s ease;
 }
 
+/* Caixa de Conteúdo do Modal */
 .modal-content {
     background: var(--bg-card);
     padding: 32px;
@@ -243,6 +253,7 @@
     font-size: 24px;
 }
 
+/* Grupos de Formulário (Label + Input) */
 .form-group {
     margin-bottom: 20px;
     display: flex;
@@ -260,6 +271,7 @@
     margin: 0;
 }
 
+/* Rodapé do Modal (Botões de Ação) */
 .modal-footer {
     display: flex;
     gap: 12px;
@@ -280,7 +292,7 @@
     background: #e4e4e7;
 }
 
-/* Empty State */
+/* Estado Vazio (Quando não há categorias) */
 .empty-state {
     text-align: center;
     padding: 60px;

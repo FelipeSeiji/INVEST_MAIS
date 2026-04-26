@@ -78,11 +78,19 @@ public class SecurityConfig {
                         .requestMatchers(
                                 "/",
                                 "/static/**",
+                                "/assets/**",
                                 "/css/**",
                                 "/js/**",
                                 "/templates/**",
                                 "/index.html",
-                                "/reset-password.html")
+                                "/*.svg",
+                                "/*.png",
+                                "/*.ico",
+                                "/dashboard",
+                                "/reset-password",
+                                "/reset-password.html",
+                                "/aportes",
+                                "/profile")
                         .permitAll()
                         .requestMatchers(HttpMethod.POST,
                                 "/auth/login",

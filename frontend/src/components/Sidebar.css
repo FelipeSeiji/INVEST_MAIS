@@ -1,0 +1,119 @@
+.sidebar {
+  width: 200px;
+  background-color: var(--text-main);
+  color: #e1e1e6;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  position: sticky;
+  top: 0;
+  box-shadow: 4px 0 15px rgba(0, 0, 0, 0.1);
+  z-index: 100;
+  transition: all 0.3s ease;
+  font-family: var(--sans);
+}
+
+.sidebar-brand {
+  padding: 32px 24px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.sidebar-brand h2 {
+  margin: 0;
+  font-size: 26px;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  color: #ffffff;
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.sidebar-nav {
+  flex: 1;
+  padding: 24px 16px;
+  overflow-y: auto;
+}
+
+.sidebar-nav ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.sidebar-nav a {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 18px;
+  text-decoration: none;
+  color: #a8a8b3;
+  font-weight: 500;
+  font-size: 15px;
+  border-radius: 8px;
+  transition: all 0.2s ease-in-out;
+}
+
+.sidebar-nav a .icon {
+  font-size: 18px;
+  filter: grayscale(100%) opacity(0.6);
+  transition: all 0.2s ease;
+}
+
+.sidebar-nav a:hover {
+  background-color: rgba(255, 255, 255, 0.05);
+  color: #ffffff;
+  transform: translateX(4px);
+}
+
+.sidebar-nav a:hover .icon {
+  filter: grayscale(0%) opacity(1);
+}
+
+.sidebar-nav a.active {
+  background-color: rgba(255, 192, 0, 0.1);
+  color: #a8a8b3;
+  box-shadow: inset 4px 0 0 #a8a8b3;
+}
+
+.sidebar-nav a.active .icon {
+  filter: grayscale(0%) opacity(1);
+}
+
+.sidebar-actions {
+  padding: 0 20px;
+  margin-bottom: 8px;
+}
+
+.btn-logout-sidebar {
+  width: 100%;
+  padding: 12px;
+  background-color: rgba(255, 255, 255, 0.05);
+  color: #e1e1e6;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-logout-sidebar:hover {
+  background-color: #ff4757;
+  border-color: #ff4757;
+  color: white;
+}
+
+.sidebar-footer {
+  padding: 16px 20px 24px;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  text-align: center;
+}
+
+.sidebar-footer p {
+  margin: 0;
+  font-size: 12px;
+  color: #737380;
+}

@@ -85,10 +85,10 @@ public class LoginService {
                 return ServiceResult.error(MessageConstants.Auth.ERR_INVALID_CREDENTIALS);
         }
 
-        if (!user.getSecurity().isEmailVerified()) {
-            log.warn("Tentativa de login em conta não verificada: {}", maskEmail(user.getEmail()));
-            return ServiceResult.error(MessageConstants.Auth.ERR_INVALID_CREDENTIALS);
-        }
+        // if (!user.getSecurity().isEmailVerified()) {
+        //     log.warn("Tentativa de login em conta não verificada: {}", maskEmail(user.getEmail()));
+        //     return ServiceResult.error(MessageConstants.Auth.ERR_INVALID_CREDENTIALS);
+        // }
 
         loginAttemptService.loginSucceeded(ip);
         loginAttemptService.loginSucceeded(user.getEmail());

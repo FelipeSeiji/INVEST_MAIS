@@ -165,34 +165,36 @@ const Aportes = () => {
                         </div>
 
                         <div className="assets-list">
-                            {category.assets && category.assets.length > 0 ? (
-                                category.assets.map(asset => (
-                                    <div key={asset.id} className="asset-item">
-                                        <div className="asset-main">
-                                            <span className="asset-ticker">{asset.ticker}</span>
-                                            <span className={`asset-score ${asset.score >= 0 ? 'score-positive' : 'score-negative'}`}>
-                                                Score: {asset.score}
-                                            </span>
+                            <div className="assets-scroll-area">
+                                {category.assets && category.assets.length > 0 ? (
+                                    category.assets.map(asset => (
+                                        <div key={asset.id} className="asset-item">
+                                            <div className="asset-main">
+                                                <span className="asset-ticker">{asset.ticker}</span>
+                                                <span className={`asset-score ${asset.score >= 0 ? 'score-positive' : 'score-negative'}`}>
+                                                    Score: {asset.score}
+                                                </span>
+                                            </div>
+                                            <div className="asset-values">
+                                                <div className="asset-price">R$ {asset.currentPositionValue.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</div>
+                                                <div className="asset-qty">{asset.quantity} cotas</div>
+                                            </div>
+                                            <div className="asset-actions">
+                                                <button className="icon-btn" onClick={() => handleOpenModal('asset', 'edit', asset, category.id)}>
+                                                    ✏️
+                                                </button>
+                                                <button className="icon-btn delete" onClick={() => handleDelete('asset', asset.id)}>
+                                                    🗑️
+                                                </button>
+                                            </div>
                                         </div>
-                                        <div className="asset-values">
-                                            <div className="asset-price">R$ {asset.currentPositionValue.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</div>
-                                            <div className="asset-qty">{asset.quantity} cotas</div>
-                                        </div>
-                                        <div className="asset-actions">
-                                            <button className="icon-btn" onClick={() => handleOpenModal('asset', 'edit', asset, category.id)}>
-                                                ✏️
-                                            </button>
-                                            <button className="icon-btn delete" onClick={() => handleDelete('asset', asset.id)}>
-                                                🗑️
-                                            </button>
-                                        </div>
-                                    </div>
-                                ))
-                            ) : (
-                                <p style={{ fontSize: '14px', color: 'var(--text-placeholder)', textAlign: 'center', padding: '20px' }}>
-                                    Nenhum ativo nesta categoria.
-                                </p>
-                            )}
+                                    ))
+                                ) : (
+                                    <p style={{ fontSize: '14px', color: 'var(--text-placeholder)', textAlign: 'center', padding: '20px' }}>
+                                        Nenhum ativo nesta categoria.
+                                    </p>
+                                )}
+                            </div>
                             <button className="add-asset-btn" onClick={() => handleOpenModal('asset', 'create', null, category.id)}>
                                 + Adicionar Ativo
                             </button>

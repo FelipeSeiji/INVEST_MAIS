@@ -7,24 +7,21 @@ export default function Footer() {
         <div className="footer-section">
           <h3>Sobre Nós</h3>
           <p>
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean augue purus, finibus sed ultrices vel, efficitur eget nisl. Phasellus vehicula in ex at dignissim. Suspendisse rhoncus, tellus quis cursus semper, velit diam ornare lorem, et aliquam justo felis at nulla. Cras dui felis, interdum sit amet sodales nec, lacinia sit amet nisl. Nullam sed nulla cursus, facilisis sapien eu, congue nisi. Proin id eros sollicitudin, elementum elit in, lacinia tortor. Vivamus condimentum rhoncus felis a faucibus. Cras at augue pretium, efficitur orci vitae, sollicitudin est. Fusce dictum libero pretium lectus auctor, at semper enim commodo. Nulla vitae ipsum id magna ornare aliquam. Nunc ut tortor ac mi consequat fringilla. Ut vel massa sed enim vehicula porttitor. Morbi dictum sem ut nulla porta porta. Quisque in lobortis arcu. 
-          </p>
+            O Invest+ é uma plataforma inovadora de gestão de investimentos desenvolvida para ajudar usuários a gerenciar seus portfólios de forma eficiente e segura. Utilizando tecnologias modernas como Spring Boot no backend e React no frontend, oferecemos ferramentas avançadas para análise de ativos, acompanhamento de aportes, controle de usuários e muito mais. Nosso objetivo é democratizar o acesso a informações financeiras precisas e facilitar decisões de investimento inteligentes.
+          </p>  
         </div>
         <div className="footer-section">
           <h3>Contatos</h3>
           <p>
-            Lorem ipsum dolor.
+            email: ivestmais@gmail.com
           </p>
           <p>
-            email: Lorem  ipsum
-          </p>
-          <p>
-            telefone: Lorem  ipsum
+            telefone: (11) 91234-5678
           </p>
         </div>
       </div>
       <div className="footer-bottom">
-        <p>© 2026 Invest+. Talvez uma licenca no futuro.</p>
+        <p>2026 Invest+</p>
       </div>
     </footer>
   );

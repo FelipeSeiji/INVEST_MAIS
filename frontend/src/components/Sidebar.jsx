@@ -21,11 +21,6 @@ export default function Sidebar() {
       <nav className="sidebar-nav">
         <ul>
           <li>
-            <Link to="/dashboard" className={isActive('/dashboard')}>
-              Dashboard
-            </Link>
-          </li>
-          <li>
             <Link to="/aportes" className={isActive('/aportes')}>
               Aportes
             </Link>

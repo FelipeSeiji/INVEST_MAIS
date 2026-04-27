@@ -4,7 +4,7 @@
   border-top: 1px solid var(--border-color);
   padding: 40px 40px 20px;
   font-family: var(--sans);
-  margin-top: auto; /* Empurra o footer para o final da página se o conteúdo for pouco */
+  margin-top: auto;
 }
 
 /* Container centralizado do conteúdo do footer */
@@ -12,7 +12,7 @@
   max-width: 1000px;
   margin: 0 auto 30px auto;
   display: flex;
-  flex-wrap: wrap; /* Permite que as seções quebrem linha em telas menores */
+  flex-wrap: wrap;
   gap: 40px;
   text-align: left;
 }

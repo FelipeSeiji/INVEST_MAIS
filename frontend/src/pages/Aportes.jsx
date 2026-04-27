@@ -225,9 +225,9 @@ const Aportes = () => {
                                         <label>Nome da Categoria</label>
                                         <input 
                                             type="text" 
-                                            placeholder="Ex: Ações Brasileiras"
+                                            placeholder="Ex: AÇÕES BRASILEIRAS"
                                             value={formData.name}
-                                            onChange={e => setFormData({...formData, name: e.target.value})}
+                                            onChange={e => setFormData({...formData, name: e.target.value.toUpperCase()})}
                                             required
                                         />
                                     </div>

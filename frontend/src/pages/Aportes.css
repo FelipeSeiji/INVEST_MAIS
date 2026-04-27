@@ -91,7 +91,7 @@
 .category-info h2 {
     margin: 0;
     font-size: 20px;
-    color: var(--text-main);
+    color: #000000; 
 }
 
 .target-badge {
@@ -251,6 +251,7 @@
 .modal-content h2 {
     margin-bottom: 24px;
     font-size: 24px;
+    color: #09090b;
 }
 
 /* Grupos de Formulário (Label + Input) */

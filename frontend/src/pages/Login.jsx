@@ -70,7 +70,7 @@ export default function Login() {
 
             if (response.ok) {
                 localStorage.setItem('token', data.token);
-                navigate('/dashboard');
+                navigate('/aportes');
             } else {
                 alert("Código inválido ou expirado.");
             }

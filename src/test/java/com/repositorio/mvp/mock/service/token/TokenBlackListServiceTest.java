@@ -11,6 +11,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import com.repositorio.mvp.common.security.CryptoService;
 import com.repositorio.mvp.domain.auth.model.InvalidToken;
 import com.repositorio.mvp.domain.auth.repository.InvalidTokenRepository;
 import com.repositorio.mvp.domain.auth.service.token.TokenBlackListService;
@@ -33,6 +34,9 @@ public class TokenBlackListServiceTest {
     @Mock
     private InvalidTokenRepository invalidTokenRepository;
 
+    @Mock
+    private CryptoService cryptoService;
+
     @Captor
     private ArgumentCaptor<InvalidToken> invalidTokenCaptor;
 
@@ -40,13 +44,16 @@ public class TokenBlackListServiceTest {
     public void invalidateToken_SavesTokenToBlacklist() {
         String token = "secret_token";
         Instant expiredAt = Instant.now().plusSeconds(3600);
+        String hashedToken = DigestUtils.sha256Hex(token);
+
+        when(cryptoService.generateSha256Hash(token)).thenReturn(hashedToken);
 
         tokenBlackListService.invalidateToken(token, expiredAt);
 
         verify(invalidTokenRepository).save(invalidTokenCaptor.capture());
         InvalidToken savedToken = invalidTokenCaptor.getValue();
 
-        assertEquals(DigestUtils.sha256Hex(token), savedToken.getToken());
+        assertEquals(hashedToken, savedToken.getToken());
         assertEquals(expiredAt, savedToken.getExpiresAt());
     }
 
@@ -63,25 +70,29 @@ public class TokenBlackListServiceTest {
     @Test
     public void isBlacklisted_WithValidToken_QueriesRepository() {
         String token = "valid_token";
-        when(invalidTokenRepository.existsById(DigestUtils.sha256Hex(token))).thenReturn(true);
+        String hashedToken = DigestUtils.sha256Hex(token);
+        when(cryptoService.generateSha256Hash(token)).thenReturn(hashedToken);
+        when(invalidTokenRepository.existsById(hashedToken)).thenReturn(true);
 
         boolean isBlacklisted = tokenBlackListService.isBlacklisted(token);
 
         assertTrue(isBlacklisted);
 
-        verify(invalidTokenRepository).existsById(DigestUtils.sha256Hex(token));
+        verify(invalidTokenRepository).existsById(hashedToken);
     }
 
     @Test
     public void isBlacklisted_WithInvalidToken_QueriesRepository() {
         String token = "invalid_token";
-        when(invalidTokenRepository.existsById(DigestUtils.sha256Hex(token))).thenReturn(false);
+        String hashedToken = DigestUtils.sha256Hex(token);
+        when(cryptoService.generateSha256Hash(token)).thenReturn(hashedToken);
+        when(invalidTokenRepository.existsById(hashedToken)).thenReturn(false);
 
         boolean isBlacklisted = tokenBlackListService.isBlacklisted(token);
 
         assertFalse(isBlacklisted);
 
-        verify(invalidTokenRepository).existsById(DigestUtils.sha256Hex(token));
+        verify(invalidTokenRepository).existsById(hashedToken);
     }
 
     @Test

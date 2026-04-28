@@ -21,7 +21,6 @@ import com.repositorio.mvp.domain.auth.DTO.TokenResponseDTO;
 import com.repositorio.mvp.domain.auth.DTO.Verify2FARequestDTO;
 import com.repositorio.mvp.domain.auth.service.auth.PasswordRecoveryService;
 import com.repositorio.mvp.domain.auth.service.auth.SessionService;
-import com.repositorio.mvp.domain.auth.service.login.LoginAttemptService;
 import com.repositorio.mvp.domain.auth.service.login.LoginService;
 import com.repositorio.mvp.domain.auth.service.security.RateLimitingService;
 import com.repositorio.mvp.infrastructure.security.util.ClientIp;
@@ -40,7 +39,6 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 @Tag(name = "Authentication Commands", description = "Endpoints públicos para login, 2FA e recuperação de senhas")
 public class AuthCommandController {
-    private final LoginAttemptService loginAttemptService;
     private final LoginService loginService;
     private final SessionService sessionService;
     private final PasswordRecoveryService passwordRecoveryService;

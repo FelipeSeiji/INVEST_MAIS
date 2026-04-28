@@ -2,7 +2,7 @@ package com.repositorio.mvp.domain.auth.service.login;
 
 import java.time.LocalDateTime;
 
-import org.apache.commons.codec.digest.DigestUtils;
+import com.repositorio.mvp.common.security.CryptoService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -12,7 +12,6 @@ import com.repositorio.mvp.common.constants.MessageConstants;
 import com.repositorio.mvp.common.result.ServiceResult;
 import com.repositorio.mvp.domain.auth.DTO.LoginRequestDTO;
 import com.repositorio.mvp.domain.auth.DTO.Verify2FARequestDTO;
-import com.repositorio.mvp.domain.auth.service.interfaces.TwoFactorNotification;
 import com.repositorio.mvp.domain.auth.service.token.TokenProvider;
 import com.repositorio.mvp.domain.user.model.User;
 import com.repositorio.mvp.domain.user.repository.UserRepository;
@@ -36,8 +35,8 @@ public class LoginService {
     private final PasswordEncoder passwordEncoder;
     private final TokenProvider tokenProvider;
     private final TwoFactorService twoFactorService;
-    private final TwoFactorNotification twoFactorStrategy;
     private final LoginAttemptService loginAttemptService;
+    private final CryptoService cryptoService;
 
     /**
      * Processa a primeira etapa do login.
@@ -57,11 +56,7 @@ public class LoginService {
             return ServiceResult.error(MessageConstants.Auth.ERR_TOO_MANY_ATTEMPTS);
         }
 
-        String searchHash = DigestUtils
-            .sha256Hex(
-                loginRequest.email()
-                    .toLowerCase()
-            );
+        String searchHash = cryptoService.generateSha256Hash(loginRequest.email());
         User user = userRepository.findBySecurityEmailHash(searchHash)
                 .orElse(null);
 
@@ -85,11 +80,6 @@ public class LoginService {
                 return ServiceResult.error(MessageConstants.Auth.ERR_INVALID_CREDENTIALS);
         }
 
-        // if (!user.getSecurity().isEmailVerified()) {
-        //     log.warn("Tentativa de login em conta não verificada: {}", maskEmail(user.getEmail()));
-        //     return ServiceResult.error(MessageConstants.Auth.ERR_INVALID_CREDENTIALS);
-        // }
-
         loginAttemptService.loginSucceeded(ip);
         loginAttemptService.loginSucceeded(user.getEmail());
 
@@ -98,14 +88,8 @@ public class LoginService {
             ip
         );
 
-        twoFactorService.prepareTwoFactor(user);
+        twoFactorService.prepareAndSendTwoFactor(user);
         userRepository.save(user);
-
-        twoFactorStrategy.sendTwoFactorCode(
-            user, 
-            user.getSecurity()
-                .getTwoFactorCode()
-        );
 
         return ServiceResult.success(null);
     }
@@ -129,8 +113,7 @@ public class LoginService {
             return ServiceResult.error(MessageConstants.Auth.ERR_TOO_MANY_ATTEMPTS_2FA);
         }
 
-        String searchHash = DigestUtils.sha256Hex(verifyRequest.email()
-            .toLowerCase());
+        String searchHash = cryptoService.generateSha256Hash(verifyRequest.email());
         User user = userRepository.findBySecurityEmailHash(searchHash)
                 .orElse(null);
 

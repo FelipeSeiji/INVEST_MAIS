@@ -2,7 +2,7 @@ package com.repositorio.mvp.domain.auth.service.token;
 
 import java.time.Instant;
 
-import org.apache.commons.codec.digest.DigestUtils;
+import com.repositorio.mvp.common.security.CryptoService;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,6 +21,7 @@ import lombok.RequiredArgsConstructor;
 public class TokenBlackListService {
 
     private final InvalidTokenRepository invalidTokenRepository;
+    private final CryptoService cryptoService;
 
     /**
      * Verifica no banco de dados se um token específico foi invalidado anteriormente (via logout).
@@ -31,7 +32,7 @@ public class TokenBlackListService {
      */
     @Transactional(readOnly = true)
     public boolean isTokenInvalidated(String token) {
-        return invalidTokenRepository.existsById(DigestUtils.sha256Hex(token));
+        return invalidTokenRepository.existsById(cryptoService.generateSha256Hash(token));
     }
 
     /**
@@ -42,7 +43,7 @@ public class TokenBlackListService {
      */
     @Transactional
     public void invalidateToken(String token, Instant expiresAt) {
-        InvalidToken invalidToken = new InvalidToken(DigestUtils.sha256Hex(token), expiresAt);
+        InvalidToken invalidToken = new InvalidToken(cryptoService.generateSha256Hash(token), expiresAt);
         invalidTokenRepository.save(invalidToken);
     }
 
@@ -56,7 +57,7 @@ public class TokenBlackListService {
         if (token == null || token.isBlank()) {
             return false;
         }
-        return invalidTokenRepository.existsById(DigestUtils.sha256Hex(token));
+        return invalidTokenRepository.existsById(cryptoService.generateSha256Hash(token));
     }
 
     /**

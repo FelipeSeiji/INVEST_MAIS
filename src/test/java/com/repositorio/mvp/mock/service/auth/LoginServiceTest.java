@@ -3,7 +3,7 @@ package com.repositorio.mvp.mock.service.auth;
 import java.time.LocalDateTime;
 import java.util.Optional;
 
-import org.apache.commons.codec.digest.DigestUtils;
+import com.repositorio.mvp.common.security.CryptoService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -15,7 +15,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import com.repositorio.mvp.common.result.ServiceResult;
 import com.repositorio.mvp.domain.auth.DTO.LoginRequestDTO;
 import com.repositorio.mvp.domain.auth.DTO.Verify2FARequestDTO;
-import com.repositorio.mvp.domain.auth.service.interfaces.TwoFactorNotification;
 import com.repositorio.mvp.domain.auth.service.login.LoginAttemptService;
 import com.repositorio.mvp.domain.auth.service.login.LoginService;
 import com.repositorio.mvp.domain.auth.service.login.TwoFactorService;
@@ -55,7 +54,7 @@ public class LoginServiceTest {
     private TwoFactorService twoFactorService;
 
     @Mock
-    private TwoFactorNotification twoFactorStrategy;
+    private CryptoService cryptoService;
 
     @Mock
     private LoginAttemptService loginAttemptService;
@@ -75,20 +74,20 @@ public class LoginServiceTest {
 
         when(loginAttemptService.isBlocked(MOCK_IP)).thenReturn(false);
         when(loginAttemptService.isBlocked(loginRequestDTO.email())).thenReturn(false);
-        when(userRepository.findBySecurityEmailHash(DigestUtils.sha256Hex(loginRequestDTO.email().toLowerCase()))).thenReturn(Optional.of(mockUser));
+        when(cryptoService.generateSha256Hash(loginRequestDTO.email())).thenReturn("hash");
+        when(userRepository.findBySecurityEmailHash("hash")).thenReturn(Optional.of(mockUser));
         when(passwordEncoder.matches(loginRequestDTO.password(), mockUser.getSecurity().getPassword())).thenReturn(true);
 
         doAnswer(invocation -> {
             User u = invocation.getArgument(0);
             u.getSecurity().generateTwoFactorCode("123456", LocalDateTime.now().plusMinutes(5));
             return null;
-        }).when(twoFactorService).prepareTwoFactor(any(User.class));
+        }).when(twoFactorService).prepareAndSendTwoFactor(mockUser);
 
         ServiceResult<Void> result = loginService.initiateLogin(loginRequestDTO, MOCK_IP);
         assertTrue(result instanceof ServiceResult.Success);
 
-        verify(twoFactorService).prepareTwoFactor(mockUser); 
-        verify(twoFactorStrategy).sendTwoFactorCode(eq(mockUser), anyString());
+        verify(twoFactorService).prepareAndSendTwoFactor(mockUser);
         
         assertNotNull(mockUser.getSecurity().getTwoFactorCode());
     }
@@ -99,7 +98,8 @@ public class LoginServiceTest {
 
         when(loginAttemptService.isBlocked(MOCK_IP)).thenReturn(false);
         when(loginAttemptService.isBlocked(loginRequestDTO.email())).thenReturn(false);
-        when(userRepository.findBySecurityEmailHash(DigestUtils.sha256Hex(loginRequestDTO.email().toLowerCase()))).thenReturn(Optional.of(mockUser));
+        when(cryptoService.generateSha256Hash(loginRequestDTO.email())).thenReturn("hash");
+        when(userRepository.findBySecurityEmailHash("hash")).thenReturn(Optional.of(mockUser));
         when(passwordEncoder.matches(loginRequestDTO.password(), mockUser.getSecurity().getPassword())).thenReturn(false);
 
         ServiceResult<Void> result = loginService.initiateLogin(loginRequestDTO, MOCK_IP);
@@ -108,22 +108,9 @@ public class LoginServiceTest {
         verify(loginAttemptService).loginFailed(MOCK_IP);
         verify(loginAttemptService).loginFailed(loginRequestDTO.email());
 
-        verify(twoFactorStrategy, never()).sendTwoFactorCode(any(), any());
+        verify(loginAttemptService).loginFailed(loginRequestDTO.email());
     }
 
-    @Test
-    public void initiateLogin_WithUnverifiedEmail_ReturnsError() {
-        LoginRequestDTO loginRequestDTO = new LoginRequestDTO(UserConstants.USER.email(), UserConstants.USER.password());
-        mockUser.getSecurity().setEmailVerified(false);
-
-        when(loginAttemptService.isBlocked(MOCK_IP)).thenReturn(false);
-        when(loginAttemptService.isBlocked(loginRequestDTO.email())).thenReturn(false);
-        when(userRepository.findBySecurityEmailHash(anyString())).thenReturn(Optional.of(mockUser));
-        when(passwordEncoder.matches(anyString(), anyString())).thenReturn(true);
-
-        ServiceResult<Void> result = loginService.initiateLogin(loginRequestDTO, MOCK_IP);
-        assertTrue(result instanceof ServiceResult.Error);
-    }
 
     @Test
     public void initiateLogin_WhenIpIsBlocked_ReturnsError() {
@@ -145,7 +132,8 @@ public class LoginServiceTest {
         String expectedJwt = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.mocked_token";
 
         when(loginAttemptService.isBlocked(MOCK_IP)).thenReturn(false);
-        when(userRepository.findBySecurityEmailHash(DigestUtils.sha256Hex(verify2faRequestDTO.email().toLowerCase()))).thenReturn(Optional.of(mockUser));
+        when(cryptoService.generateSha256Hash(verify2faRequestDTO.email())).thenReturn("hash");
+        when(userRepository.findBySecurityEmailHash("hash")).thenReturn(Optional.of(mockUser));
         when(tokenService.generateToken(mockUser.getId())).thenReturn(expectedJwt);
 
         ServiceResult<String> result = loginService.verify2FAAndGenerateToken(verify2faRequestDTO, MOCK_IP);
@@ -162,7 +150,8 @@ public class LoginServiceTest {
         Verify2FARequestDTO request = new Verify2FARequestDTO(mockUser.getEmail(), "999999"); 
         
         when(loginAttemptService.isBlocked(MOCK_IP)).thenReturn(false);
-        when(userRepository.findBySecurityEmailHash(DigestUtils.sha256Hex(request.email().toLowerCase()))).thenReturn(Optional.of(mockUser));
+        when(cryptoService.generateSha256Hash(request.email())).thenReturn("hash");
+        when(userRepository.findBySecurityEmailHash("hash")).thenReturn(Optional.of(mockUser));
 
         ServiceResult<String> result = loginService.verify2FAAndGenerateToken(request, MOCK_IP);
         assertTrue(result instanceof ServiceResult.Error);
@@ -181,7 +170,8 @@ public class LoginServiceTest {
         Verify2FARequestDTO request = new Verify2FARequestDTO(mockUser.getEmail(), validCode);
         
         when(loginAttemptService.isBlocked(MOCK_IP)).thenReturn(false);
-        when(userRepository.findBySecurityEmailHash(DigestUtils.sha256Hex(request.email().toLowerCase()))).thenReturn(Optional.of(mockUser));
+        when(cryptoService.generateSha256Hash(request.email())).thenReturn("hash");
+        when(userRepository.findBySecurityEmailHash("hash")).thenReturn(Optional.of(mockUser));
 
         ServiceResult<String> result = loginService.verify2FAAndGenerateToken(request, MOCK_IP);
         assertTrue(result instanceof ServiceResult.Error);

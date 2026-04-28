@@ -4,7 +4,8 @@ import java.time.LocalDateTime;
 
 import org.springframework.stereotype.Service;
 
-import com.repositorio.mvp.domain.auth.service.interfaces.CodeGenerator;
+import com.repositorio.mvp.common.security.CryptoService;
+import com.repositorio.mvp.domain.auth.service.interfaces.TwoFactorNotification;
 import com.repositorio.mvp.domain.user.model.User;
 
 import lombok.NonNull;
@@ -13,7 +14,8 @@ import lombok.RequiredArgsConstructor;
 @Service
 @RequiredArgsConstructor
 public class TwoFactorService {
-    private final CodeGenerator codeGenerator;
+    private final CryptoService cryptoService;
+    private final TwoFactorNotification twoFactorNotification;
     
     /**
      * Prepara o processo de segundo fator de autenticação (2FA) para um usuário.
@@ -21,12 +23,13 @@ public class TwoFactorService {
      * 
      * @param user Objeto do usuário que está tentando se autenticar.
      */
-    public void prepareTwoFactor(@NonNull User user) {
-        String code = codeGenerator.generate(6);
+    public void prepareAndSendTwoFactor(@NonNull User user) {
+        String code = cryptoService.generateNumericCode(6);
         user.getSecurity().generateTwoFactorCode(
             code, 
             LocalDateTime.now()
                 .plusMinutes(5)
         );
+        twoFactorNotification.sendTwoFactorCode(user, code);
     }
 }

@@ -25,11 +25,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
-/**
- * Entidade que representa um ativo financeiro (Ação, FII, Cripto, etc.) na carteira do usuário.
- * Armazena informações sobre o ticker, quantidade custodiada, preço médio de compra
- * e o valor atual da posição.
- */
 @Entity
 @Table(name = "TB_ASSET")
 @Getter

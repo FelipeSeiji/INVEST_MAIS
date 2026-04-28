@@ -77,6 +77,8 @@ public class UserCommandServiceImpl implements UserCommandService {
         } catch (DataIntegrityViolationException _) {
             log.warn("Tentativa de registro duplicado omitida para segurança.");
             return ServiceResult.error(MessageConstants.User.EMAIL_ALREADY_IN_USE);
+        } catch (IllegalArgumentException e) {
+            return ServiceResult.error(e.getMessage());
         } catch (Exception e) {
             log.error("Erro inesperado no registro de usuário: {}", e.getMessage());
             return ServiceResult.error("Ocorreu um erro ao processar seu cadastro. Tente novamente mais tarde.");

@@ -9,20 +9,20 @@ import com.repositorio.mvp.common.validation.asset.ValidTargetPercentage;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
-@Schema(description = "Objeto de requisição para a criação ou alteração de uma Categoria de Investimentos")
+@Schema(description = "Requisição de categoria")
 public record CategoryRequestDTO(
-    @Schema(description = "ID único da categoria (ignorado na criação)", example = "123e4567-e89b-12d3-a456-426614174000") 
+    @Schema(description = "ID único da categoria", example = "123e4567-e89b-12d3-a456-426614174000") 
     UUID id,
 
     @ValidCategoryName
-    @Schema(description = "Nome descritivo para agrupar investimentos (ex: Ações Brasileiras, Renda Fixa)", example = "Ações")
+    @Schema(description = "Nome da categoria", example = "Ações")
     String name,
 
     @ValidTargetPercentage
-    @Schema(description = "Percentual alvo (meta) desta categoria dentro do respectivo portfólio", example = "30.0")
+    @Schema(description = "Percentual alvo desta categoria", example = "30.0")
     BigDecimal targetPercentage,
 
-    @Schema(description = "Opcional: Listagem inicial de ativos a serem persistidos junto a esta categoria") 
+    @Schema(description = "Lista de ativos") 
     List<AssetRequestDTO> assets
 ) {
     

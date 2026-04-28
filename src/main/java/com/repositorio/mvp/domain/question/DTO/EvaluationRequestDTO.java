@@ -7,6 +7,7 @@ import com.repositorio.mvp.common.validation.question.ValidQuestionId;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
+@Schema(description = "Requisição de avaliação")
 public record EvaluationRequestDTO(
         @ValidQuestionId 
         @Schema(description = "ID único da pergunta", example = "123e4567-e89b-12d3-a456-426614174000") 

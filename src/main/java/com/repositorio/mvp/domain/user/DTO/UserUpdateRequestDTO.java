@@ -6,7 +6,7 @@ import com.repositorio.mvp.common.validation.user.ValidPassword;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
-@Schema(name = "UserUpdateRequestDTO", description = "DTO para atualizar os dados de um usuário.")
+@Schema(description = "Requisição de atualização do usuário")
 public record UserUpdateRequestDTO(
         @Schema(description = "Nome do usuário", example = "User Name") 
         @ValidName 

@@ -9,7 +9,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
-@Schema(name = "UserRequestDTO", description = "DTO para atualizar os dados de um usuário.")
+@Schema(description = "Requisição do usuário")
 @JsonIgnoreProperties(ignoreUnknown = true)
 public record UserRequestDTO(
     @Schema(description = "Nome do usuário", example = "User Name")

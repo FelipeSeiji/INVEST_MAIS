@@ -5,6 +5,7 @@ import com.repositorio.mvp.common.validation.user.ValidEmail;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
+@Schema(description = "Requisição de verificação de 2FA")
 public record Verify2FARequestDTO(
     @Schema(description = "Email do usuário",example = "example@gmail.com")
     @ValidEmail

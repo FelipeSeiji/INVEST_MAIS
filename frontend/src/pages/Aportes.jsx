@@ -130,134 +130,166 @@ const Aportes = () => {
         }
     };
 
-    if (loading) return <div className="aportes-container"><div className="loading">Carregando...</div></div>;
+    if (loading) return <div className="flex-1 flex items-center justify-center min-h-[50vh]"><div className="animate-pulse flex flex-col items-center gap-4"><div className="w-8 h-8 border-4 border-zinc-200 border-t-zinc-900 rounded-full animate-spin"></div><span className="text-zinc-500 font-medium">Carregando ativos...</span></div></div>;
 
     return (
-        <div className="aportes-container">
-            <header className="header-section">
+        <div className="flex-1 p-4 md:p-8 bg-zinc-50 dark:bg-zinc-950 min-h-screen">
+            <header className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
                 <div>
-                    <h1>Meus Ativos</h1>
-                    <p>Gerencie sua estratégia e alocação</p>
+                    <h1 className="text-3xl font-bold text-zinc-900 dark:text-white">Meus Ativos</h1>
+                    <p className="text-zinc-500 dark:text-zinc-400 mt-1">Gerencie sua estratégia e alocação</p>
                 </div>
-                <button className="add-category-btn" onClick={() => handleOpenModal('category', 'create')}>
-                    + Nova Categoria
+                <button 
+                    className="flex items-center gap-2 px-5 py-2.5 bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 font-semibold rounded-xl hover:bg-zinc-800 dark:hover:bg-zinc-100 transition-all shadow-sm" 
+                    onClick={() => handleOpenModal('category', 'create')}
+                >
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4"></path></svg>
+                    Nova Categoria
                 </button>
             </header>
 
-            {error && <div className="error-msg">{error}</div>}
+            {error && <div className="mb-6 p-4 bg-red-50 text-red-600 rounded-xl border border-red-100">{error}</div>}
 
-            <div className="categories-grid">
+            <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
                 {categories.map(category => (
-                    <div key={category.id} className="category-card">
-                        <div className="category-header">
-                            <div className="category-info">
-                                <h2>{category.name}</h2>
-                                <span className="target-badge">Alvo: {category.targetPercentage}%</span>
+                    <div key={category.id} className="bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200 dark:border-zinc-800 shadow-sm overflow-hidden flex flex-col">
+                        <div className="p-5 border-b border-zinc-100 dark:border-zinc-800 flex justify-between items-center bg-zinc-50/50 dark:bg-zinc-900/50">
+                            <div>
+                                <h2 className="text-lg font-bold text-zinc-900 dark:text-white">{category.name}</h2>
+                                <span className="inline-flex items-center mt-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400">
+                                    Alvo: {category.targetPercentage}%
+                                </span>
                             </div>
-                            <div className="category-actions">
-                                <button className="icon-btn" onClick={() => handleOpenModal('category', 'edit', category)}>
-                                    ✏️
+                            <div className="flex items-center gap-1">
+                                <button className="p-2 text-zinc-400 hover:text-indigo-600 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 rounded-lg transition-colors" onClick={() => handleOpenModal('category', 'edit', category)}>
+                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
                                 </button>
-                                <button className="icon-btn delete" onClick={() => handleDelete('category', category.id)}>
-                                    🗑️
+                                <button className="p-2 text-zinc-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors" onClick={() => handleDelete('category', category.id)}>
+                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
                                 </button>
                             </div>
                         </div>
 
-                        <div className="assets-list">
-                            <div className="assets-scroll-area">
+                        <div className="p-5 flex-1 flex flex-col">
+                            <div className="space-y-3 flex-1 overflow-y-auto max-h-[300px] pr-2 custom-scrollbar">
                                 {category.assets && category.assets.length > 0 ? (
                                     category.assets.map(asset => (
-                                        <div key={asset.id} className="asset-item">
-                                            <div className="asset-main">
-                                                <span className="asset-ticker">{asset.ticker}</span>
-                                                <span className={`asset-score ${asset.score >= 0 ? 'score-positive' : 'score-negative'}`}>
-                                                    Score: {asset.score}
-                                                </span>
+                                        <div key={asset.id} className="group flex items-center justify-between p-3 rounded-xl hover:bg-zinc-50 dark:hover:bg-zinc-800/50 border border-transparent hover:border-zinc-100 dark:hover:border-zinc-800 transition-all">
+                                            <div className="flex flex-col">
+                                                <div className="flex items-center gap-2">
+                                                    <span className="font-bold text-zinc-900 dark:text-white">{asset.ticker}</span>
+                                                    <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${asset.score >= 0 ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' : 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400'}`}>
+                                                        {asset.score}
+                                                    </span>
+                                                </div>
+                                                <div className="text-xs text-zinc-500 mt-1">
+                                                    {asset.quantity} cotas • P.M. R$ {asset.averagePrice.toLocaleString('pt-BR')}
+                                                </div>
                                             </div>
-                                            <div className="asset-values">
-                                                <div className="asset-price">R$ {asset.currentPositionValue.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</div>
-                                                <div className="asset-qty">{asset.quantity} cotas</div>
-                                            </div>
-                                            <div className="asset-actions">
-                                                <button className="icon-btn" onClick={() => handleOpenModal('asset', 'edit', asset, category.id)}>
-                                                    ✏️
-                                                </button>
-                                                <button className="icon-btn delete" onClick={() => handleDelete('asset', asset.id)}>
-                                                    🗑️
-                                                </button>
+                                            <div className="flex items-center gap-3">
+                                                <div className="text-right">
+                                                    <div className="font-semibold text-zinc-900 dark:text-white">
+                                                        R$ {asset.currentPositionValue.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                                                    </div>
+                                                </div>
+                                                <div className="flex opacity-0 group-hover:opacity-100 transition-opacity">
+                                                    <button className="p-1.5 text-zinc-400 hover:text-indigo-600 rounded-md" onClick={() => handleOpenModal('asset', 'edit', asset, category.id)}>
+                                                        <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
+                                                    </button>
+                                                    <button className="p-1.5 text-zinc-400 hover:text-red-600 rounded-md" onClick={() => handleDelete('asset', asset.id)}>
+                                                        <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                                                    </button>
+                                                </div>
                                             </div>
                                         </div>
                                     ))
                                 ) : (
-                                    <p style={{ fontSize: '14px', color: 'var(--text-placeholder)', textAlign: 'center', padding: '20px' }}>
-                                        Nenhum ativo nesta categoria.
-                                    </p>
+                                    <div className="flex flex-col items-center justify-center py-8 text-zinc-400">
+                                        <svg className="w-8 h-8 mb-2 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M20 12H4M12 20V4"></path></svg>
+                                        <p className="text-sm">Nenhum ativo nesta categoria.</p>
+                                    </div>
                                 )}
                             </div>
-                            <button className="add-asset-btn" onClick={() => handleOpenModal('asset', 'create', null, category.id)}>
-                                + Adicionar Ativo
+                            <button 
+                                className="mt-4 w-full py-2.5 border border-dashed border-zinc-300 dark:border-zinc-700 rounded-xl text-zinc-500 hover:text-zinc-900 hover:border-zinc-900 dark:hover:text-white dark:hover:border-zinc-500 hover:bg-zinc-50 dark:hover:bg-zinc-800/50 transition-all text-sm font-medium flex items-center justify-center gap-2" 
+                                onClick={() => handleOpenModal('asset', 'create', null, category.id)}
+                            >
+                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4"></path></svg>
+                                Adicionar Ativo
                             </button>
                         </div>
                     </div>
                 ))}
 
                 {categories.length === 0 && (
-                    <div className="empty-state">
-                        <div style={{ fontSize: '48px' }}>📁</div>
-                        <h3>Nenhuma categoria encontrada</h3>
-                        <p>Comece criando uma categoria para seus investimentos (ex: Ações, FIIs).</p>
-                        <button onClick={() => handleOpenModal('category', 'create')}>Criar Primeira Categoria</button>
+                    <div className="col-span-full flex flex-col items-center justify-center py-20 px-4 text-center border-2 border-dashed border-zinc-200 dark:border-zinc-800 rounded-3xl">
+                        <div className="text-6xl mb-4 opacity-50">📁</div>
+                        <h3 className="text-xl font-bold text-zinc-900 dark:text-white mb-2">Nenhuma categoria encontrada</h3>
+                        <p className="text-zinc-500 max-w-md mb-6">Comece criando uma categoria para organizar seus investimentos (ex: Ações, FIIs, Renda Fixa).</p>
+                        <button 
+                            className="px-6 py-3 bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 font-semibold rounded-xl hover:bg-zinc-800 dark:hover:bg-zinc-100 transition-all shadow-md"
+                            onClick={() => handleOpenModal('category', 'create')}
+                        >
+                            Criar Primeira Categoria
+                        </button>
                     </div>
                 )}
             </div>
 
             {modalConfig.isOpen && (
-                <div className="modal-overlay" onClick={handleCloseModal}>
-                    <div className="modal-content" onClick={e => e.stopPropagation()}>
-                        <h2>
-                            {modalConfig.mode === 'create' ? 'Adicionar ' : 'Editar '}
-                            {modalConfig.type === 'category' ? 'Categoria' : 'Ativo'}
-                        </h2>
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200" onClick={handleCloseModal}>
+                    <div className="bg-white dark:bg-zinc-900 rounded-2xl w-full max-w-md overflow-hidden shadow-2xl border border-zinc-200 dark:border-zinc-800 animate-in zoom-in-95 duration-200" onClick={e => e.stopPropagation()}>
+                        <div className="p-6 border-b border-zinc-100 dark:border-zinc-800 flex justify-between items-center">
+                            <h2 className="text-xl font-bold text-zinc-900 dark:text-white">
+                                {modalConfig.mode === 'create' ? 'Adicionar ' : 'Editar '}
+                                {modalConfig.type === 'category' ? 'Categoria' : 'Ativo'}
+                            </h2>
+                            <button onClick={handleCloseModal} className="text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300">
+                                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                            </button>
+                        </div>
                         
-                        <form onSubmit={handleSubmit}>
+                        <form onSubmit={handleSubmit} className="p-6 space-y-4">
                             {modalConfig.type === 'category' ? (
                                 <>
-                                    <div className="form-group">
-                                        <label>Nome da Categoria</label>
+                                    <div className="space-y-2">
+                                        <label className="text-sm font-medium text-zinc-700 dark:text-zinc-300">Nome da Categoria</label>
                                         <input 
                                             type="text" 
                                             placeholder="Ex: AÇÕES BRASILEIRAS"
                                             value={formData.name}
                                             onChange={e => setFormData({...formData, name: e.target.value.toUpperCase()})}
                                             required
+                                            className="w-full px-4 py-3 rounded-xl bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-zinc-900 dark:text-white placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-zinc-900 transition-all m-0"
                                         />
                                     </div>
-                                    <div className="form-group">
-                                        <label>Porcentagem Alvo (%)</label>
+                                    <div className="space-y-2">
+                                        <label className="text-sm font-medium text-zinc-700 dark:text-zinc-300">Porcentagem Alvo (%)</label>
                                         <input 
                                             type="number" 
                                             placeholder="Ex: 25"
                                             value={formData.targetPercentage}
                                             onChange={e => setFormData({...formData, targetPercentage: e.target.value})}
                                             required
+                                            className="w-full px-4 py-3 rounded-xl bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-zinc-900 dark:text-white placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-zinc-900 transition-all m-0"
                                         />
                                     </div>
                                 </>
                             ) : (
                                 <>
-                                    <div className="form-group">
-                                        <label>Ticker (Código)</label>
+                                    <div className="space-y-2">
+                                        <label className="text-sm font-medium text-zinc-700 dark:text-zinc-300">Ticker (Código)</label>
                                         <input 
                                             type="text" 
                                             placeholder="Ex: PETR4"
                                             value={formData.ticker}
                                             onChange={e => setFormData({...formData, ticker: e.target.value.toUpperCase()})}
                                             required
+                                            className="w-full px-4 py-3 rounded-xl bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-zinc-900 dark:text-white placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-zinc-900 transition-all m-0"
                                         />
                                     </div>
-                                    <div className="form-group">
-                                        <label>Valor Atual da Posição (R$)</label>
+                                    <div className="space-y-2">
+                                        <label className="text-sm font-medium text-zinc-700 dark:text-zinc-300">Valor Atual da Posição (R$)</label>
                                         <input 
                                             type="number" 
                                             step="0.01"
@@ -265,36 +297,41 @@ const Aportes = () => {
                                             value={formData.currentPositionValue}
                                             onChange={e => setFormData({...formData, currentPositionValue: e.target.value})}
                                             required
+                                            className="w-full px-4 py-3 rounded-xl bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-zinc-900 dark:text-white placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-zinc-900 transition-all m-0"
                                         />
                                     </div>
-                                    <div className="form-group">
-                                        <label>Quantidade</label>
-                                        <input 
-                                            type="number" 
-                                            step="0.0001"
-                                            placeholder="0"
-                                            value={formData.quantity}
-                                            onChange={e => setFormData({...formData, quantity: e.target.value})}
-                                            required
-                                        />
-                                    </div>
-                                    <div className="form-group">
-                                        <label>Preço Médio (R$)</label>
-                                        <input 
-                                            type="number" 
-                                            step="0.01"
-                                            placeholder="0.00"
-                                            value={formData.averagePrice}
-                                            onChange={e => setFormData({...formData, averagePrice: e.target.value})}
-                                            required
-                                        />
+                                    <div className="grid grid-cols-2 gap-4">
+                                        <div className="space-y-2">
+                                            <label className="text-sm font-medium text-zinc-700 dark:text-zinc-300">Quantidade</label>
+                                            <input 
+                                                type="number" 
+                                                step="0.0001"
+                                                placeholder="0"
+                                                value={formData.quantity}
+                                                onChange={e => setFormData({...formData, quantity: e.target.value})}
+                                                required
+                                                className="w-full px-4 py-3 rounded-xl bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-zinc-900 dark:text-white placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-zinc-900 transition-all m-0"
+                                            />
+                                        </div>
+                                        <div className="space-y-2">
+                                            <label className="text-sm font-medium text-zinc-700 dark:text-zinc-300">Preço Médio (R$)</label>
+                                            <input 
+                                                type="number" 
+                                                step="0.01"
+                                                placeholder="0.00"
+                                                value={formData.averagePrice}
+                                                onChange={e => setFormData({...formData, averagePrice: e.target.value})}
+                                                required
+                                                className="w-full px-4 py-3 rounded-xl bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-zinc-900 dark:text-white placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-zinc-900 transition-all m-0"
+                                            />
+                                        </div>
                                     </div>
                                 </>
                             )}
 
-                            <div className="modal-footer">
-                                <button type="button" className="cancel-btn" onClick={handleCloseModal}>Cancelar</button>
-                                <button type="submit">Salvar</button>
+                            <div className="pt-4 flex gap-3">
+                                <button type="button" className="flex-1 py-3 px-4 bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 font-semibold rounded-xl hover:bg-zinc-200 dark:hover:bg-zinc-700 transition-colors m-0" onClick={handleCloseModal}>Cancelar</button>
+                                <button type="submit" className="flex-1 py-3 px-4 bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 font-semibold rounded-xl hover:bg-zinc-800 dark:hover:bg-zinc-100 transition-colors shadow-md m-0">Salvar</button>
                             </div>
                         </form>
                     </div>

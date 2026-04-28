@@ -1,190 +1,19 @@
-:root {
-  /* New Global Color Palette */
-  --bg-primary: #f4f4f5; /* Off-white for full screens */
-  --bg-card: #ffffff;    /* Pure white for cards */
-  --bg-card-alt: #fafafa; /* Slightly gray for alternate card sections */
-  --text-main: #27272a;   /* Dark gray for primary text and accents */
-  --text-muted: #52525b;  /* Medium gray for secondary text */
-  --text-placeholder: #a1a1aa; /* Light gray for placeholders */
-  --border-color: #e4e4e7; /* Light gray for borders */
-  --border-color-light: #eaeaea; 
-  --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.15);
-  --shadow-lg: 0 10px 40px rgba(0, 0, 0, 0.05);
+@import "tailwindcss";
 
-  /* Legacy / existing variables updated to match theme */
-  --text: var(--text-muted);
-  --text-h: var(--text-main);
-  --bg: var(--bg-card);
-  --code-bg: #f4f3ec;
-  --accent: var(--text-main);
-  --accent-bg: rgba(39, 39, 42, 0.1);
-  --accent-border: rgba(39, 39, 42, 0.5);
-  --social-bg: rgba(244, 243, 236, 0.5);
-  --shadow: var(--shadow-sm);
-
-  --sans: system-ui, 'Segoe UI', Roboto, sans-serif;
-  --heading: system-ui, 'Segoe UI', Roboto, sans-serif;
-  --mono: ui-monospace, Consolas, monospace;
-
-  font: 18px/145% var(--sans);
-  letter-spacing: 0.18px;
-  color-scheme: light dark;
-  color: var(--text);
-  background: var(--bg);
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-
-  @media (max-width: 1024px) {
-    font-size: 16px;
-  }
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --text: #9ca3af;
-    --text-h: #f3f4f6;
-    --bg: #16171d;
-    --border: #2e303a;
-    --code-bg: #1f2028;
-    --accent: #e4e4e7;
-    --accent-bg: rgba(228, 228, 231, 0.15);
-    --accent-border: rgba(228, 228, 231, 0.5);
-    --social-bg: rgba(47, 48, 58, 0.5);
-    --shadow:
-      rgba(0, 0, 0, 0.4) 0 10px 15px -3px, rgba(0, 0, 0, 0.25) 0 4px 6px -2px;
-  }
-
-  #social .button-icon {
-    filter: invert(1) brightness(2);
-  }
+@theme {
+  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+  --color-bg-primary: #f4f4f5;
+  --color-bg-card: #ffffff;
+  --color-text-main: #27272a;
+  --color-text-muted: #52525b;
 }
 
 html, body {
-  margin: 0;
-  overflow: hidden;
-  height: 100%;
+  @apply h-full antialiased bg-bg-primary text-text-main;
 }
 
 #root {
+  @apply min-h-screen flex flex-col mx-auto bg-bg-card shadow-sm;
   width: 1126px;
   max-width: 100%;
-  margin: 0 auto;
-  text-align: center;
-  border-inline: 1px solid var(--border);
-  min-height: 100svh;
-  display: flex;
-  flex-direction: column;
-  box-sizing: border-box;
-}
-
-h1,
-h2 {
-  font-family: var(--heading);
-  font-weight: 500;
-  color: var(--text-h);
-}
-
-h1 {
-  font-size: 56px;
-  letter-spacing: -1.68px;
-  margin: 32px 0;
-  @media (max-width: 1024px) {
-    font-size: 36px;
-    margin: 20px 0;
-  }
-}
-h2 {
-  font-size: 24px;
-  line-height: 118%;
-  letter-spacing: -0.24px;
-  margin: 0 0 8px;
-  @media (max-width: 1024px) {
-    font-size: 20px;
-  }
-}
-p {
-  margin: 0;
-}
-
-code,
-.counter {
-  font-family: var(--mono);
-  display: inline-flex;
-  border-radius: 4px;
-  color: var(--text-h);
-}
-
-code {
-  font-size: 15px;
-  line-height: 135%;
-  padding: 4px 8px;
-  background: var(--code-bg);
-}
-
-/* Global Reusable Layouts */
-.fullscreen-layout {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-  background-color: var(--bg-primary);
-  font-family: var(--sans);
-  z-index: 100;
-}
-
-/* Global Reusable Form Elements */
-input { 
-  margin: 10px 0; 
-  padding: 16px; 
-  border: 1px solid var(--border-color); 
-  border-radius: 10px; 
-  font-size: 15px;
-  background-color: var(--bg-card);
-  color: var(--text-main);
-  transition: all 0.3s ease;
-  font-family: var(--sans);
-}
-
-input::placeholder {
-  color: var(--text-placeholder);
-}
-
-input:focus {
-  outline: none;
-  border-color: var(--text-main);
-  box-shadow: 0 0 0 3px var(--accent-bg);
-}
-
-button { 
-  margin-top: 20px;
-  padding: 16px; 
-  background-color: var(--text-main); 
-  color: white; 
-  border: none; 
-  border-radius: 10px; 
-  cursor: pointer; 
-  font-weight: 600;
-  font-size: 16px;
-  transition: all 0.3s ease;
-  font-family: var(--sans);
-}
-
-button:hover { 
-  background-color: #18181b; 
-  transform: translateY(-1px);
-  box-shadow: var(--shadow-sm);
-}
-
-button:disabled {
-  background-color: var(--border-color);
-  color: var(--text-placeholder);
-  cursor: not-allowed;
-  transform: none;
-  box-shadow: none;
 }

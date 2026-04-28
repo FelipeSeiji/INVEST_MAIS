@@ -35,7 +35,7 @@ public class AssetCategoryCommandController {
 
     @PostMapping
     @Operation(summary = "Cria uma nova categoria", description = "Cria uma categoria de ativos vinculada à carteira do usuário")
-    @ApiResponse(responseCode = "201", description = "Categoria criada com sucesso")
+    @ApiResponse(responseCode = "201", description = "Categoria criada")
     public ResponseEntity<CategoryResponseDTO> createCategory(@Valid @RequestBody CategoryRequestDTO request) {
         ServiceResult<CategoryResponseDTO> result = commandService.createCategory(request);
         
@@ -47,8 +47,8 @@ public class AssetCategoryCommandController {
     }
 
     @PutMapping("/{id}")
-    @Operation(summary = "Atualiza uma categoria")
-    @ApiResponse(responseCode = "200", description = "Categoria atualizada com sucesso")
+    @Operation(summary = "Atualiza uma categoria", description = "Atualiza uma categoria de ativos vinculada à carteira do usuário")
+    @ApiResponse(responseCode = "200", description = "Categoria atualizada")
     public ResponseEntity<CategoryResponseDTO> updateCategory(@PathVariable UUID id, @Valid @RequestBody CategoryRequestDTO request) {
         ServiceResult<CategoryResponseDTO> result = commandService.updateCategory(id, request);
         
@@ -60,8 +60,8 @@ public class AssetCategoryCommandController {
     }
 
     @DeleteMapping("/{id}")
-    @Operation(summary = "Remove uma categoria")
-    @ApiResponse(responseCode = "204", description = "Categoria deletada com sucesso")
+    @Operation(summary = "Remove uma categoria", description = "Remove uma categoria de ativos vinculada à carteira do usuário")
+    @ApiResponse(responseCode = "204", description = "Categoria removida")
     public ResponseEntity<Void> deleteCategory(@PathVariable UUID id) {
         ServiceResult<Void> result = commandService.deleteCategory(id);
         

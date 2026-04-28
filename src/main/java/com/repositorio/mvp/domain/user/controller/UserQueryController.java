@@ -27,13 +27,13 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequestMapping("/api/users")
 @RequiredArgsConstructor
-@Tag(name = "User Queries", description = "Operações de leitura para busca e listagem de perfis de usuário")
+@Tag(name = "User Queries", description = "Operações de leitura para busca e listagem de usuarios")
 public class UserQueryController {
     private final UserQueryService userQueryService;
 
     @GetMapping
     @PreAuthorize("hasRole('ADMIN')")
-    @Operation(summary = "Lista os usuarios com paginação", description = "Retorna uma página de usuários do sistema")
+    @Operation(summary = "Lista os usuarios com paginação", description = "Retorna uma página de usuários")
     public ResponseEntity<Page<UserResponseDTO>> getAllUsers(@PageableDefault(size = 20) @NonNull Pageable pageable) {
         ServiceResult<Page<UserResponseDTO>> result = userQueryService.listAllUsers(pageable);
         
@@ -46,7 +46,7 @@ public class UserQueryController {
 
     @GetMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN') or #id.toString() == authentication.principal.user.id.toString()")
-    @Operation(summary = "Busca um usuario pelo id", description = "Busca um usuario do banco de dados pelo id")
+    @Operation(summary = "Busca um usuario pelo id", description = "Busca um usuário pelo ID")
     public ResponseEntity<UserResponseDTO> findUserByID(@PathVariable @NonNull UUID id) {
         ServiceResult<UserResponseDTO> result = userQueryService.findUserById(id);
         

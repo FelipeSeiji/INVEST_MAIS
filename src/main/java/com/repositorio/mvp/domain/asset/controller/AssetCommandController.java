@@ -35,8 +35,8 @@ public class AssetCommandController {
     private final AssetCommandService assetCommandService;
 
     @PostMapping("/categories/{categoryId}/assets")
-    @Operation(summary = "Adiciona um novo ativo em uma categoria")
-    @ApiResponse(responseCode = "201", description = "Ativo criado com sucesso")
+    @Operation(summary = "Adiciona um novo ativo em uma categoria", description = "Adiciona um novo ativo na categoria especificada")
+    @ApiResponse(responseCode = "201", description = "Ativo criado")
     public ResponseEntity<AssetResponseDTO> createAsset(@PathVariable UUID categoryId, @Valid @RequestBody AssetRequestDTO request) {
         ServiceResult<AssetResponseDTO> result = assetCommandService.createAsset(categoryId, request);
         
@@ -48,8 +48,8 @@ public class AssetCommandController {
     }
 
     @PutMapping("/{id}")
-    @Operation(summary = "Atualiza dados de um ativo (Ticker/Valor)")
-    @ApiResponse(responseCode = "200", description = "Ativo atualizado com sucesso")
+    @Operation(summary = "Atualiza um ativo", description = "Atualiza dados de um ativo da carteira do usuário")
+    @ApiResponse(responseCode = "200", description = "Ativo atualizado")
     public ResponseEntity<AssetResponseDTO> updateAsset(@PathVariable UUID id, @Valid @RequestBody AssetRequestDTO request) {
         ServiceResult<AssetResponseDTO> result = assetCommandService.updateAsset(id, request);
         
@@ -61,8 +61,8 @@ public class AssetCommandController {
     }
 
     @DeleteMapping("/{id}")
-    @Operation(summary = "Remove um ativo")
-    @ApiResponse(responseCode = "204", description = "Ativo deletado com sucesso")
+    @Operation(summary = "Remove um ativo", description = "Remove um ativo da carteira")
+    @ApiResponse(responseCode = "204", description = "Ativo removido")
     public ResponseEntity<Void> deleteAsset(@PathVariable UUID id) {
         ServiceResult<Void> result = assetCommandService.deleteAsset(id);
         

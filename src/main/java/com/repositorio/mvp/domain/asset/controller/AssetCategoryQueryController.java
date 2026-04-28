@@ -27,8 +27,8 @@ public class AssetCategoryQueryController {
     private final AssetCategoryQueryService queryService;
 
     @GetMapping
-    @Operation(summary = "Lista todas as categorias do usuário")
-    @ApiResponse(responseCode = "200", description = "Lista de categorias retornada com sucesso")
+    @Operation(summary = "Lista todas as categorias do usuário", description = "Retorna todas as categorias de ativos vinculadas à carteira do usuário")
+    @ApiResponse(responseCode = "200", description = "Lista de categorias retornada")
     public ResponseEntity<List<CategoryResponseDTO>> listCategories() {
         ServiceResult<List<CategoryResponseDTO>> result = queryService.listUserCategories();
         

@@ -44,8 +44,8 @@ public class UserCommandController {
     private final RateLimitingService rateLimitingService;
 
     @PostMapping
-    @Operation(summary = "Cria um novo usuário e inicializa sua carteira")
-    @ApiResponse(responseCode = "201", description = "Usuário criado com sucesso")
+    @Operation(summary = "Cria um novo usuário", description = "Cria um novo usuário")
+    @ApiResponse(responseCode = "201", description = "Usuário criado")
     public ResponseEntity<UserResponseDTO> createUser(
             @Valid @RequestBody @NonNull UserRequestDTO userRequestDTO,
             HttpServletRequest request) {
@@ -68,8 +68,8 @@ public class UserCommandController {
 
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    @Operation(summary = "Exclui permanentemente um usuário pelo ID")
-    @ApiResponse(responseCode = "204", description = "Usuário excluído com sucesso")
+    @Operation(summary = "Exclui permanentemente um usuário", description = "Exclui permanentemente um usuário pelo ID")
+    @ApiResponse(responseCode = "204", description = "Usuário excluído")
     public ResponseEntity<Void> deleteUser(@PathVariable @NonNull UUID id) {
         ServiceResult<Void> result = userCommandService.deleteUserById(id);
         
@@ -82,8 +82,8 @@ public class UserCommandController {
 
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN') or #id.toString() == authentication.principal.user.id.toString()")
-    @Operation(summary = "Atualiza o perfil de um usuário (Nome/E-mail)")
-    @ApiResponse(responseCode = "200", description = "Perfil atualizado com sucesso")
+    @Operation(summary = "Atualiza um usuário", description = "Atualiza um usuário pelo ID")
+    @ApiResponse(responseCode = "200", description = "Usuário atualizado")
     public ResponseEntity<UserResponseDTO> updateUser(@PathVariable @NonNull UUID id,
             @Valid @RequestBody @NonNull UserUpdateRequestDTO userUpdateRequestDTO) {
         ServiceResult<UserResponseDTO> result = userCommandService.updateUserById(id, userUpdateRequestDTO);

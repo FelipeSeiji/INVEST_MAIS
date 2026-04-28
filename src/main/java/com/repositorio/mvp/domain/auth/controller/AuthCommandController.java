@@ -37,7 +37,7 @@ import lombok.extern.slf4j.Slf4j;
 @RestController
 @RequestMapping("/auth")
 @RequiredArgsConstructor
-@Tag(name = "Authentication Commands", description = "Endpoints públicos para login, 2FA e recuperação de senhas")
+@Tag(name = "Comandos de Autenticação", description = "Operações de autenticação")
 public class AuthCommandController {
     private final LoginService loginService;
     private final SessionService sessionService;
@@ -45,8 +45,8 @@ public class AuthCommandController {
     private final RateLimitingService rateLimitingService;
 
     @PostMapping("/login")
-    @Operation(summary = "Inicia o login e envia código 2FA", description = "Valida e-mail e senha. Se corretos, envia um e-mail com o código de 6 dígitos para o usuário.")
-    @ApiResponse(responseCode = "200", description = "Código 2FA enviado com sucesso")
+    @Operation(summary = "Inicia o login e envia código 2FA", description = "Valida e-mail e senha e envia um código por e-mail.")
+    @ApiResponse(responseCode = "200", description = "Código 2FA enviado")
     public ResponseEntity<MessageResponseDTO> login(@Valid @RequestBody @NonNull LoginRequestDTO loginRequest, @NonNull HttpServletRequest request) {
         String ip = ClientIp.getClientIp(request);
         Bucket bucket = rateLimitingService.resolveLoginBucket(ip);
@@ -65,7 +65,7 @@ public class AuthCommandController {
     }
 
     @PostMapping("/verify-2fa")
-    @Operation(summary = "Valida o código 2FA e retorna o JWT", description = "Valida o código recebido por e-mail. Se correto e no prazo, devolve o token de acesso (JWT).")
+    @Operation(summary = "Valida código 2FA e retorna JWT", description = "Valida o código 2FA enviado por e-mail.")
     @ApiResponse(responseCode = "200", description = "Token JWT gerado com sucesso")
     public ResponseEntity<TokenResponseDTO> verify2FA(@Valid @RequestBody @NonNull Verify2FARequestDTO verifyRequest,
             @NonNull HttpServletRequest request) {
@@ -80,8 +80,8 @@ public class AuthCommandController {
     }
 
     @PostMapping("/logout")
-    @Operation(summary = "Realiza o logout do usuário", description = "Invalida o token JWT fornecido no cabeçalho de autorização, encerrando a sessão ativa.")
-    @ApiResponse(responseCode = "204", description = "Logout realizado com sucesso")
+    @Operation(summary = "Realiza o logout do usuário", description = "Invalida o token JWT, encerrando a sessão.")
+    @ApiResponse(responseCode = "204", description = "Logout realizado")
     public ResponseEntity<Void> logout(@RequestHeader("Authorization") @NonNull String token) {
         SecurityContextHolder.clearContext();
         ServiceResult<Void> result = sessionService.logout(token);
@@ -94,8 +94,8 @@ public class AuthCommandController {
     }
 
     @PostMapping("/forgot-password")
-    @Operation(summary = "Solicita a recuperação de senha", description = "Gera um token de redefinição e envia um link para o e-mail informado.")
-    @ApiResponse(responseCode = "200", description = "Token de recuperação enviado com sucesso")
+    @Operation(summary = "Solicita recuperação de senha", description = "Gera token de redefinição e envia um link por e-mail.")
+    @ApiResponse(responseCode = "200", description = "Token de recuperação enviado")
     public ResponseEntity<MessageResponseDTO> forgotPassword(@Valid @RequestBody @NonNull ForgotPasswordRequestDTO forgotPasswordRequestDTO,
             @NonNull HttpServletRequest request) {
         String ip = ClientIp.getClientIp(request);
@@ -113,8 +113,8 @@ public class AuthCommandController {
     }
 
     @PostMapping("/reset-password")
-    @Operation(summary = "Redefine a senha do usuário", description = "Recebe o token de recuperação e a nova senha para atualizar as credenciais.")
-    @ApiResponse(responseCode = "200", description = "Senha redefinida com sucesso")
+    @Operation(summary = "Redefine senha", description = "Recebe token de redefinição e nova senha.")
+    @ApiResponse(responseCode = "200", description = "Senha redefinida")
     public ResponseEntity<MessageResponseDTO> resetPassword(@Valid @RequestBody @NonNull ResetPasswordRequestDTO request,
             @NonNull HttpServletRequest httpRequest) {
         String ip = ClientIp.getClientIp(httpRequest);

@@ -24,14 +24,14 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequestMapping("/api/assets")
 @RequiredArgsConstructor
-@Tag(name = "Asset Queries", description = "Operações de leitura para ativos da carteira")
+@Tag(name = "Asset Queries", description = "Operações de leitura para ativos")
 public class AssetQueryController {
 
     private final AssetQueryService assetQueryService;
 
     @GetMapping("/categories/{categoryId}/assets")
-    @Operation(summary = "Lista ativos de uma categoria específica")
-    @ApiResponse(responseCode = "200", description = "Lista de ativos retornada com sucesso")
+    @Operation(summary = "Lista ativos de uma categoria", description = "Retorna todos os ativos da categoria especificada")
+    @ApiResponse(responseCode = "200", description = "Lista de ativos retornada")
     public ResponseEntity<List<AssetResponseDTO>> listAssetsByCategory(@PathVariable UUID categoryId) {
         ServiceResult<List<AssetResponseDTO>> result = assetQueryService.listAssetsByCategory(categoryId);
         

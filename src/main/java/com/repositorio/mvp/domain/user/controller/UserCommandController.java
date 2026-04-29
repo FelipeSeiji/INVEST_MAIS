@@ -38,7 +38,7 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequestMapping("/api/users")
 @RequiredArgsConstructor
-@Tag(name = "User Commands", description = "Operações de escrita para cadastro e gerenciamento de perfis de usuário")
+@Tag(name = "Comandos de Usuário", description = "Operações de escrita para cadastro e gerenciamento de perfis de usuário")
 public class UserCommandController {
     private final UserCommandService userCommandService;
     private final RateLimitingService rateLimitingService;

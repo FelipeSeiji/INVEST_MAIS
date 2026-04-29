@@ -31,7 +31,7 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequestMapping("/api/questions")
 @RequiredArgsConstructor
-@Tag(name = "Question Commands", description = "Operações de escrita para questões e critérios de avaliação")
+@Tag(name = "Comandos de Perguntas", description = "Operações de escrita para questões e critérios de avaliação")
 public class QuestionCommandController {
 
     private final QuestionCommandService commandService;

@@ -29,7 +29,7 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequestMapping("/api/assets/categories")
 @RequiredArgsConstructor
-@Tag(name = "Asset Category Commands", description = "Operações de escrita para categorias de ativos")
+@Tag(name = "Comandos de Categorias de Ativos", description = "Operações de escrita para categorias de ativos")
 public class AssetCategoryCommandController {
     private final AssetCategoryCommandService commandService;
 

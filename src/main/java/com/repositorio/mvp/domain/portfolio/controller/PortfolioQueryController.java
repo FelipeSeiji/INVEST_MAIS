@@ -24,7 +24,7 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequestMapping("/api/portfolio")
 @RequiredArgsConstructor
-@Tag(name = "Portfolio & Rebalancing Queries", description = "Endpoints para visualização da carteira e cálculo de rebalanceamento")
+@Tag(name = "Consultas de Carteira", description = "Endpoints para visualização da carteira e cálculo de rebalanceamento")
 public class PortfolioQueryController {
 
     private final PortfolioQueryService portfolioQueryService;

@@ -24,7 +24,7 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequestMapping("/api/assets")
 @RequiredArgsConstructor
-@Tag(name = "Asset Queries", description = "Operações de leitura para ativos")
+@Tag(name = "Consultas de Ativos", description = "Operações de leitura para ativos")
 public class AssetQueryController {
 
     private final AssetQueryService assetQueryService;

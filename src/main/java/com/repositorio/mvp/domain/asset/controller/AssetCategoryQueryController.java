@@ -22,7 +22,7 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequestMapping("/api/assets/categories")
 @RequiredArgsConstructor
-@Tag(name = "Asset Category Queries", description = "Operações de leitura para categorias de ativos")
+@Tag(name = "Consultas de Categorias de Ativos", description = "Operações de leitura para categorias de ativos")
 public class AssetCategoryQueryController {
     private final AssetCategoryQueryService queryService;
 

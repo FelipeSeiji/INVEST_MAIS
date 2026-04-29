@@ -21,7 +21,7 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequestMapping("/api/admin")
 @RequiredArgsConstructor
-@Tag(name = "Admin Commands", description = "Endpoints de operações administrativas e infraestrutura")
+@Tag(name = "Comandos do Admin", description = "Endpoints de operações administrativas e infraestrutura")
 public class SystemAdminCommandController {
     private final TokenBlackListService tokenBlackListService;
 

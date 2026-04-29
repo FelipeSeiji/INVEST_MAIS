@@ -29,7 +29,7 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequestMapping("/api/assets")
 @RequiredArgsConstructor
-@Tag(name = "Asset Commands", description = "Operações de escrita para ativos da carteira")
+@Tag(name = "Comandos de Ativos", description = "Operações de escrita para ativos da carteira")
 public class AssetCommandController {
 
     private final AssetCommandService assetCommandService;

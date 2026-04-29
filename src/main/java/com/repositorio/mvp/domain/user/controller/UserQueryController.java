@@ -27,7 +27,7 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequestMapping("/api/users")
 @RequiredArgsConstructor
-@Tag(name = "User Queries", description = "Operações de leitura para busca e listagem de usuarios")
+@Tag(name = "Consultas de Usuário", description = "Operações de leitura para busca e listagem de usuarios")
 public class UserQueryController {
     private final UserQueryService userQueryService;
 

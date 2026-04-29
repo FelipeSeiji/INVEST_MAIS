@@ -24,7 +24,7 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequestMapping("/api/questions")
 @RequiredArgsConstructor
-@Tag(name = "Question Queries", description = "Operações de leitura para perguntas qualitativas")
+@Tag(name = "Consultas de Perguntas", description = "Operações de leitura para perguntas qualitativas")
 public class QuestionQueryController {
     private final QuestionQueryService queryService;
 

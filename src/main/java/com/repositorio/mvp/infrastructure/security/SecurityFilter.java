@@ -17,7 +17,7 @@ import com.repositorio.mvp.common.constants.LogMessageConstants;
 import com.repositorio.mvp.common.constants.MessageConstants;
 import com.repositorio.mvp.domain.auth.service.token.TokenBlackListService;
 import com.repositorio.mvp.domain.auth.service.token.TokenService;
-import com.repositorio.mvp.domain.user.service.interfaces.UserCommandService;
+import com.repositorio.mvp.domain.user.service.interfaces.UserQueryService;
 import com.repositorio.mvp.infrastructure.security.util.ClientIp;
 
 import lombok.NonNull;
@@ -35,7 +35,7 @@ import lombok.extern.slf4j.Slf4j;
 public class SecurityFilter extends OncePerRequestFilter {
 
     private final TokenService tokenService;
-    private final UserCommandService userService;
+    private final UserQueryService userService;
     private final TokenBlackListService invalidatedTokenService;
 
     /**

@@ -6,6 +6,7 @@ import jakarta.persistence.EntityNotFoundException;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -13,8 +14,10 @@ import com.repositorio.mvp.common.constants.MessageConstants;
 import com.repositorio.mvp.common.result.ServiceResult;
 import com.repositorio.mvp.domain.user.DTO.UserResponseDTO;
 import com.repositorio.mvp.domain.user.mapper.UserMapper;
+import com.repositorio.mvp.domain.user.model.User;
 import com.repositorio.mvp.domain.user.repository.UserRepository;
 import com.repositorio.mvp.domain.user.service.interfaces.UserQueryService;
+import com.repositorio.mvp.infrastructure.security.UserDetailsImpl;
 
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -52,5 +55,23 @@ public class UserQueryServiceImpl implements UserQueryService {
         Page<UserResponseDTO> users = userRepository.findAll(pageable)
             .map(userMapper::toUserResponseDTO);
         return ServiceResult.success(users);
+    }
+
+    /**
+     * Localiza e carrega os detalhes de segurança do usuário para o Spring Security.
+     * Método central para a autorização stateless via Token JWT.
+     * 
+     * @param subjectId ID do usuário (como String) extraído do assunto do Token.
+     * @return Objeto UserDetailsImpl compatível com o ecossistema de segurança do Spring.
+     * @throws IllegalArgumentException Caso o ID no token não corresponda a um usuário ativo.
+     */
+    @Override
+    @Transactional(readOnly = true)
+    public UserDetails loadUserDetailsById(@NonNull String subjectId) {
+        User user = userRepository.findById(UUID.fromString(subjectId))
+            .orElseThrow(() -> new IllegalArgumentException(
+                MessageConstants.User.NOT_FOUND_FOR_TOKEN
+            ));
+        return new UserDetailsImpl(user);
     }
 }

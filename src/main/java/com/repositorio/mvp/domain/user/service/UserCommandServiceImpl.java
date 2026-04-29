@@ -3,11 +3,7 @@ package com.repositorio.mvp.domain.user.service;
 import java.util.List;
 import java.util.UUID;
 
-import jakarta.persistence.EntityNotFoundException;
-
-import org.apache.commons.codec.digest.DigestUtils;
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -15,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.repositorio.mvp.common.constants.LogMessageConstants;
 import com.repositorio.mvp.common.constants.MessageConstants;
 import com.repositorio.mvp.common.result.ServiceResult;
+import com.repositorio.mvp.common.security.CryptoService;
 import com.repositorio.mvp.domain.portfolio.service.interfaces.PortfolioCommandService;
 import com.repositorio.mvp.domain.user.DTO.UserRequestDTO;
 import com.repositorio.mvp.domain.user.DTO.UserResponseDTO;
@@ -27,7 +24,6 @@ import com.repositorio.mvp.domain.user.repository.UserRepository;
 import com.repositorio.mvp.domain.user.service.interfaces.UserCommandService;
 import com.repositorio.mvp.domain.user.validation.interfaces.UserRegisterValidator;
 import com.repositorio.mvp.domain.user.validation.interfaces.UserUpdateValidator;
-import com.repositorio.mvp.infrastructure.security.UserDetailsImpl;
 
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -42,6 +38,7 @@ public class UserCommandServiceImpl implements UserCommandService {
     private final PasswordEncoder passwordEncoder;
     private final UserMapper userMapper;
     private final PortfolioCommandService portfolioCommandService;
+    private final CryptoService cryptoService;
     private final List<UserRegisterValidator> registerValidators;
     private final List<UserUpdateValidator> updateValidators;
 
@@ -51,7 +48,6 @@ public class UserCommandServiceImpl implements UserCommandService {
      * 
      * @param userRequestDTO DTO contendo os dados do prospecto (nome, e-mail, senha).
      * @return DTO com os dados do usuário persistido, ocultando informações de segurança.
-     * @throws ValidationException Caso as regras de negócio de registro sejam violadas.
      */
     @Override
     @Transactional
@@ -62,7 +58,7 @@ public class UserCommandServiceImpl implements UserCommandService {
             User user = userMapper.toUser(userRequestDTO);
             UserSecurity security = UserSecurity.builder()
                 .password(passwordEncoder.encode(userRequestDTO.password()))
-                .emailHash(DigestUtils.sha256Hex(userRequestDTO.email().toLowerCase()))
+                .emailHash(cryptoService.generateSha256Hash(userRequestDTO.email()))
                 .role(UserRole.USER)
                 .emailVerified(false)
                 .build();
@@ -89,7 +85,6 @@ public class UserCommandServiceImpl implements UserCommandService {
      * Remove permanentemente um usuário da base de dados.
      * 
      * @param id UUID do usuário que deve ser excluído.
-     * @throws EntityNotFoundException Caso o identificador não seja localizado.
      */
     @Override
     @Transactional
@@ -109,8 +104,6 @@ public class UserCommandServiceImpl implements UserCommandService {
      * @param id UUID do usuário a ser atualizado.
      * @param userUpdateRequestDTO Novos dados do perfil e senha de confirmação.
      * @return DTO com o perfil atualizado do usuário.
-     * @throws IllegalArgumentException Se a senha atual informada estiver incorreta.
-     * @throws EntityNotFoundException Se o usuário não for encontrado.
      */
     @Override
     @Transactional
@@ -123,7 +116,8 @@ public class UserCommandServiceImpl implements UserCommandService {
                 
                 try {
                     updateValidators.forEach(v -> v.validate(userUpdateRequestDTO, user));
-                    user.updateProfile(userUpdateRequestDTO.name(), userUpdateRequestDTO.email());
+                    String emailHash = cryptoService.generateSha256Hash(userUpdateRequestDTO.email());
+                    user.updateProfile(userUpdateRequestDTO.name(), userUpdateRequestDTO.email(), emailHash);
                     User updatedUser = userRepository.save(user);
                     log.info(LogMessageConstants.AUDIT.USER_UPDATED, id);
                     return ServiceResult.success(userMapper.toUserResponseDTO(updatedUser));
@@ -132,22 +126,5 @@ public class UserCommandServiceImpl implements UserCommandService {
                 }
             })
             .orElseGet(() -> ServiceResult.notFound(MessageConstants.User.NOT_FOUND_FOR_UPDATE));
-    }
-
-    /**
-     * Localiza e carrega os detalhes de segurança do usuário para o Spring Security.
-     * Método central para a autorização stateless via Token JWT.
-     * 
-     * @param subjectId ID do usuário (como String) extraído do assunto do Token.
-     * @return Objeto UserDetailsImpl compatível com o ecossistema de segurança do Spring.
-     * @throws IllegalArgumentException Caso o ID no token não corresponda a um usuário ativo.
-     */
-    @Transactional(readOnly = true)
-    public UserDetails loadUserDetailsById(@NonNull String subjectId) {
-        User user = userRepository.findById(UUID.fromString(subjectId))
-            .orElseThrow(() -> new IllegalArgumentException(
-                MessageConstants.User.NOT_FOUND_FOR_TOKEN
-            ));
-        return new UserDetailsImpl(user);
     }
 }

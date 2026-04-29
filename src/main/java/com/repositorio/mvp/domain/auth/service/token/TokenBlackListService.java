@@ -19,7 +19,6 @@ import lombok.RequiredArgsConstructor;
 @Service
 @RequiredArgsConstructor
 public class TokenBlackListService {
-
     private final InvalidTokenRepository invalidTokenRepository;
     private final CryptoService cryptoService;
 

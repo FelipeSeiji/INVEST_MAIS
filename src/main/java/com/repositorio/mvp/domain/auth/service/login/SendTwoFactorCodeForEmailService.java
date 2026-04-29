@@ -14,7 +14,7 @@ import lombok.RequiredArgsConstructor;
  */
 @Component
 @RequiredArgsConstructor
-public class EmailTwoFactorService implements TwoFactorNotification{
+public class SendTwoFactorCodeForEmailService implements TwoFactorNotification{
     private final JavaMailSender mailSender;
 
     /**

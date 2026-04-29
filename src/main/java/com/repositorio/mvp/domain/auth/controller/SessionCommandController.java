@@ -8,7 +8,7 @@ import org.springframework.web.ErrorResponseException;
 import org.springframework.web.bind.annotation.*;
 
 import com.repositorio.mvp.common.result.ServiceResult;
-import com.repositorio.mvp.domain.auth.service.auth.SessionService;
+import com.repositorio.mvp.domain.auth.service.auth.LogoutService;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -23,7 +23,7 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 @Tag(name = "Autenticação - Sessão", description = "Gerenciamento de sessão (Logout)")
 public class SessionCommandController {
-    private final SessionService sessionService;
+    private final LogoutService sessionService;
 
     @PostMapping("/logout")
     @Operation(summary = "Realiza o logout do usuário", description = "Invalida o token JWT, encerrando a sessão.")

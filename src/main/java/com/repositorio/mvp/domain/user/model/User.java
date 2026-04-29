@@ -16,8 +16,6 @@ import jakarta.persistence.Table;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 
-import org.apache.commons.codec.digest.DigestUtils;
-
 import com.repositorio.mvp.domain.portfolio.model.Portfolio;
 import com.repositorio.mvp.infrastructure.util.AttributeEncryptor;
 
@@ -61,11 +59,11 @@ public class User {
     @Embedded
     private UserSecurity security;
 
-    public void updateProfile(String name, String email) {
+    public void updateProfile(String name, String email, String emailHash) {
         this.name = name;
         this.email = email;
         if (this.security != null) {
-            this.security.setEmailHash(DigestUtils.sha256Hex(email.toLowerCase()));
+            this.security.setEmailHash(emailHash);
         }
     }
 }

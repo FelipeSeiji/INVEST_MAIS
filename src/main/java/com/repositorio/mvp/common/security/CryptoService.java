@@ -2,7 +2,11 @@ package com.repositorio.mvp.common.security;
 
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
+import java.security.SecureRandom;
 import java.util.Base64;
+
+import javax.crypto.Mac;
+import javax.crypto.spec.SecretKeySpec;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -18,7 +22,7 @@ public class CryptoService {
     @Value("${api.security.token.secret}")
     private String tokenSecret;
 
-    private final java.security.SecureRandom secureRandom = new java.security.SecureRandom();
+    private final SecureRandom secureRandom = new SecureRandom();
 
     /**
      * Gera um hash determinístico de um valor em texto (ex: e-mail) 
@@ -58,8 +62,8 @@ public class CryptoService {
      */
     public String generateHmacTokenHash(String token) {
         try {
-            javax.crypto.Mac sha256_HMAC = javax.crypto.Mac.getInstance("HmacSHA256");
-            javax.crypto.spec.SecretKeySpec secret_key = new javax.crypto.spec.SecretKeySpec(
+            Mac sha256_HMAC = Mac.getInstance("HmacSHA256");
+            SecretKeySpec secret_key = new SecretKeySpec(
                 tokenSecret.getBytes(StandardCharsets.UTF_8), 
                 "HmacSHA256"
             );

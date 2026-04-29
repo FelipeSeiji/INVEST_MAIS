@@ -8,9 +8,9 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import com.repositorio.mvp.domain.auth.service.auth.SessionService;
+import com.repositorio.mvp.domain.auth.service.auth.LogoutService;
+import com.repositorio.mvp.domain.auth.service.interfaces.TokenProvider;
 import com.repositorio.mvp.domain.auth.service.token.TokenBlackListService;
-import com.repositorio.mvp.domain.auth.service.token.TokenProvider;
 
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -19,7 +19,7 @@ import static org.mockito.Mockito.when;
 public class SessionServiceTest {
 
     @InjectMocks
-    private SessionService sessionService;
+    private LogoutService sessionService;
 
     @Mock
     private TokenBlackListService tokenBlackListService;

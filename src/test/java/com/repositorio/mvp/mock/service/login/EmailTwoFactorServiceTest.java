@@ -11,7 +11,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 
-import com.repositorio.mvp.domain.auth.service.login.EmailTwoFactorService;
+import com.repositorio.mvp.domain.auth.service.login.SendTwoFactorCodeForEmailService;
 import com.repositorio.mvp.domain.user.model.User;
 import com.repositorio.mvp.shared.UserConstants;
 
@@ -23,7 +23,7 @@ import static org.mockito.Mockito.verify;
 public class EmailTwoFactorServiceTest{
 
     @InjectMocks
-    private EmailTwoFactorService emailTwoFactorService;
+    private SendTwoFactorCodeForEmailService emailTwoFactorService;
 
     @Mock
     private JavaMailSender mailSender;

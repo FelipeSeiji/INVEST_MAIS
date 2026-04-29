@@ -9,7 +9,7 @@ import org.springframework.http.ResponseEntity;
 
 import com.repositorio.mvp.common.result.ServiceResult;
 import com.repositorio.mvp.domain.auth.controller.SessionCommandController;
-import com.repositorio.mvp.domain.auth.service.auth.SessionService;
+import com.repositorio.mvp.domain.auth.service.auth.LogoutService;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.verify;
@@ -21,7 +21,7 @@ public class SessionControllerTest {
     private SessionCommandController sessionController;
 
     @Mock
-    private SessionService sessionService;
+    private LogoutService sessionService;
 
     @Test
     public void logout_CallsSessionService() {

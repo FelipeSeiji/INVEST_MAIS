@@ -1,4 +1,4 @@
-package com.repositorio.mvp.domain.auth.service.token;
+package com.repositorio.mvp.domain.auth.service.interfaces;
 
 import java.time.Instant;
 import java.util.UUID;

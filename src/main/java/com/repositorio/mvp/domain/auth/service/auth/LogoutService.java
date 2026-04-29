@@ -5,8 +5,8 @@ import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 import com.repositorio.mvp.common.result.ServiceResult;
+import com.repositorio.mvp.domain.auth.service.interfaces.TokenProvider;
 import com.repositorio.mvp.domain.auth.service.token.TokenBlackListService;
-import com.repositorio.mvp.domain.auth.service.token.TokenProvider;
 
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -16,7 +16,7 @@ import lombok.RequiredArgsConstructor;
  */
 @Service
 @RequiredArgsConstructor
-public class SessionService {
+public class LogoutService {
 
     private final TokenBlackListService tokenBlackListService;
     private final TokenProvider tokenProvider;

@@ -14,6 +14,4 @@ public interface UserRepository extends JpaRepository<User, UUID> {
     boolean existsBySecurityEmailHash(String emailHash);
 
     Optional<User> findBySecurityEmailHash(String emailHash);
-
-    boolean existsBySecurityEmailHashAndIdNot(String emailHash, UUID id);
 }

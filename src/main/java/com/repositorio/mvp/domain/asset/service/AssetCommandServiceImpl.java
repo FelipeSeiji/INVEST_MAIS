@@ -40,7 +40,9 @@ public class AssetCommandServiceImpl implements AssetCommandService {
     private final AssetMapper assetMapper;
 
     /**
+     * {@inheritDoc}
      * Registra um novo ativo em uma categoria de investimento específica.
+     * Garante que a categoria informada pertença ao usuário autenticado antes de criar o ativo.
      * 
      * @param categoryId UUID da categoria de destino.
      * @param request DTO com os dados do ativo (ticker, quantidade, preço médio, valor atual).
@@ -68,7 +70,9 @@ public class AssetCommandServiceImpl implements AssetCommandService {
     }
 
     /**
+     * {@inheritDoc}
      * Atualiza os dados de um ativo existente.
+     * Valida a propriedade da categoria do ativo antes de permitir a atualização.
      * 
      * @param id UUID do ativo a ser atualizado.
      * @param request Novos dados do ativo.
@@ -97,7 +101,9 @@ public class AssetCommandServiceImpl implements AssetCommandService {
     }
 
     /**
-     * Remove permanentemente um ativo da carteira.
+     * {@inheritDoc}
+     * Remove um ativo da base de dados.
+     * Verifica se o usuário tem permissão para excluir o ativo com base na categoria vinculada.
      * 
      * @param id UUID do ativo a ser removido.
      * @return ServiceResult indicando sucesso ou erro caso o ativo não seja encontrado.

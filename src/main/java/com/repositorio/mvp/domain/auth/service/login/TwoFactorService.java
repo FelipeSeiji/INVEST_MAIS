@@ -5,17 +5,21 @@ import java.time.LocalDateTime;
 import org.springframework.stereotype.Service;
 
 import com.repositorio.mvp.common.security.CryptoService;
-import com.repositorio.mvp.domain.auth.service.interfaces.TwoFactorNotification;
+import com.repositorio.mvp.domain.auth.service.interfaces.TwoFactorNotificationService;
 import com.repositorio.mvp.domain.user.model.User;
 
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
+/**
+ * Serviço responsável por gerenciar a geração e o envio de códigos de Segundo Fator (2FA).
+ * Centraliza a lógica de expiração e integração com provedores de notificação.
+ */
 @Service
 @RequiredArgsConstructor
 public class TwoFactorService {
     private final CryptoService cryptoService;
-    private final TwoFactorNotification twoFactorNotification;
+    private final TwoFactorNotificationService twoFactorNotification;
     
     /**
      * Prepara o processo de segundo fator de autenticação (2FA) para um usuário.

@@ -5,7 +5,7 @@ import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 import com.repositorio.mvp.common.result.ServiceResult;
-import com.repositorio.mvp.domain.auth.service.interfaces.TokenProvider;
+import com.repositorio.mvp.domain.auth.service.interfaces.TokenProviderService;
 import com.repositorio.mvp.domain.auth.service.token.TokenBlackListService;
 
 import lombok.NonNull;
@@ -19,7 +19,7 @@ import lombok.RequiredArgsConstructor;
 public class LogoutService {
 
     private final TokenBlackListService tokenBlackListService;
-    private final TokenProvider tokenProvider;
+    private final TokenProviderService tokenProvider;
     
     private static final String BEARER_PREFIX = "Bearer ";
 

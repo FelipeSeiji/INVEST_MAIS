@@ -37,7 +37,7 @@ public class PasswordRecoveryService {
     private final TransactionTemplate transactionTemplate;
     private final LoginAttemptService loginAttemptService;
     private final CryptoService cryptoService;
-    private final AuthEmailService authEmailService;
+    private final RecoveryEmailService authEmailService;
 
     /**
      * Inicia o processo de recuperação de senha de forma segura.

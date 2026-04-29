@@ -12,7 +12,7 @@ import com.repositorio.mvp.common.constants.MessageConstants;
 import com.repositorio.mvp.common.result.ServiceResult;
 import com.repositorio.mvp.domain.auth.DTO.LoginRequestDTO;
 import com.repositorio.mvp.domain.auth.DTO.Verify2FARequestDTO;
-import com.repositorio.mvp.domain.auth.service.interfaces.TokenProvider;
+import com.repositorio.mvp.domain.auth.service.interfaces.TokenProviderService;
 import com.repositorio.mvp.domain.user.model.User;
 import com.repositorio.mvp.domain.user.repository.UserRepository;
 
@@ -33,7 +33,7 @@ public class LoginService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
-    private final TokenProvider tokenProvider;
+    private final TokenProviderService tokenProvider;
     private final TwoFactorService twoFactorService;
     private final LoginAttemptService loginAttemptService;
     private final CryptoService cryptoService;

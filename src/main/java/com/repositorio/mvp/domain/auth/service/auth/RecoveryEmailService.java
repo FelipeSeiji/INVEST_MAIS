@@ -16,7 +16,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class AuthEmailService {
+public class RecoveryEmailService {
 
     private final JavaMailSender mailSender;
 

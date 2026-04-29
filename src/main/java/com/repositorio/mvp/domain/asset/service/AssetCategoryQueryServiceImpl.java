@@ -15,6 +15,10 @@ import com.repositorio.mvp.infrastructure.security.UserContextService;
 
 import lombok.RequiredArgsConstructor;
 
+/**
+ * Implementação do serviço de consulta para categorias de ativos.
+ * Fornece acesso otimizado às categorias cadastradas na carteira do usuário.
+ */
 @Service
 @RequiredArgsConstructor
 public class AssetCategoryQueryServiceImpl implements AssetCategoryQueryService {
@@ -23,6 +27,10 @@ public class AssetCategoryQueryServiceImpl implements AssetCategoryQueryService 
     private final UserContextService userContextService;
     private final AssetMapper assetMapper;
 
+    /**
+     * {@inheritDoc}
+     * Recupera a carteira do usuário a partir do contexto de segurança e retorna suas categorias.
+     */
     @Override
     @Transactional(readOnly = true)
     public ServiceResult<List<CategoryResponseDTO>> listUserCategories() {

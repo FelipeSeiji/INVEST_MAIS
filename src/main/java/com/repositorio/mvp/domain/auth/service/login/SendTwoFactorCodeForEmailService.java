@@ -4,7 +4,7 @@ import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Component;
 
-import com.repositorio.mvp.domain.auth.service.interfaces.TwoFactorNotification;
+import com.repositorio.mvp.domain.auth.service.interfaces.TwoFactorNotificationService;
 import com.repositorio.mvp.domain.user.model.User;
 
 import lombok.RequiredArgsConstructor;
@@ -14,7 +14,7 @@ import lombok.RequiredArgsConstructor;
  */
 @Component
 @RequiredArgsConstructor
-public class SendTwoFactorCodeForEmailService implements TwoFactorNotification{
+public class SendTwoFactorCodeForEmailService implements TwoFactorNotificationService{
     private final JavaMailSender mailSender;
 
     /**

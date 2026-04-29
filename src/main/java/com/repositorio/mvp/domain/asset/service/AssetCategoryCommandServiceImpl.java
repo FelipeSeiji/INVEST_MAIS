@@ -23,6 +23,11 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+/**
+ * Implementação do serviço de comando para categorias de ativos.
+ * Gerencia a lógica de negócio para criação, edição e remoção de categorias,
+ * incluindo a validação de percentuais alvo na carteira.
+ */
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -32,6 +37,10 @@ public class AssetCategoryCommandServiceImpl implements AssetCategoryCommandServ
     private final UserContextService userContextService;
     private final AssetMapper assetMapper;
 
+    /**
+     * {@inheritDoc}
+     * Realiza a validação da soma dos percentuais alvo antes de persistir a nova categoria.
+     */
     @Override
     @Transactional
     public ServiceResult<CategoryResponseDTO> createCategory(@NonNull CategoryRequestDTO request) {
@@ -50,6 +59,10 @@ public class AssetCategoryCommandServiceImpl implements AssetCategoryCommandServ
         }
     }
 
+    /**
+     * {@inheritDoc}
+     * Garante que a categoria pertença à carteira do usuário autenticado.
+     */
     @Override
     @Transactional
     public ServiceResult<CategoryResponseDTO> updateCategory(@NonNull UUID id, @NonNull CategoryRequestDTO request) {
@@ -72,6 +85,10 @@ public class AssetCategoryCommandServiceImpl implements AssetCategoryCommandServ
         }
     }
 
+    /**
+     * {@inheritDoc}
+     * Remove a categoria e todos os ativos associados (via cascata no banco/entidade se configurado).
+     */
     @Override
     @Transactional
     public ServiceResult<Void> deleteCategory(@NonNull UUID id) {

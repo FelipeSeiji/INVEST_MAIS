@@ -8,7 +8,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import com.repositorio.mvp.common.constants.MessageConstants;
-import com.repositorio.mvp.domain.auth.service.interfaces.TokenProvider;
+import com.repositorio.mvp.domain.auth.service.interfaces.TokenProviderService;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTVerificationException;
@@ -19,7 +19,7 @@ import lombok.NonNull;
  * Serviço core de criptografia e gerenciamento de JSON Web Tokens (JWT).
  */
 @Service
-public class TokenService implements TokenProvider {
+public class TokenService implements TokenProviderService {
 
     @Value("${api.security.token.secret}")
     private String secret;

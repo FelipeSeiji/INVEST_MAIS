@@ -9,7 +9,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.repositorio.mvp.domain.auth.service.auth.LogoutService;
-import com.repositorio.mvp.domain.auth.service.interfaces.TokenProvider;
+import com.repositorio.mvp.domain.auth.service.interfaces.TokenProviderService;
 import com.repositorio.mvp.domain.auth.service.token.TokenBlackListService;
 
 import static org.mockito.Mockito.verify;
@@ -25,7 +25,7 @@ public class SessionServiceTest {
     private TokenBlackListService tokenBlackListService;
     
     @Mock
-    private TokenProvider tokenProvider;
+    private TokenProviderService tokenProvider;
 
     @Test
     public void logout_WithBearerPrefix_RemovesPrefixAndSavesToBlacklist() {

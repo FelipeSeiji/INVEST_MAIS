@@ -22,6 +22,11 @@ import com.repositorio.mvp.infrastructure.security.UserDetailsImpl;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
+/**
+ * Implementação do serviço de consulta para gestão de usuários.
+ * Provê métodos para leitura de dados de perfil e carregamento de detalhes
+ * de segurança para o framework de segurança.
+ */
 @Service
 @RequiredArgsConstructor
 public class UserQueryServiceImpl implements UserQueryService {

@@ -35,11 +35,12 @@ public class AssetQueryServiceImpl implements AssetQueryService {
     private final AssetMapper assetMapper;
 
     /**
+     * {@inheritDoc}
      * Lista todos os ativos pertencentes a uma categoria específica do usuário.
+     * Verifica a existência da categoria e a propriedade do usuário antes de retornar os ativos.
      * 
      * @param categoryId UUID da categoria cujos ativos devem ser recuperados.
      * @return Lista de DTOs representando os ativos encontrados na categoria.
-     * @throws EntityNotFoundException Caso a categoria informada não pertença à carteira do usuário.
      */
     @Override
     @Transactional(readOnly = true)

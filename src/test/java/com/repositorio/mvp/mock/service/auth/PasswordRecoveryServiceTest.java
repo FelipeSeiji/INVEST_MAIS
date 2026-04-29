@@ -4,7 +4,7 @@ import java.time.LocalDateTime;
 import java.util.Optional;
 
 import com.repositorio.mvp.common.security.CryptoService;
-import com.repositorio.mvp.domain.auth.service.auth.AuthEmailService;
+import com.repositorio.mvp.domain.auth.service.auth.RecoveryEmailService;
 import com.repositorio.mvp.domain.auth.service.login.LoginAttemptService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -49,7 +49,7 @@ public class PasswordRecoveryServiceTest {
     private PasswordEncoder passwordEncoder;
 
     @Mock
-    private AuthEmailService authEmailService;
+    private RecoveryEmailService authEmailService;
 
     @Mock
     private TransactionTemplate transactionTemplate;

@@ -29,6 +29,11 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+/**
+ * Implementação do serviço de comando para gestão de usuários.
+ * Centraliza as operações de escrita, aplicando regras de segurança,
+ * criptografia e orquestração com outros domínios (ex: inicialização de carteira).
+ */
 @Slf4j
 @Service
 @RequiredArgsConstructor

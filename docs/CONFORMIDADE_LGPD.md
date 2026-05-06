@@ -71,10 +71,33 @@
 
 ---
 
-## 7. Boas Práticas
+7. Fluxo de Tráfego e Dados em Trânsito
+
+Para garantir a segurança ponta-a-ponta, o tráfego é segmentado em três fluxos principais, todos protegidos por TLS.
+
+7.1. Fluxo de Entrada
+
+Nesta etapa, os dados saem do navegador do usuário para o servidor.
+
+| Dado Trafegado | Descrição do Conteúdo | Proteção em Trânsito |
+| :--- | :--- | :--- |
+| Credenciais de Acesso | E-mail e Senha. | HTTPS/TLS |
+| Token 2FA/TOTP | Código de 6 dígitos gerado pelo app do usuário. | HTTPS/TLS |
+| Dados Patrimoniais | Valores de aportes, nomes de ativos e datas de operação. | HTTPS/TLS |
+| Respostas Suitability | Opções selecionadas no questionário de perfil de risco. | HTTPS/TLS |
+
+7.2. Fluxo de Autenticação
+Após a validação, a API devolve as chaves de acesso que trafegarão em todas as requisições.
+
+| Dado Trafegado | Finalidade | Proteção / Mecanismo |
+| :--- | :--- | :--- |
+| JSON Web Token (JWT) | Contém o ID do usuário e permissões. | Assinado digitalmente. |
+| Header de Autorização | Token enviado no cabeçalho. | HTTPS/TLS |
+
+## 8. Boas Práticas
 
 A estruturação deste documento visa consolidar a política de governança. Conforme a **Resolução CD/ANPD nº 4/2023**, a demonstração destas medidas (especialmente a implementação técnica de 2FA e Criptografia comprovada no código) pode reduzir eventuais sanções administrativas em até **40%**, sendo 20% pela política de boas práticas e 20% pelos mecanismos internos de mitigação.
 
 ---
-**Última Atualização:** 05 de Maio de 2026.
+**Última Atualização:** 06 de Maio de 2026.
 **Responsável:** Equipe de Desenvolvimento.

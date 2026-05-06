@@ -147,3 +147,11 @@ A documentação interativa da API é gerada automaticamente e pode ser acessada
 
 - **Swagger UI**: `https://localhost:8443/swagger-ui.html`
 - **OpenAPI Spec**: `https://localhost:8443/v3/api-docs`
+
+---
+
+## Conformidade
+
+Este projeto foi desenvolvido seguindo as diretrizes da **Lei Geral de Proteção de Dados (LGPD)**. Para detalhes sobre o inventário de dados, base legal e políticas de segurança, consulte o documento abaixo:
+
+- [Dossiê de Conformidade LGPD](docs/CONFORMIDADE_LGPD.md)

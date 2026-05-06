@@ -71,11 +71,11 @@
 
 ---
 
-7. Fluxo de Tráfego e Dados em Trânsito
+## 7. Fluxo de Tráfego e Dados em Trânsito
 
 Para garantir a segurança ponta-a-ponta, o tráfego é segmentado em três fluxos principais, todos protegidos por TLS.
 
-7.1. Fluxo de Entrada
+### 7.1. Fluxo de Entrada
 
 Nesta etapa, os dados saem do navegador do usuário para o servidor.
 
@@ -86,7 +86,7 @@ Nesta etapa, os dados saem do navegador do usuário para o servidor.
 | Dados Patrimoniais | Valores de aportes, nomes de ativos e datas de operação. | HTTPS/TLS |
 | Respostas Suitability | Opções selecionadas no questionário de perfil de risco. | HTTPS/TLS |
 
-7.2. Fluxo de Autenticação
+### 7.2. Fluxo de Autenticação
 Após a validação, a API devolve as chaves de acesso que trafegarão em todas as requisições.
 
 | Dado Trafegado | Finalidade | Proteção / Mecanismo |

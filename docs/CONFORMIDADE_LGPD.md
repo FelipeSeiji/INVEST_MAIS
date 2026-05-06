@@ -9,11 +9,6 @@
 | **Gestão Patrimonial** | Controlador | Cálculos de rentabilidade e rebalanceamento de carteira. | Art. 7º, V (Execução de Contrato) | E-mail, logs de acesso, aportes financeiros, ativos em custódia. | Enquanto a conta estiver ativa ou 5 anos após encerramento (exercício de direitos). |
 | **Perfilamento** | Controlador | Personalização e recomendações conforme perfil de risco. | Art. 7º, V | Respostas ao questionário de perfil, nível de tolerância a risco. | Mesma da conta. |
 
-### 1.2 Governança Institucional (RH e Administrativo)
-| Processo | Papel | Finalidade | Base Legal | Categorias de Dados | Medida de Segurança |
-| :--- | :--- | :--- | :--- | :--- | :--- |
-| **Gestão de RH** | Controlador | Obrigações trabalhistas e previdenciárias. | Art. 7º, II e V | Identificação, Dados Bancários, Filiação Sindical (Sensível). | RBAC e Criptografia de documentos. |
-
 ---
 
 ## 2. Política de Privacidade e Direitos do Titular

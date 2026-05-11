@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.repositorio.mvp.common.DTO.MessageResponseDTO;
 import com.repositorio.mvp.common.constants.MessageConstants;
 import com.repositorio.mvp.common.result.ServiceResult;
-import com.repositorio.mvp.domain.auth.service.token.TokenBlackListService;
+import com.repositorio.mvp.domain.auth.token.service.TokenBlackListService;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;

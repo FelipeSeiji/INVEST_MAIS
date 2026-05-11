@@ -15,8 +15,8 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import com.repositorio.mvp.common.constants.LogMessageConstants;
 import com.repositorio.mvp.common.constants.MessageConstants;
-import com.repositorio.mvp.domain.auth.service.token.TokenBlackListService;
-import com.repositorio.mvp.domain.auth.service.token.TokenService;
+import com.repositorio.mvp.domain.auth.token.service.TokenBlackListService;
+import com.repositorio.mvp.domain.auth.token.service.TokenService;
 import com.repositorio.mvp.domain.user.service.interfaces.UserQueryService;
 import com.repositorio.mvp.infrastructure.security.util.ClientIp;
 

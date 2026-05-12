@@ -12,7 +12,7 @@ import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import com.repositorio.mvp.domain.auth.service.security.RateLimitingService;
+import com.repositorio.mvp.domain.auth.security.service.RateLimitingService;
 import com.repositorio.mvp.infrastructure.security.util.ClientIp;
 
 import lombok.NonNull;

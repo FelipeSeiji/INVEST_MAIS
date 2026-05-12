@@ -15,7 +15,7 @@ import org.springframework.web.servlet.HandlerExceptionResolver;
 
 import com.repositorio.mvp.common.constants.LogMessageConstants;
 import com.repositorio.mvp.common.constants.MessageConstants;
-import com.repositorio.mvp.domain.auth.service.security.RateLimitingService;
+import com.repositorio.mvp.domain.auth.security.service.RateLimitingService;
 import com.repositorio.mvp.infrastructure.exception.RateLimitExceededException;
 import com.repositorio.mvp.infrastructure.security.util.ClientIp;
 

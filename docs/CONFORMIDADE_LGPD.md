@@ -63,11 +63,50 @@ Este documento detalha as medidas técnicas e administrativas adotadas para gara
 
 ## 6. Fluxo de Tráfego e Dados em Trânsito
 
+<<<<<<< HEAD
 | Dado Trafegado | Conteúdo | Proteção |
 | :--- | :--- | :--- |
 | Credenciais | E-mail e Senha | HTTPS/TLS |
 | Token 2FA | Código de 6 dígitos | HTTPS/TLS |
 | JSON Web Token (JWT) | Identidade e Escopos | Assinatura HS256 |
+=======
+| ID | Campo | Natureza | Fonte | Armazenamento |
+| :--- | :--- | :--- | :--- | :--- |
+| **ASSET_001** | E-mail Login | Simples | Titular | PostgreSQL (Cloud) |
+| **ASSET_002** | Hash Senha | Simples | Titular | Argon2 Hash |
+| **ASSET_003** | Perfil | Simples | Questionário | Tabela |
+| **ASSET_004** | Aportes Financeiros | Simples/Crítico | Titular | AES-256 Encrypted |
+| **ASSET_005** | Logs de IP/Acesso | Eletrônico | Sistema | Auditoria S3/Logback |
+
+---
+
+## 7. Fluxo de Tráfego e Dados em Trânsito
+
+Para garantir a segurança ponta-a-ponta, o tráfego é segmentado em três fluxos principais, todos protegidos por TLS.
+
+### 7.1. Fluxo de Entrada
+
+Nesta etapa, os dados saem do navegador do usuário para o servidor.
+
+| Dado Trafegado | Descrição do Conteúdo | Proteção em Trânsito |
+| :--- | :--- | :--- |
+| Credenciais de Acesso | E-mail e Senha. | HTTPS/TLS |
+| Token 2FA/TOTP | Código de 6 dígitos gerado pelo app do usuário. | HTTPS/TLS |
+| Dados Patrimoniais | Valores de aportes, nomes de ativos e datas de operação. | HTTPS/TLS |
+| Respostas Suitability | Opções selecionadas no questionário de perfil de risco. | HTTPS/TLS |
+
+### 7.2. Fluxo de Autenticação
+Após a validação, a API devolve as chaves de acesso que trafegarão em todas as requisições.
+
+| Dado Trafegado | Finalidade | Proteção / Mecanismo |
+| :--- | :--- | :--- |
+| JSON Web Token (JWT) | Contém o ID do usuário e permissões. | Assinado digitalmente. |
+| Header de Autorização | Token enviado no cabeçalho. | HTTPS/TLS |
+
+## 8. Boas Práticas
+
+A estruturação deste documento visa consolidar a política de governança. Conforme a **Resolução CD/ANPD nº 4/2023**, a demonstração destas medidas (especialmente a implementação técnica de 2FA e Criptografia comprovada no código) pode reduzir eventuais sanções administrativas em até **40%**, sendo 20% pela política de boas práticas e 20% pelos mecanismos internos de mitigação.
+>>>>>>> b61fe9efceb2c2d43e9efd578b66ce7316dcf3b7
 
 ---
 

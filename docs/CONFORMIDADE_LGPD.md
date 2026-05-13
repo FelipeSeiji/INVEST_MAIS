@@ -9,8 +9,8 @@ Este documento detalha as medidas técnicas e administrativas adotadas para gara
 ### 1.1 Operação da Plataforma Investe+
 | Processo | Papel | Finalidade | Base Legal | Categorias de Dados | Retenção |
 | :--- | :--- | :--- | :--- | :--- | :--- |
-| **Gestão Patrimonial** | Controlador | Cálculos de rentabilidade e rebalanceamento de carteira. | Art. 7º, V (Execução de Contrato) | Nome, E-mail, logs de acesso, aportes e ativos. | Enquanto a conta estiver ativa ou 5 anos após encerramento (exercício de direitos). |
-| **Perfilamento** | Controlador | Personalização e recomendações conforme perfil de risco. | Art. 7º, V | Respostas qualitativas, metas de alocação por categoria. | Mesma da conta. |
+| **Gestão Patrimonial** | Controlador | Cálculos de rentabilidade e rebalanceamento de carteira. | Art. 7º, V (Execução de Contrato) | Nome, E-mail, logs de acesso, aportes e ativos. | Enquanto a conta estiver ativa. |
+| **Perfilamento** | Controlador | Personalização e recomendações conforme perfil de risco. | Art. 7º, V | Respostas qualitativas, metas de alocação por categoria. | Enquanto a conta estiver ativa. |
 
 ---
 
@@ -18,28 +18,28 @@ Este documento detalha as medidas técnicas e administrativas adotadas para gara
 
 *   **Agentes de Tratamento:** O projeto **Investe+** atua como Controlador dos dados.
 *   **Dados Coletados:** Identificação (Nome, E-mail), Financeiros (Quantidades, Preços Médios), Perfil Qualitativo e Eletrônicos (IP, Logs).
-*   **Direito ao Esquecimento:** O titular pode solicitar a exclusão definitiva. O sistema remove irreversivelmente o histórico financeiro e pessoal das bases de produção (Soft Delete não aplicado para dados pessoais).
+*   **Direito ao Esquecimento:** O titular pode solicitar a exclusão definitiva. O sistema remove irreversivelmente o histórico financeiro e pessoal das bases de produção.
 
 ---
 
 ## 3. Política de Segurança da Informação (PSI)
 
-1.  **Criptografia em Repouso (Field-Level):** Implementação de cifragem **AES-256 GCM** via `AttributeEncryptor` para campos de identificação pessoal (`User.name` e `User.email`).
+1.  **Criptografia em Repouso (Field-Level):** Implementação de cifragem **AES-256 GCM** via `AttributeEncryptor` focada em dados de identificação pessoal (`User.name` e `User.email`). Dados financeiros são protegidos por isolamento lógico.
 2.  **Hashing de Segurança:**
     *   **Senhas:** Protegidas com **Argon2** (padrão de alta resistência a força bruta).
     *   **Busca Segura:** Uso de **SHA-256** para `emailHash`, permitindo indexação sem expor o dado original.
     *   **Tokens de Reset:** Protegidos com **HMAC-SHA256**.
-3.  **Criptografia em Trânsito:** Protocolos **TLS 1.2+** obrigatórios em todas as comunicações.
-4.  **Autenticação de Dois Fatores (2FA):** Gerada via `SecureRandom` para garantir códigos imprevisíveis.
+3.  **Criptografia em Trânsito:** Protocolos **TLS 1.2+** obrigatórios em todas as comunicações via HTTPS.
+4.  **Autenticação de Dois Fatores (2FA):** Gerada via `SecureRandom` e armazenada com criptografia para garantir códigos imprevisíveis.
 5.  **Gestão de Acessos (IAM):** Princípio do privilégio mínimo. O acesso aos dados financeiros é filtrado via `user_id` em nível de aplicação e persistência.
 
 ---
 
 ## 4. Relatório de Impacto à Proteção de Dados (RIPD)
 
-*   **A) Identificação dos Agentes:** Controlador: Projeto Investe+ (MVP Repositório).
+*   **A) Identificação dos Agentes:** Controlador: Projeto Investe+ (Equipe de Desenvolvimento).
 *   **B) Justificativa:** Tratamento de dados financeiros para automação de carteira de investimentos.
-*   **C) Sistemas:** PostgreSQL (Produção), API Java 25 (Spring Boot 3.5), Frontend React.
+*   **C) Sistemas:** H2 Database (In-Memory/MVP), API Java 25 (Spring Boot 3.5), Frontend React (Vite).
 *   **D) Dados Pessoais:** E-mail (Identificação); Financeiros (Saldos, Aportes); Perfil (Respostas de ativos).
 *   **E) Fonte de Coleta:** Direta com o titular através de formulários cifrados.
 *   **F) Medidas de Mitigação:** Cifragem **AES-256 GCM**, Hashing **Argon2**, Tokens **JWT** assinados e **2FA**.
@@ -50,73 +50,50 @@ Este documento detalha as medidas técnicas e administrativas adotadas para gara
 
 | ID | Campo | Natureza | Fonte | Armazenamento | Proteção |
 | :--- | :--- | :--- | :--- | :--- | :--- |
-| **ASSET_001** | Nome Completo | Simples | Titular | PostgreSQL | **AES-256 GCM** |
-| **ASSET_002** | E-mail Login | Simples | Titular | PostgreSQL | **AES-256 GCM** |
-| **ASSET_003** | Senha | Crítico | Titular | PostgreSQL | **Argon2 Hashing** |
-| **ASSET_004** | Perfil/Metas | Simples | Titular | PostgreSQL | Texto Claro / IAM |
-| **ASSET_005** | Dados Financeiros | Crítico | Titular | PostgreSQL | Texto Claro / IAM* |
-| **ASSET_006** | Logs de IP | Eletrônico | Sistema | Logback | Proteção de Acesso |
+| **ASSET_001** | Nome Completo | Simples | Titular | H2 | **AES-256 GCM** |
+| **ASSET_002** | E-mail Login | Simples | Titular | H2 | **AES-256 GCM** |
+| **ASSET_003** | Senha | Crítico | Titular | H2 | **Argon2 Hashing** |
+| **ASSET_004** | Perfil/Metas | Simples | Titular | H2 | Texto Claro / IAM |
+| **ASSET_005** | Dados Financeiros | Crítico | Titular | H2 | Texto Claro / IAM* |
+| **ASSET_006** | Logs de IP/Acesso | Eletrônico | Sistema | Logback / Arquivos | Proteção de Acesso |
 
-*\*Dados financeiros são mantidos em texto claro para permitir cálculos de rebalanceamento, sendo protegidos por rigoroso isolamento de identidade (IAM).*
+*\*Dados financeiros são mantidos em texto claro no banco para viabilizar cálculos de performance, sendo protegidos por rigoroso isolamento de identidade (IAM) em nível de linha.*
 
 ---
 
-## 6. Fluxo de Tráfego e Dados em Trânsito
+## 6. Tecnologias de Armazenamento (Cookies e Similares)
 
-<<<<<<< HEAD
-| Dado Trafegado | Conteúdo | Proteção |
-| :--- | :--- | :--- |
-| Credenciais | E-mail e Senha | HTTPS/TLS |
-| Token 2FA | Código de 6 dígitos | HTTPS/TLS |
-| JSON Web Token (JWT) | Identidade e Escopos | Assinatura HS256 |
-=======
-| ID | Campo | Natureza | Fonte | Armazenamento |
+O sistema utiliza o armazenamento local do navegador para funções críticas de segurança e usabilidade. Não utilizamos cookies de rastreamento de terceiros (Analytics/Ads).
+
+| Nome | Fornecedor | Finalidade | Categoria | Expiração |
 | :--- | :--- | :--- | :--- | :--- |
-| **ASSET_001** | E-mail Login | Simples | Titular | PostgreSQL (Cloud) |
-| **ASSET_002** | Hash Senha | Simples | Titular | Argon2 Hash |
-| **ASSET_003** | Perfil | Simples | Questionário | Tabela |
-| **ASSET_004** | Aportes Financeiros | Simples/Crítico | Titular | AES-256 Encrypted |
-| **ASSET_005** | Logs de IP/Acesso | Eletrônico | Sistema | Auditoria S3/Logback |
+| `token` | Próprio | Armazena o JSON Web Token (JWT) para manter a sessão ativa. | Estritamente Necessário (LocalStorage) | Até o logout ou limpeza do cache. |
+| `theme` | Próprio | Armazena a preferência de tema (claro/escuro). | Preferências (LocalStorage) | Persistente. |
 
 ---
 
 ## 7. Fluxo de Tráfego e Dados em Trânsito
 
-Para garantir a segurança ponta-a-ponta, o tráfego é segmentado em três fluxos principais, todos protegidos por TLS.
+Para garantir a segurança ponta-a-ponta, o tráfego é segmentado em fluxos protegidos por TLS 1.2+.
 
-### 7.1. Fluxo de Entrada
-
-Nesta etapa, os dados saem do navegador do usuário para o servidor.
-
-| Dado Trafegado | Descrição do Conteúdo | Proteção em Trânsito |
+### 7.1. Fluxo de Entrada e Autenticação
+| Dado Trafegado | Descrição / Finalidade | Proteção em Trânsito |
 | :--- | :--- | :--- |
-| Credenciais de Acesso | E-mail e Senha. | HTTPS/TLS |
-| Token 2FA/TOTP | Código de 6 dígitos gerado pelo app do usuário. | HTTPS/TLS |
-| Dados Patrimoniais | Valores de aportes, nomes de ativos e datas de operação. | HTTPS/TLS |
-| Respostas Suitability | Opções selecionadas no questionário de perfil de risco. | HTTPS/TLS |
-
-### 7.2. Fluxo de Autenticação
-Após a validação, a API devolve as chaves de acesso que trafegarão em todas as requisições.
-
-| Dado Trafegado | Finalidade | Proteção / Mecanismo |
-| :--- | :--- | :--- |
-| JSON Web Token (JWT) | Contém o ID do usuário e permissões. | Assinado digitalmente. |
-| Header de Autorização | Token enviado no cabeçalho. | HTTPS/TLS |
-
-## 8. Boas Práticas
-
-A estruturação deste documento visa consolidar a política de governança. Conforme a **Resolução CD/ANPD nº 4/2023**, a demonstração destas medidas (especialmente a implementação técnica de 2FA e Criptografia comprovada no código) pode reduzir eventuais sanções administrativas em até **40%**, sendo 20% pela política de boas práticas e 20% pelos mecanismos internos de mitigação.
->>>>>>> b61fe9efceb2c2d43e9efd578b66ce7316dcf3b7
+| Credenciais | E-mail e Senha enviados para login. | HTTPS / TLS |
+| Token 2FA/TOTP | Código de 6 dígitos para validação extra. | HTTPS / TLS |
+| **JWT (Token)** | Token de acesso devolvido após login e enviado em cada requisição. | Assinatura HS256 / HTTPS |
+| Dados Patrimoniais | Valores de aportes e nomes de ativos. | HTTPS / TLS |
 
 ---
 
-## 7. Boas Práticas e Isenções
+## 8. Boas Práticas e Isenções
 
 1.  **Natureza da Ferramenta:** O Investe+ é um sistema de auxílio ao investimento patrimonial e não constitui consultoria financeira.
-2.  **Mitigação de Riscos:** Conforme a Resolução CD/ANPD nº 4/2023, a demonstração destas medidas técnicas pode reduzir sanções administrativas em caso de incidentes.
+2.  **Mitigação de Riscos:** Conforme a **Resolução CD/ANPD nº 4/2023**, a demonstração destas medidas técnicas (2FA, Criptografia GCM, JWT) pode reduzir eventuais sanções administrativas.
 3.  **Responsabilidade do Usuário:** O titular é responsável pela guarda das credenciais 2FA e veracidade dos dados inseridos.
+4.  **Marco Civil da Internet:** Logs de acesso são mantidos por 6 meses para cumprimento de obrigação legal (Art. 15 da Lei 12.965/2014).
 
 ---
 
-**Última Atualização:** 11 de Maio de 2026.
+**Última Atualização:** 12 de Maio de 2026.
 **Responsável:** Equipe de Desenvolvimento.

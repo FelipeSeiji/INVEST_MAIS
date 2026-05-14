@@ -24,7 +24,7 @@ Este documento detalha as medidas técnicas e administrativas adotadas para gara
 
 ## 3. Política de Segurança da Informação (PSI)
 
-1.  **Criptografia em Repouso (Field-Level):** Implementação de cifragem **AES-256 GCM** via `AttributeEncryptor` focada em dados de identificação pessoal (`User.name` e `User.email`). Dados financeiros são protegidos por isolamento lógico.
+1.  **Criptografia em Repouso (Field-Level):** Implementação de cifragem **AES-256 GCM** focada em dados de identificação pessoal (`User.name` e `User.email` via `AttributeEncryptor`) e dados financeiros do portfólio (via `BigDecimalEncryptor`).
 2.  **Hashing de Segurança:**
     *   **Senhas:** Protegidas com **Argon2** (padrão de alta resistência a força bruta).
     *   **Busca Segura:** Uso de **SHA-256** para `emailHash`, permitindo indexação sem expor o dado original.
@@ -54,10 +54,10 @@ Este documento detalha as medidas técnicas e administrativas adotadas para gara
 | **ASSET_002** | E-mail Login | Simples | Titular | H2 | **AES-256 GCM** |
 | **ASSET_003** | Senha | Crítico | Titular | H2 | **Argon2 Hashing** |
 | **ASSET_004** | Perfil/Metas | Simples | Titular | H2 | Texto Claro / IAM |
-| **ASSET_005** | Dados Financeiros | Crítico | Titular | H2 | Texto Claro / IAM* |
+| **ASSET_005** | Dados Financeiros | Crítico | Titular | H2 | **AES-256 GCM** / IAM |
 | **ASSET_006** | Logs de IP/Acesso | Eletrônico | Sistema | Logback / Arquivos | Proteção de Acesso |
 
-*\*Dados financeiros são mantidos em texto claro no banco para viabilizar cálculos de performance, sendo protegidos por rigoroso isolamento de identidade (IAM) em nível de linha.*
+*\*Dados financeiros agora são mantidos de forma criptografada no banco para garantir maior segurança, utilizando o conversor `BigDecimalEncryptor` para preservar o modelo de domínio enquanto os dados são protegidos em repouso.*
 
 ---
 

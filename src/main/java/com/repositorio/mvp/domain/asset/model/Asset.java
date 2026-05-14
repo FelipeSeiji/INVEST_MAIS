@@ -16,6 +16,9 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.persistence.Convert;
+
+import com.repositorio.mvp.infrastructure.util.BigDecimalEncryptor;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -46,12 +49,15 @@ public class Asset {
 
     @Column(nullable = false)
     @Builder.Default
+    @Convert(converter = BigDecimalEncryptor.class)
     private BigDecimal currentPositionValue = BigDecimal.ZERO;
 
     @Column(precision = 19, scale = 4)
+    @Convert(converter = BigDecimalEncryptor.class)
     private BigDecimal quantity;
 
     @Column(precision = 19, scale = 2)
+    @Convert(converter = BigDecimalEncryptor.class)
     private BigDecimal averagePrice;
 
     @ManyToOne(fetch = FetchType.LAZY)

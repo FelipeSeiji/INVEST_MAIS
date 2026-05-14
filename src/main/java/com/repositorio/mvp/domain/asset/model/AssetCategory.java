@@ -17,7 +17,9 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.PositiveOrZero;
+import jakarta.persistence.Convert;
 
+import com.repositorio.mvp.infrastructure.util.BigDecimalEncryptor;
 import com.repositorio.mvp.domain.portfolio.model.Portfolio;
 import com.repositorio.mvp.domain.question.model.Question;
 
@@ -55,6 +57,7 @@ public class AssetCategory {
 
     @Column(nullable = false)
     @PositiveOrZero
+    @Convert(converter = BigDecimalEncryptor.class)
     private BigDecimal targetPercentage;
 
     @OneToMany(mappedBy = "category", cascade = CascadeType.ALL, fetch = FetchType.LAZY)

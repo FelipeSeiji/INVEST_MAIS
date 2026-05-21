@@ -8,12 +8,23 @@
   --color-text-muted: #52525b;
 }
 
+:root {
+  --bg-primary: var(--color-bg-primary);
+  --bg-card: var(--color-bg-card);
+  --bg-card-alt: #fafafa;
+  --text-main: var(--color-text-main);
+  --text-muted: var(--color-text-muted);
+  --border-color: #e4e4e7;
+  --border-color-light: #f4f4f5;
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+  --sans: var(--font-sans);
+}
+
 html, body {
   @apply h-full antialiased bg-bg-primary text-text-main;
 }
 
 #root {
-  @apply min-h-screen flex flex-col mx-auto bg-bg-card shadow-sm;
-  width: 1126px;
-  max-width: 100%;
+  @apply min-h-screen flex flex-col;
 }

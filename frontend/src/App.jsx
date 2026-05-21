@@ -3,7 +3,7 @@ import Login from './pages/Login'
 import Dashboard from './pages/Dashboard'
 import Profile from './pages/Profile'
 import Aportes from './pages/Aportes'
-import ResetPassword from './pages/ResetPassword'
+import RecuperarSenha from './pages/RecuperarSenha'
 import Layout from './components/Layout'
 import PublicLayout from './components/PublicLayout'
 
@@ -14,7 +14,7 @@ function App() {
         {/* Public Routes wrapped in PublicLayout */}
         <Route element={<PublicLayout />}>
           <Route path="/" element={<Login />} />
-          <Route path="/reset-password" element={<ResetPassword />} />
+          <Route path="/recuperar-senha" element={<RecuperarSenha />} />
         </Route>
 
         {/* Private Routes wrapped in Layout */}

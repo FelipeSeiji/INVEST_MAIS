@@ -1,14 +1,13 @@
 import { Outlet } from 'react-router-dom';
 import Sidebar from './Sidebar';
 import Footer from './Footer';
-import './Layout.css';
 
 export default function Layout() {
   return (
-    <div className="fullscreen-layout" style={{ flexDirection: 'row' }}>
+    <div className="flex flex-row w-full min-h-screen bg-bg-card">
       <Sidebar />
-      <div className="layout-content">
-        <main className="main-area">
+      <div className="flex-1 flex flex-col overflow-y-auto bg-[#fafafa]">
+        <main className="flex-1 p-10 box-border">
           <Outlet />
         </main>
         <Footer />

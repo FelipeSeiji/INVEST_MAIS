@@ -6,15 +6,15 @@ export default function Footer() {
           <h3 className="text-base font-semibold text-text-main mb-3">Sobre Nós</h3>
           <p className="text-sm leading-relaxed text-text-muted mb-2 text-justify">
             O Invest+ é uma plataforma inovadora de gestão de investimentos desenvolvida para ajudar usuários a gerenciar seus portfólios de forma eficiente e segura. Utilizando tecnologias modernas como Spring Boot no backend e React no frontend, oferecemos ferramentas avançadas para análise de ativos, acompanhamento de aportes, controle de usuários e muito mais. Nosso objetivo é democratizar o acesso a informações financeiras precisas e facilitar decisões de investimento inteligentes.
-          </p>  
+          </p>
         </div>
         <div className="flex-1 min-w-[250px]">
           <h3 className="text-base font-semibold text-text-main mb-3">Contatos</h3>
           <p className="text-sm leading-relaxed text-text-muted mb-2 text-justify">
-            email: ivestmais@gmail.com
+            email: investmaisinfo@gmail.com
           </p>
           <p className="text-sm leading-relaxed text-text-muted mb-2 text-justify">
-            telefone: (11) 91234-5678
+            telefone: (11) 96387-2730
           </p>
         </div>
       </div>

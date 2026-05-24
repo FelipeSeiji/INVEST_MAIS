@@ -54,7 +54,7 @@ public class AssetCategoryCommandServiceImpl implements AssetCategoryCommandServ
             AssetCategory savedCategory = categoryRepository.save(category);
             log.info(LogMessageConstants.AUDIT.CATEGORY_CREATED, savedCategory.getId(), savedCategory.getName());
             return ServiceResult.success(assetMapper.toResponse(savedCategory));
-        } catch (Exception e) {
+        } catch (IllegalArgumentException e) {
             return ServiceResult.error(e.getMessage());
         }
     }
@@ -80,7 +80,7 @@ public class AssetCategoryCommandServiceImpl implements AssetCategoryCommandServ
             return ServiceResult.success(assetMapper.toResponse(updatedCategory));
         } catch (EntityNotFoundException e) {
             return ServiceResult.notFound(e.getMessage());
-        } catch (Exception e) {
+        } catch (IllegalArgumentException e) {
             return ServiceResult.error(e.getMessage());
         }
     }

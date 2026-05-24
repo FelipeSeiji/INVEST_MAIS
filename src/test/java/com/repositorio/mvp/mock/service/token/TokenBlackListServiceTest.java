@@ -12,9 +12,9 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.repositorio.mvp.common.security.CryptoService;
-import com.repositorio.mvp.domain.auth.model.InvalidToken;
-import com.repositorio.mvp.domain.auth.repository.InvalidTokenRepository;
-import com.repositorio.mvp.domain.auth.service.token.TokenBlackListService;
+import com.repositorio.mvp.domain.auth.token.model.InvalidToken;
+import com.repositorio.mvp.domain.auth.token.repository.InvalidTokenRepository;
+import com.repositorio.mvp.domain.auth.token.service.TokenBlackListService;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;

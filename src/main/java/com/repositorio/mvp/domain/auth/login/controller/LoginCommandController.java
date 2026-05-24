@@ -9,6 +9,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.ErrorResponseException;
 import org.springframework.web.bind.annotation.*;
 
+import com.repositorio.mvp.infrastructure.exception.RateLimitExceededException;
+
 import com.repositorio.mvp.common.DTO.MessageResponseDTO;
 import com.repositorio.mvp.common.constants.MessageConstants;
 import com.repositorio.mvp.common.result.ServiceResult;
@@ -44,7 +46,7 @@ public class LoginCommandController {
         Bucket bucket = rateLimitingService.resolveLoginBucket(ip);
 
         if (!bucket.tryConsume(1)) {
-            throw new ErrorResponseException(HttpStatus.TOO_MANY_REQUESTS, ProblemDetail.forStatusAndDetail(HttpStatus.TOO_MANY_REQUESTS, MessageConstants.Auth.ERR_RATELIMIT_EXCEEDED), null);
+            throw new RateLimitExceededException(MessageConstants.Auth.ERR_RATELIMIT_EXCEEDED);
         }
 
         ServiceResult<Void> result = loginService.initiateLogin(loginRequest, ip);

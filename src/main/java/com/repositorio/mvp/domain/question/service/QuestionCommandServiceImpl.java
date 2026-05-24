@@ -5,7 +5,6 @@ import java.util.UUID;
 
 import jakarta.persistence.EntityNotFoundException;
 
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,7 +17,6 @@ import com.repositorio.mvp.domain.asset.repository.AssetCategoryRepository;
 import com.repositorio.mvp.domain.asset.repository.AssetEvaluationRepository;
 import com.repositorio.mvp.domain.asset.repository.AssetRepository;
 import com.repositorio.mvp.domain.portfolio.model.Portfolio;
-import com.repositorio.mvp.domain.portfolio.repository.PortfolioRepository;
 import com.repositorio.mvp.domain.question.DTO.EvaluationRequestDTO;
 import com.repositorio.mvp.domain.question.DTO.QuestionRequestDTO;
 import com.repositorio.mvp.domain.question.DTO.QuestionResponseDTO;
@@ -26,16 +24,18 @@ import com.repositorio.mvp.domain.question.mapper.QuestionMapper;
 import com.repositorio.mvp.domain.question.model.Question;
 import com.repositorio.mvp.domain.question.repository.QuestionRepository;
 import com.repositorio.mvp.domain.question.service.interfaces.QuestionCommandService;
-import com.repositorio.mvp.infrastructure.security.UserDetailsImpl;
+import com.repositorio.mvp.infrastructure.security.UserContextService;
 
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Implementação do serviço de comandos para Perguntas e Avaliações.
  * Gerenta o questionário qualitativo (Buy & Hold) associado a cada categoria de ativo,
  * permitindo que o usuário personalize os critérios de avaliação de seus ativos.
  */
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class QuestionCommandServiceImpl implements QuestionCommandService {
@@ -44,7 +44,7 @@ public class QuestionCommandServiceImpl implements QuestionCommandService {
     private final AssetCategoryRepository categoryRepository;
     private final AssetRepository assetRepository;
     private final AssetEvaluationRepository evaluationRepository;
-    private final PortfolioRepository portfolioRepository;
+    private final UserContextService userContextService;
     private final QuestionMapper questionMapper;
 
     /**
@@ -62,12 +62,12 @@ public class QuestionCommandServiceImpl implements QuestionCommandService {
             
             Question question = questionMapper.toEntity(request);
             question.setAssetCategory(category);
+            Question savedQuestion = questionRepository.save(question);
+            log.info("AUDITORIA: Pergunta qualitativa criada. ID: {} | Categoria: {}", savedQuestion.getId(), category.getName());
             
-            return ServiceResult.success(questionMapper.toResponse(questionRepository.save(question)));
+            return ServiceResult.success(questionMapper.toResponse(savedQuestion));
         } catch (EntityNotFoundException e) {
             return ServiceResult.notFound(e.getMessage());
-        } catch (Exception e) {
-            return ServiceResult.error(e.getMessage());
         }
     }
 
@@ -88,11 +88,11 @@ public class QuestionCommandServiceImpl implements QuestionCommandService {
             getCategoryForCurrentUser(question.getAssetCategory().getId());
             
             question.setText(request.text());
-            return ServiceResult.success(questionMapper.toResponse(questionRepository.save(question)));
+            Question savedQuestion = questionRepository.save(question);
+            log.info("AUDITORIA: Pergunta qualitativa atualizada. ID: {}", savedQuestion.getId());
+            return ServiceResult.success(questionMapper.toResponse(savedQuestion));
         } catch (EntityNotFoundException e) {
             return ServiceResult.notFound(e.getMessage());
-        } catch (Exception e) {
-            return ServiceResult.error(e.getMessage());
         }
     }
 
@@ -111,11 +111,10 @@ public class QuestionCommandServiceImpl implements QuestionCommandService {
             
             getCategoryForCurrentUser(question.getAssetCategory().getId()); 
             questionRepository.delete(question);
+            log.info("AUDITORIA: Pergunta qualitativa removida. ID: {}", id);
             return ServiceResult.success(null);
         } catch (EntityNotFoundException e) {
             return ServiceResult.notFound(e.getMessage());
-        } catch (Exception e) {
-            return ServiceResult.error(e.getMessage());
         }
     }
 
@@ -153,11 +152,10 @@ public class QuestionCommandServiceImpl implements QuestionCommandService {
                     .toList();
 
             evaluationRepository.saveAll(newEvaluations);
+            log.info("AUDITORIA: Avaliações salvas com sucesso para o ativo ID: {}", assetId);
             return ServiceResult.success(null);
         } catch (EntityNotFoundException e) {
             return ServiceResult.notFound(e.getMessage());
-        } catch (Exception e) {
-            return ServiceResult.error(e.getMessage());
         }
     }
 
@@ -168,8 +166,6 @@ public class QuestionCommandServiceImpl implements QuestionCommandService {
     }
 
     private Portfolio getCurrentUserPortfolio() {
-        UserDetailsImpl userDetails = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        return portfolioRepository.findByUserId(userDetails.getUser().getId())
-                .orElseThrow(() -> new EntityNotFoundException(MessageConstants.Portfolio.NOT_FOUND));
+        return userContextService.getCurrentUserPortfolio();
     }
 }

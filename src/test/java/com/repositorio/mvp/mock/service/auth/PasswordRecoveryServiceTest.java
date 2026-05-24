@@ -4,8 +4,8 @@ import java.time.LocalDateTime;
 import java.util.Optional;
 
 import com.repositorio.mvp.common.security.CryptoService;
-import com.repositorio.mvp.domain.auth.service.auth.RecoveryEmailService;
-import com.repositorio.mvp.domain.auth.service.login.LoginAttemptService;
+import com.repositorio.mvp.domain.auth.password.service.RecoveryEmailService;
+import com.repositorio.mvp.domain.auth.login.service.LoginAttemptService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -17,9 +17,9 @@ import org.springframework.transaction.support.TransactionCallback;
 import org.springframework.transaction.support.TransactionTemplate;
 
 import com.repositorio.mvp.common.result.ServiceResult;
-import com.repositorio.mvp.domain.auth.model.PasswordResetToken;
-import com.repositorio.mvp.domain.auth.repository.PasswordResetTokenRepository;
-import com.repositorio.mvp.domain.auth.service.auth.PasswordRecoveryService;
+import com.repositorio.mvp.domain.auth.password.model.PasswordResetToken;
+import com.repositorio.mvp.domain.auth.password.repository.PasswordResetTokenRepository;
+import com.repositorio.mvp.domain.auth.password.service.PasswordRecoveryService;
 import com.repositorio.mvp.domain.user.model.User;
 import com.repositorio.mvp.domain.user.repository.UserRepository;
 import com.repositorio.mvp.shared.UserConstants;

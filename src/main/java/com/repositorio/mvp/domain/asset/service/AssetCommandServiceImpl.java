@@ -55,9 +55,6 @@ public class AssetCommandServiceImpl implements AssetCommandService {
             .map(category -> {
                 Asset asset = assetMapper.toEntity(request);
                 asset.setCategory(category);
-                asset.setCurrentPositionValue(request.currentPositionValue());
-                asset.setQuantity(request.quantity());
-                asset.setAveragePrice(request.averagePrice());
                 
                 Asset savedAsset = assetRepository.save(asset);
                 log.info(LogMessageConstants.AUDIT.ASSET_CREATED, 
@@ -88,10 +85,7 @@ public class AssetCommandServiceImpl implements AssetCommandService {
                     return ServiceResult.<AssetResponseDTO>notFound(MessageConstants.Asset.CATEGORY_NOT_FOUND);
                 }
 
-                asset.setTicker(request.ticker());
-                asset.setCurrentPositionValue(request.currentPositionValue());
-                asset.setQuantity(request.quantity());
-                asset.setAveragePrice(request.averagePrice());
+                assetMapper.updateEntity(request, asset);
 
                 Asset updatedAsset = assetRepository.save(asset);
                 log.info(LogMessageConstants.AUDIT.ASSET_UPDATED, updatedAsset.getId(), updatedAsset.getTicker());

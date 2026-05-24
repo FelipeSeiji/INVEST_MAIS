@@ -3,12 +3,14 @@ package com.repositorio.mvp.mock.service.validation;
 import java.util.UUID;
 
 import org.apache.commons.codec.digest.DigestUtils;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import com.repositorio.mvp.common.security.CryptoService;
 import com.repositorio.mvp.domain.user.DTO.UserRequestDTO;
 import com.repositorio.mvp.domain.user.DTO.UserUpdateRequestDTO;
 import com.repositorio.mvp.domain.user.model.User;
@@ -20,6 +22,8 @@ import com.repositorio.mvp.common.constants.MessageConstants;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -35,8 +39,19 @@ public class UserValidationTest {
     @Mock
     private UserRepository userRepository;
 
+    @Mock
+    private CryptoService cryptoService;
+
     private final String TEST_EMAIL = "example@gmail.com";
     private final UUID userId = UUID.randomUUID();
+
+    @BeforeEach
+    public void setUp() {
+        lenient().when(cryptoService.generateSha256Hash(anyString())).thenAnswer(invocation -> {
+            String email = invocation.getArgument(0);
+            return DigestUtils.sha256Hex(email.toLowerCase());
+        });
+    }
 
     @Test
     public void validateRegister_WhenEmailDoesNotExist_DoesNotThrowException() {

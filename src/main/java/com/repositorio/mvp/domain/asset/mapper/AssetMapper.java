@@ -2,6 +2,7 @@ package com.repositorio.mvp.domain.asset.mapper;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.MappingTarget;
 import org.mapstruct.ReportingPolicy;
 
 import com.repositorio.mvp.domain.asset.DTO.AssetRequestDTO;
@@ -19,6 +20,11 @@ public interface AssetMapper {
     Asset toEntity(AssetRequestDTO request);
 
     AssetResponseDTO toResponse(Asset asset);
+
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "evaluations", ignore = true)
+    @Mapping(target = "category", ignore = true)
+    void updateEntity(AssetRequestDTO request, @MappingTarget Asset asset);
 
     @Mapping(target = "portfolio", ignore = true)
     @Mapping(target = "questions", ignore = true)

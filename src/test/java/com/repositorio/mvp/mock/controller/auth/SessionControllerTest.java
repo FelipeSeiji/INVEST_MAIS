@@ -8,8 +8,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.ResponseEntity;
 
 import com.repositorio.mvp.common.result.ServiceResult;
-import com.repositorio.mvp.domain.auth.controller.SessionCommandController;
-import com.repositorio.mvp.domain.auth.service.auth.LogoutService;
+import com.repositorio.mvp.domain.auth.session.controller.SessionCommandController;
+import com.repositorio.mvp.domain.auth.session.service.LogoutService;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.verify;

@@ -10,7 +10,7 @@ import org.springframework.http.ResponseEntity;
 import com.repositorio.mvp.common.DTO.MessageResponseDTO;
 import com.repositorio.mvp.common.result.ServiceResult;
 import com.repositorio.mvp.domain.admin.controller.SystemAdminCommandController;
-import com.repositorio.mvp.domain.auth.service.token.TokenBlackListService;
+import com.repositorio.mvp.domain.auth.token.service.TokenBlackListService;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;

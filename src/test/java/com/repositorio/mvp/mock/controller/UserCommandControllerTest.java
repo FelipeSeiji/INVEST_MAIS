@@ -13,7 +13,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.ResponseEntity;
 
 import com.repositorio.mvp.common.result.ServiceResult;
-import com.repositorio.mvp.domain.auth.service.security.RateLimitingService;
+import com.repositorio.mvp.domain.auth.security.service.RateLimitingService;
 import com.repositorio.mvp.domain.user.DTO.UserRequestDTO;
 import com.repositorio.mvp.domain.user.DTO.UserResponseDTO;
 import com.repositorio.mvp.domain.user.DTO.UserUpdateRequestDTO;

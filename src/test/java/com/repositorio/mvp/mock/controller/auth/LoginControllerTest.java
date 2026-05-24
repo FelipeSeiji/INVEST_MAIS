@@ -11,12 +11,12 @@ import org.springframework.http.ResponseEntity;
 
 import com.repositorio.mvp.common.DTO.MessageResponseDTO;
 import com.repositorio.mvp.common.result.ServiceResult;
-import com.repositorio.mvp.domain.auth.DTO.LoginRequestDTO;
-import com.repositorio.mvp.domain.auth.DTO.TokenResponseDTO;
-import com.repositorio.mvp.domain.auth.DTO.Verify2FARequestDTO;
-import com.repositorio.mvp.domain.auth.controller.LoginCommandController;
-import com.repositorio.mvp.domain.auth.service.login.LoginService;
-import com.repositorio.mvp.domain.auth.service.security.RateLimitingService;
+import com.repositorio.mvp.domain.auth.login.DTO.LoginRequestDTO;
+import com.repositorio.mvp.domain.auth.token.DTO.TokenResponseDTO;
+import com.repositorio.mvp.domain.auth.login.DTO.Verify2FARequestDTO;
+import com.repositorio.mvp.domain.auth.login.controller.LoginCommandController;
+import com.repositorio.mvp.domain.auth.login.service.LoginService;
+import com.repositorio.mvp.domain.auth.security.service.RateLimitingService;
 import com.repositorio.mvp.shared.UserConstants;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;

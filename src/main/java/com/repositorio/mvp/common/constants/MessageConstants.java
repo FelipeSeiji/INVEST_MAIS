@@ -15,6 +15,8 @@ public final class MessageConstants {
         public static final String PASSWORD_RESET_SUCCESS = "Senha redefinida com sucesso.";
         public static final String EMAIL_RECOVERY_SUBJECT = "Recuperação de Senha - MVP";
         public static final String EMAIL_RECOVERY_BODY = "Olá %s,\n\nVocê solicitou a recuperação de senha.\nUtilize o token abaixo para redefinir sua senha:\n\n%s\n\nSe você não solicitou isso, ignore este e-mail.";
+        public static final String EMAIL_2FA_SUBJECT = "Seu código de acesso (2FA) - MVP";
+        public static final String EMAIL_2FA_BODY = "Olá %s,\n\nSeu código de acesso é: %s\nVálido por 5 minutos.";
         public static final String ERR_TOO_MANY_ATTEMPTS = "Muitas tentativas falhas.";
         public static final String ERR_TOO_MANY_ATTEMPTS_2FA = "Muitas tentativas falhas. Tente novamente mais tarde.";
         public static final String ERR_INVALID_CREDENTIALS = "Credenciais inválidas.";

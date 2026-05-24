@@ -29,11 +29,6 @@ public class TokenBlackListService {
      * @param token Token JWT a ser verificado.
      * @return true se o token constar na blacklist, false caso contrário.
      */
-    @Transactional(readOnly = true)
-    public boolean isTokenInvalidated(String token) {
-        return invalidTokenRepository.existsById(cryptoService.generateSha256Hash(token));
-    }
-
     /**
      * Adiciona um token à blacklist de forma permanente até sua expiração natural.
      * 
@@ -52,6 +47,7 @@ public class TokenBlackListService {
      * @param token String do token JWT.
      * @return true se o token for nulo, em branco, ou constar na blacklist.
      */
+    @Transactional(readOnly = true)
     public boolean isBlacklisted(String token) {
         if (token == null || token.isBlank()) {
             return false;

@@ -11,10 +11,10 @@ import org.springframework.http.ResponseEntity;
 
 import com.repositorio.mvp.common.DTO.MessageResponseDTO;
 import com.repositorio.mvp.common.result.ServiceResult;
-import com.repositorio.mvp.domain.auth.DTO.ForgotPasswordRequestDTO;
-import com.repositorio.mvp.domain.auth.DTO.ResetPasswordRequestDTO;
-import com.repositorio.mvp.domain.auth.controller.PasswordCommandController;
-import com.repositorio.mvp.domain.auth.service.auth.PasswordRecoveryService;
+import com.repositorio.mvp.domain.auth.password.DTO.ForgotPasswordRequestDTO;
+import com.repositorio.mvp.domain.auth.password.DTO.ResetPasswordRequestDTO;
+import com.repositorio.mvp.domain.auth.password.controller.PasswordCommandController;
+import com.repositorio.mvp.domain.auth.password.service.PasswordRecoveryService;
 import com.repositorio.mvp.shared.UserConstants;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;

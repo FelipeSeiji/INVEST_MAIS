@@ -11,7 +11,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 
-import com.repositorio.mvp.domain.auth.service.login.SendTwoFactorCodeForEmailService;
+import com.repositorio.mvp.domain.auth.login.service.SendTwoFactorCodeForEmailService;
 import com.repositorio.mvp.domain.user.model.User;
 import com.repositorio.mvp.shared.UserConstants;
 

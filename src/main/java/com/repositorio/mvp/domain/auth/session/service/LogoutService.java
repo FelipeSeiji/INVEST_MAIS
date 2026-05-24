@@ -1,6 +1,6 @@
 package com.repositorio.mvp.domain.auth.session.service;
 
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 
 import org.springframework.stereotype.Service;
 

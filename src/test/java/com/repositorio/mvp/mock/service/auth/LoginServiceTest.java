@@ -13,12 +13,12 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import com.repositorio.mvp.common.result.ServiceResult;
-import com.repositorio.mvp.domain.auth.DTO.LoginRequestDTO;
-import com.repositorio.mvp.domain.auth.DTO.Verify2FARequestDTO;
-import com.repositorio.mvp.domain.auth.service.login.LoginAttemptService;
-import com.repositorio.mvp.domain.auth.service.login.LoginService;
-import com.repositorio.mvp.domain.auth.service.login.TwoFactorService;
-import com.repositorio.mvp.domain.auth.service.token.TokenService;
+import com.repositorio.mvp.domain.auth.login.DTO.LoginRequestDTO;
+import com.repositorio.mvp.domain.auth.login.DTO.Verify2FARequestDTO;
+import com.repositorio.mvp.domain.auth.login.service.LoginAttemptService;
+import com.repositorio.mvp.domain.auth.login.service.LoginService;
+import com.repositorio.mvp.domain.auth.login.service.TwoFactorService;
+import com.repositorio.mvp.domain.auth.token.service.TokenService;
 import com.repositorio.mvp.domain.user.model.User;
 import com.repositorio.mvp.domain.user.repository.UserRepository;
 import com.repositorio.mvp.shared.UserConstants;

@@ -8,9 +8,9 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import com.repositorio.mvp.domain.auth.service.auth.LogoutService;
-import com.repositorio.mvp.domain.auth.service.interfaces.TokenProviderService;
-import com.repositorio.mvp.domain.auth.service.token.TokenBlackListService;
+import com.repositorio.mvp.domain.auth.session.service.LogoutService;
+import com.repositorio.mvp.domain.auth.token.service.TokenProviderService;
+import com.repositorio.mvp.domain.auth.token.service.TokenBlackListService;
 
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;

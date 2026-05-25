@@ -19,6 +19,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.persistence.Convert;
 
 import com.repositorio.mvp.infrastructure.util.BigDecimalEncryptor;
+import com.repositorio.mvp.common.model.Auditable;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -36,7 +37,7 @@ import lombok.ToString;
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-public class Asset {
+public class Asset extends Auditable {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     @Setter(AccessLevel.NONE)

@@ -17,6 +17,7 @@ import jakarta.persistence.Table;
 
 import com.repositorio.mvp.domain.asset.model.AssetCategory;
 import com.repositorio.mvp.domain.user.model.User;
+import com.repositorio.mvp.common.model.Auditable;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -39,7 +40,7 @@ import lombok.ToString;
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-public class Portfolio {
+public class Portfolio extends Auditable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)

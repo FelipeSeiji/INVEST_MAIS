@@ -14,6 +14,7 @@ import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 
 import com.repositorio.mvp.domain.question.model.Question;
+import com.repositorio.mvp.common.model.Auditable;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -38,7 +39,7 @@ import lombok.ToString;
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-public class AssetEvaluation {
+public class AssetEvaluation extends Auditable {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     @Setter(AccessLevel.NONE)
